@@ -1,0 +1,14 @@
+[workspace]
+members = ["crates/*"]
+workspace.resolver = "2"
+
+[workspace.dependencies]
+anyhow = "1.0"
+rogalik = { path = "../rogalik" , features = ["serialize"]}
+# rogalik = { git = "https://github.com/maciekglowka/rogalik" , features = ["serialize"]}
+log = "0.4"
+wunderkammer = { path = "../wunderkammer", features = ["log"] }
+# wunderkammer = { git = "https://github.com/maciekglowka/wunderkammer", features = ["serialize"] }
+rand = "0.8"
+serde = { version = "1.0", features = ["derive"]}
+serde_yaml = "0.9"

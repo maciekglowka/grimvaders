@@ -1,0 +1,16 @@
+Empty:
+  sprite:
+    atlas: sprites
+    index: 0
+  components:
+  
+Exit:
+  sprite:
+    atlas: sprites
+    index: 296
+  components:
+    capture: "exit"
+  script: >
+    pub fn exit(world, target) {
+      RuneCommand::Descend
+    }

@@ -1,0 +1,22 @@
+[package]
+name = "game"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+# crate-type=["cdylib"]
+crate-type=["staticlib"]
+
+[[bin]]
+path = "src/lib.rs"
+name = "game"
+
+[dependencies]
+env_logger = "0.11"
+rogalik = { workspace = true }
+wunderkammer = { workspace = true }
+
+game_data = { path = "../game_data" }
+game_logic = { path = "../game_logic" }
+game_graphics = { path = "../game_graphics" }
+

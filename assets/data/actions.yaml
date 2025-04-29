@@ -1,0 +1,55 @@
+Punch:
+  sprite:
+    atlas: sprites
+    index: 41
+  components:
+    action:
+      targeting: !Neighbour
+      script: "punch" 
+  max_level: 3
+  script: >
+    pub fn punch(world, target) {
+      RuneCommand::Damage(target.unwrap(), 2)
+    }
+
+Kick:
+  sprite:
+    atlas: sprites
+    index: 39
+  components:
+    action:
+      targeting: !Neighbour
+      script: "kick" 
+  min_level: 2
+  script: >
+    pub fn kick(world, target) {
+      RuneCommand::Damage(target.unwrap(), 4)
+    }
+
+Bow:
+  sprite:
+    atlas: sprites
+    index: 335
+  components:
+    action:
+      targeting: !Any
+      script: "bow" 
+  max_level: 3
+  script: >
+    pub fn bow(world, target) {
+      RuneCommand::Damage(target.unwrap(), 1)
+    }
+
+Heal:
+  sprite:
+    atlas: sprites
+    index: 530
+  components:
+    action:
+      targeting: !None
+      script: "heal" 
+  max_level: 3
+  script: >
+    pub fn heal(world, target) {
+      RuneCommand::Heal(world.get_player().unwrap(), 1)
+    }

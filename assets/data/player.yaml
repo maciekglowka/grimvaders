@@ -1,0 +1,17 @@
+Baleog:
+  sprite:
+    atlas: sprites
+    index: 30
+  components:
+    cost: 1
+    health: [1, 1]
+    player:
+
+Erik:
+  sprite:
+    atlas: sprites
+    index: 31
+  components:
+    cost: 2
+    health: [2, 2]
+    player:

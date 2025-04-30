@@ -14,27 +14,22 @@ mod systems;
 pub(crate) mod utils;
 
 #[derive(Default)]
-pub enum BattleState {
+pub enum BattleMode {
     #[default]
     Plan,
     Attack,
 }
 
+#[derive(Default)]
+pub struct BattleState {
+    pub mode: BattleMode,
+    pub wave: u32,
+}
+
 pub fn battle_init(env: &mut GameEnv) {
     env.world.0.resources.player_data.level += 1;
     player::player_battle_init(&mut env.world);
-
-    // TEMP
-    let rat = spawn_by_name("Rat", &mut env.world).unwrap();
-    env.world.0.components.npc.insert(rat, ());
-    env.scheduler
-        .send(commands::PlaceUnit(rat, Position::new(2, BOARD_H as i32)));
-    let rat = spawn_by_name("Rat", &mut env.world).unwrap();
-    env.world.0.components.npc.insert(rat, ());
-    env.scheduler.send(commands::PlaceUnit(
-        rat,
-        Position::new(2, BOARD_H as i32 + 1),
-    ));
+    next_turn(env);
 }
 
 pub fn battle_exit(env: &mut GameEnv) {
@@ -47,14 +42,23 @@ pub fn battle_update(env: &mut GameEnv) {
     if handle_command_queue(env) {
         return;
     };
-    match env.world.0.resources.battle_state {
-        BattleState::Plan => {
+    match env.world.0.resources.battle_state.mode {
+        BattleMode::Plan => {
             handle_input_events(env);
         }
-        BattleState::Attack => {
-            npcs::next_attack(env);
+        BattleMode::Attack => {
+            if !npcs::next_attack(env) {
+                next_turn(env);
+            }
         }
     };
+}
+
+fn next_turn(env: &mut GameEnv) {
+    env.world.0.resources.battle_state.wave += 1;
+    env.world.0.resources.battle_state.mode = BattleMode::Plan;
+    player::player_next_turn(env);
+    npcs::next_wave(env);
 }
 
 fn handle_command_queue(env: &mut GameEnv) -> bool {
@@ -64,11 +68,14 @@ fn handle_command_queue(env: &mut GameEnv) -> bool {
 fn handle_input_events(env: &mut GameEnv) -> Option<()> {
     while let Some(event) = env.input.as_ref().unwrap().next() {
         match event {
-            // InputEvent::PlayerMove(target) => {
-            //     if let Some(entity) = get_entity_at(&env.world, target) {
-            //         env.scheduler.send(commands::CardInteract(entity));
-            //     }
-            // }
+            InputEvent::SpawnUnit(entity, target) => {
+                env.scheduler.send(commands::SpawnUnit(entity, target));
+            }
+            InputEvent::MoveUnit(entity, target) => {
+                env.scheduler.send(commands::PlaceUnit(entity, target));
+            }
+            InputEvent::Done => env.world.0.resources.battle_state.mode = BattleMode::Attack,
+            InputEvent::RedrawHand => env.scheduler.send(commands::RedrawHand),
             // InputEvent::PerformAction(entity, target) => {
             //     env.scheduler.send(commands::PerformAction(entity, target));
             // }

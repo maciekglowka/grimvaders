@@ -1,6 +1,35 @@
+use rand::prelude::*;
 use wunderkammer::prelude::*;
 
-use crate::{commands, components::Position, globals::BOARD_W, GameEnv, World};
+use crate::{
+    commands,
+    components::Position,
+    globals::{BOARD_H, BOARD_W},
+    utils::spawn_by_name,
+    GameEnv, World,
+};
+
+pub(crate) fn next_wave(env: &mut GameEnv) {
+    let count = 2 * env.world.0.resources.battle_state.wave;
+    let mut layout = [const { Vec::new() }; BOARD_W];
+    let mut rng = thread_rng();
+
+    for _ in 0..count {
+        let entity = spawn_by_name("Rat", &mut env.world).unwrap();
+        env.world.0.components.npc.insert(entity, ());
+        let col = rng.gen_range(0..BOARD_W);
+        layout[col].push(entity);
+    }
+
+    for x in 0..BOARD_W {
+        for (y, &entity) in layout[x].iter().enumerate() {
+            env.scheduler.send(commands::PlaceUnit(
+                entity,
+                Position::new(x as i32, (BOARD_H + y) as i32),
+            ));
+        }
+    }
+}
 
 pub(crate) fn next_attack(env: &mut GameEnv) -> bool {
     let Some((entity, position)) = next_npc(&env.world) else {

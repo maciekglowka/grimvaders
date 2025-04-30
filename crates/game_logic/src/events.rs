@@ -5,8 +5,9 @@ use crate::components::Position;
 
 #[derive(Clone, Copy, Debug)]
 pub enum InputEvent {
-    PlaceUnit(Entity, Position),
-    BuyUnit(usize),
+    MoveUnit(Entity, Position),
+    SpawnUnit(Entity, Position),
+    RedrawHand,
     Done,
     DiscardUnit(Entity),
 }

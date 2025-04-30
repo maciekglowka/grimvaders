@@ -84,7 +84,12 @@ pub(crate) fn place_unit_sprite(
     world: &World,
     sprites: &mut Vec<UnitSprite>,
 ) {
-    let sprite = UnitSprite::new(entity, world).with_origin(tile_to_sprite(position));
+    let origin = tile_to_sprite(position);
+    if let Some(sprite) = get_unit_sprite_mut(entity, sprites) {
+        sprite.origin = origin;
+        return;
+    }
+    let sprite = UnitSprite::new(entity, world).with_origin(origin);
     sprites.push(sprite);
 }
 

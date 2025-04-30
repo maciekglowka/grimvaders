@@ -2,7 +2,7 @@ use rand::prelude::*;
 use std::collections::VecDeque;
 use wunderkammer::prelude::*;
 
-use crate::World;
+use crate::{globals::HAND_SIZE, World};
 
 #[derive(Default)]
 pub struct PlayerData {
@@ -11,6 +11,7 @@ pub struct PlayerData {
     pub hand: Vec<Entity>,
     pub level: u32,
     pub health: u32,
+    pub gold: u32,
 }
 
 pub(crate) fn player_game_init(world: &mut World) {
@@ -34,4 +35,23 @@ pub(crate) fn reset_deck(world: &mut World) {
     deck.extend(world.0.resources.player_data.discard.drain(..));
     deck.shuffle(&mut rng);
     world.0.resources.player_data.draw = deck.into();
+}
+
+pub(crate) fn draw_hand(world: &mut World) {
+    world
+        .0
+        .resources
+        .player_data
+        .discard
+        .extend(world.0.resources.player_data.hand.drain(..));
+
+    if world.0.resources.player_data.draw.len() < HAND_SIZE {
+        reset_deck(world);
+    }
+
+    for _ in 0..HAND_SIZE {
+        if let Some(entity) = world.0.resources.player_data.draw.pop_front() {
+            world.0.resources.player_data.hand.push(entity);
+        }
+    }
 }

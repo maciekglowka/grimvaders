@@ -40,7 +40,7 @@ pub fn shop_draw(
             button.draw(context, input_state);
 
             if button.clicked(input_state) {
-                state.input_queue.push(InputEvent::BuyUnit(i));
+                // state.input_queue.push(InputEvent::BuyUnit(i));
             }
 
             // draw_action_card(

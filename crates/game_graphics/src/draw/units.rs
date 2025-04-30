@@ -28,6 +28,7 @@ pub(crate) fn draw_unit_overlay(
 pub(crate) fn draw_deck_unit(
     entity: Entity,
     origin: Vector2f,
+    z: i32,
     world: &World,
     context: &mut Context,
 ) {
@@ -41,7 +42,7 @@ pub(crate) fn draw_deck_unit(
         &sprite.atlas,
         sprite.index,
         origin,
-        UI_Z,
+        z,
         Vector2f::splat(SPRITE_SIZE),
         SpriteParams::default(),
     );
@@ -51,7 +52,7 @@ pub(crate) fn draw_deck_unit(
         let _ = context.graphics.draw_text(
             "digits",
             &format!("G: {}", cost),
-            origin + Vector2f::new(0., -DIGITS_TEXT_SIZE - GAP),
+            origin + Vector2f::new(0., -DIGITS_TEXT_SIZE),
             OVERLAY_Z,
             DIGITS_TEXT_SIZE,
             SpriteParams::default(),

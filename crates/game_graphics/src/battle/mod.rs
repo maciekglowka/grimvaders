@@ -17,8 +17,17 @@ use crate::{
 };
 use game_logic::{commands, GameEnv, InputEvent, World};
 
+#[derive(Default, Eq, PartialEq)]
+enum InputMode {
+    #[default]
+    None,
+    HandUnit(Entity),
+    BoardUnit(Entity),
+}
+
 #[derive(Default)]
 pub struct BattleGraphics {
+    input_mode: InputMode,
     pub input_queue: ObservableQueue<InputEvent>,
     observers: Option<Observers>,
     unit_sprites: Vec<UnitSprite>,

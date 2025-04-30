@@ -17,7 +17,7 @@ pub fn shop_update(state: &mut ShopState, env: &mut GameEnv) {
     while let Some(event) = env.input.as_ref().unwrap().next() {
         match event {
             InputEvent::Done => state.done = true,
-            InputEvent::BuyUnit(i) => buy_unit(i, state, env),
+            // InputEvent::BuyUnit(i) => buy_unit(i, state, env),
             _ => (),
         }
     }

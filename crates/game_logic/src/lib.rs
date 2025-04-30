@@ -13,5 +13,5 @@ mod utils;
 mod world;
 
 pub use events::InputEvent;
-pub use utils::is_on_board;
+pub use utils::{get_entity_at, is_on_board};
 pub use world::{GameEnv, World};

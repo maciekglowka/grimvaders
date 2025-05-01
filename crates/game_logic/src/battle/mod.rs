@@ -2,7 +2,7 @@ use crate::{
     commands,
     components::Position,
     events::InputEvent,
-    globals::BOARD_H,
+    globals::{BOARD_H, WAVES_VISIBLE},
     utils::{get_entity_at, spawn_by_name},
     GameEnv,
 };
@@ -29,6 +29,10 @@ pub struct BattleState {
 pub fn battle_init(env: &mut GameEnv) {
     env.world.0.resources.player_data.level += 1;
     player::player_battle_init(&mut env.world);
+
+    for i in 0..WAVES_VISIBLE - 1 {
+        npcs::next_wave((BOARD_H + i) as i32, env);
+    }
     next_turn(env);
 }
 
@@ -55,10 +59,10 @@ pub fn battle_update(env: &mut GameEnv) {
 }
 
 fn next_turn(env: &mut GameEnv) {
-    env.world.0.resources.battle_state.wave += 1;
     env.world.0.resources.battle_state.mode = BattleMode::Plan;
     player::player_next_turn(env);
-    npcs::next_wave(env);
+    npcs::slide_waves(env);
+    npcs::next_wave((BOARD_H + WAVES_VISIBLE - 1) as i32, env);
 }
 
 fn handle_command_queue(env: &mut GameEnv) -> bool {
@@ -69,10 +73,10 @@ fn handle_input_events(env: &mut GameEnv) -> Option<()> {
     while let Some(event) = env.input.as_ref().unwrap().next() {
         match event {
             InputEvent::SummonUnit(entity, target) => {
-                env.scheduler.send(commands::SummonUnit(entity, target));
+                env.scheduler.send(commands::OrderSpawn(entity, target));
             }
             InputEvent::MoveUnit(entity, target) => {
-                env.scheduler.send(commands::MoveUnit(entity, target));
+                env.scheduler.send(commands::OrderMove(entity, target));
             }
             InputEvent::Done => env.world.0.resources.battle_state.mode = BattleMode::Attack,
             InputEvent::RedrawHand => env.scheduler.send(commands::RedrawHand),

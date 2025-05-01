@@ -41,9 +41,6 @@ fn load_textures(context: &mut Context) {
 }
 
 pub fn load_data(data: &mut GameData) {
-    let _ = data.add_entities(include_str!("../../../assets/data/basic.yaml"));
     data.players = data.add_entities(include_str!("../../../assets/data/player.yaml"));
     data.npcs = data.add_entities(include_str!("../../../assets/data/npcs.yaml"));
-    data.items = data.add_entities(include_str!("../../../assets/data/items.yaml"));
-    data.actions = data.add_entities(include_str!("../../../assets/data/actions.yaml"));
 }

@@ -6,8 +6,6 @@ pub struct GameData {
     pub entities: HashMap<String, EntityData>,
     pub players: Vec<String>,
     pub npcs: Vec<String>,
-    pub items: Vec<String>,
-    pub actions: Vec<String>,
 }
 impl GameData {
     pub fn add_entities(&mut self, s: &str) -> Vec<String> {

@@ -44,6 +44,11 @@ pub struct Components {
     pub health: ComponentStorage<ValueDefault>,
     pub name: ComponentStorage<String>,
     pub npc: ComponentStorage<()>,
+    // handlers start
+    pub on_spawn: ComponentStorage<String>,
+    pub on_fight: ComponentStorage<String>,
+    pub on_kill: ComponentStorage<String>,
+    // handlers end
     pub player: ComponentStorage<()>,
     pub position: ComponentStorage<Position>,
 }

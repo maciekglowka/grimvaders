@@ -29,7 +29,7 @@ impl ValueDefault {
         self.1
     }
     pub fn add(&mut self, value: u32) {
-        self.0 = (self.0 + value).min(self.1);
+        self.0 += value;
     }
     pub fn sub(&mut self, value: u32) {
         self.0 = self.0.saturating_sub(value);
@@ -40,11 +40,7 @@ impl ValueDefault {
     }
     pub fn sub_default(&mut self, value: u32) {
         self.1 = self.1.saturating_sub(value);
-        self.0 = self.0.min(self.1);
-    }
-    pub fn set_default(&mut self, value: u32) {
-        self.1 = value;
-        self.0 = self.0.min(self.1);
+        self.0 = self.0.saturating_sub(value);
     }
     pub fn restore(&mut self) {
         self.0 = self.1;
@@ -66,6 +62,11 @@ pub(crate) fn insert_components(entity: Entity, world: &mut World, data: &Entity
         match k.as_str() {
             "cost" => handle_component!(world, cost, entity, v, u32),
             "health" => handle_component!(world, health, entity, v, ValueDefault),
+            // handlers
+            "on_spawn" => handle_component!(world, on_spawn, entity, v, String),
+            "on_fight" => handle_component!(world, on_fight, entity, v, String),
+            "on_kill" => handle_component!(world, on_kill, entity, v, String),
+            // handlers
             "player" => handle_component!(world, player, entity, v, ()),
             a => panic!("Unknown component {}", a),
         }

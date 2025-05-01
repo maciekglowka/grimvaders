@@ -35,13 +35,13 @@ pub(crate) fn init_rune(world: &World) -> Result<Vm> {
 
 pub(crate) fn run_command_script(
     script: &str,
-    target: Option<Ent>,
+    entity: Ent,
     world: &mut World,
 ) -> Option<Vec<RuneCommand>> {
     log::debug!("Running script: {}", script);
     let mut vm = world.0.resources.vm.take().unwrap();
 
-    let result = match vm.call([script], (&*world, target)) {
+    let result = match vm.call([script], (&*world, entity)) {
         Ok(output) => match output {
             Value::Vec(_) => rune::from_value(output).ok(),
             _ => Some(vec![rune::from_value(output).ok()?]),

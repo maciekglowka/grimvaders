@@ -1724,6 +1724,7 @@ checksum = "19b30a45b0cd0bcca8037f3d0dc3421eaf95327a17cad11964fb8179b4fc4832"
 [[package]]
 name = "rogalik"
 version = "0.3.0"
+source = "git+https://github.com/maciekglowka/rogalik#6ef31d676353b726dd11a1474395d3df83ff51ff"
 dependencies = [
  "rogalik_assets",
  "rogalik_common",
@@ -1738,6 +1739,7 @@ dependencies = [
 [[package]]
 name = "rogalik_assets"
 version = "0.1.0"
+source = "git+https://github.com/maciekglowka/rogalik#6ef31d676353b726dd11a1474395d3df83ff51ff"
 dependencies = [
  "log",
  "rogalik_common",
@@ -1746,6 +1748,7 @@ dependencies = [
 [[package]]
 name = "rogalik_common"
 version = "0.1.0"
+source = "git+https://github.com/maciekglowka/rogalik#6ef31d676353b726dd11a1474395d3df83ff51ff"
 dependencies = [
  "rogalik_math",
  "winit",
@@ -1754,6 +1757,7 @@ dependencies = [
 [[package]]
 name = "rogalik_engine"
 version = "0.1.0"
+source = "git+https://github.com/maciekglowka/rogalik#6ef31d676353b726dd11a1474395d3df83ff51ff"
 dependencies = [
  "android_logger",
  "cfg-if",
@@ -1774,10 +1778,12 @@ dependencies = [
 [[package]]
 name = "rogalik_events"
 version = "0.1.0"
+source = "git+https://github.com/maciekglowka/rogalik#6ef31d676353b726dd11a1474395d3df83ff51ff"
 
 [[package]]
 name = "rogalik_math"
 version = "0.1.0"
+source = "git+https://github.com/maciekglowka/rogalik#6ef31d676353b726dd11a1474395d3df83ff51ff"
 dependencies = [
  "num-traits",
  "serde",
@@ -1786,6 +1792,7 @@ dependencies = [
 [[package]]
 name = "rogalik_persist"
 version = "0.1.0"
+source = "git+https://github.com/maciekglowka/rogalik#6ef31d676353b726dd11a1474395d3df83ff51ff"
 dependencies = [
  "anyhow",
  "base64",
@@ -1798,6 +1805,7 @@ dependencies = [
 [[package]]
 name = "rogalik_storage"
 version = "0.1.0"
+source = "git+https://github.com/maciekglowka/rogalik#6ef31d676353b726dd11a1474395d3df83ff51ff"
 dependencies = [
  "bincode",
  "rogalik_events",
@@ -1807,6 +1815,7 @@ dependencies = [
 [[package]]
 name = "rogalik_wgpu"
 version = "0.1.0"
+source = "git+https://github.com/maciekglowka/rogalik#6ef31d676353b726dd11a1474395d3df83ff51ff"
 dependencies = [
  "bytemuck",
  "image",

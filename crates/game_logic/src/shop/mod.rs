@@ -42,38 +42,38 @@ fn buy_unit(i: usize, state: &mut ShopState, env: &mut GameEnv) {
 }
 
 fn get_choices(level: u32, world: &World) -> [Option<(String, u32)>; SHOP_SIZE] {
-    let filtered = world
-        .0
-        .resources
-        .data
-        .actions
-        .iter()
-        .filter_map(|n| world.0.resources.data.entities.get(n).map(|e| (n, e)))
-        .filter(|(_, e)| {
-            e.min_level.unwrap_or(0) <= level && e.max_level.unwrap_or(u32::MAX) >= level
-        })
-        .map(|(n, e)| {
-            (
-                e.chance,
-                n.to_string(),
-                get_price(
-                    level,
-                    e.min_level.unwrap_or(0),
-                    e.max_level.unwrap_or(u32::MAX),
-                    e.chance,
-                ),
-            )
-        })
-        .collect::<Vec<_>>();
+    // let filtered = world
+    //     .0
+    //     .resources
+    //     .data
+    //     .actions
+    //     .iter()
+    //     .filter_map(|n| world.0.resources.data.entities.get(n).map(|e| (n, e)))
+    //     .filter(|(_, e)| {
+    //         e.min_level.unwrap_or(0) <= level && e.max_level.unwrap_or(u32::MAX)
+    // >= level     })
+    //     .map(|(n, e)| {
+    //         (
+    //             e.chance,
+    //             n.to_string(),
+    //             get_price(
+    //                 level,
+    //                 e.min_level.unwrap_or(0),
+    //                 e.max_level.unwrap_or(u32::MAX),
+    //                 e.chance,
+    //             ),
+    //         )
+    //     })
+    //     .collect::<Vec<_>>();
 
     let mut output = [const { None }; SHOP_SIZE];
-    let mut rng = thread_rng();
+    // let mut rng = thread_rng();
 
-    for i in 0..SHOP_SIZE {
-        if let Ok((_, name, price)) = filtered.choose_weighted(&mut rng, |a| a.0) {
-            output[i] = Some((name.to_string(), *price));
-        }
-    }
+    // for i in 0..SHOP_SIZE {
+    //     if let Ok((_, name, price)) = filtered.choose_weighted(&mut rng, |a| a.0)
+    // {         output[i] = Some((name.to_string(), *price));
+    //     }
+    // }
     output
 }
 

@@ -6,6 +6,7 @@ use wunderkammer::prelude::*;
 use crate::{
     components::{Position, Targeting},
     globals::{BOARD_H, BOARD_W, HAND_SIZE},
+    scripting::run_command_script,
     utils::{get_entity_at, spawn_by_name},
     world::{Ent, World},
 };
@@ -46,6 +47,7 @@ pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
     scheduler.add_system(pay);
     scheduler.add_system(redraw_hand);
     scheduler.add_system(spawn_unit);
+    scheduler.add_system_with_priority(handle_on_spawn, 1);
     scheduler.add_system(place_unit);
     scheduler.add_system(attack);
     scheduler.add_system(attack_town);
@@ -103,6 +105,28 @@ fn spawn_unit(
 
     cx.send(PlaceUnit(cmd.0, cmd.1));
     cx.send(Pay(cost));
+
+    Ok(())
+}
+
+fn handle_on_spawn(
+    cmd: &mut SpawnUnit,
+    world: &mut World,
+    cx: &mut SchedulerContext,
+) -> Result<(), CommandError> {
+    let on_spawn = world
+        .0
+        .components
+        .on_spawn
+        .get(cmd.0)
+        .ok_or(CommandError::Continue)?
+        .clone();
+
+    if let Some(commands) = run_command_script(&on_spawn, cmd.0.into(), world) {
+        for c in commands {
+            c.send(cx);
+        }
+    }
 
     Ok(())
 }

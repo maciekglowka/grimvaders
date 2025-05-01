@@ -26,7 +26,7 @@ pub const GAP: f32 = 4.;
 pub const BUBBLE_SPEED: f32 = 0.5;
 pub const BUBBLE_AGE: u32 = 100;
 
-pub const MOVE_SPEED: f32 = 12. * TILE_SIZE;
+pub const MOVE_SPEED: f32 = 9. * TILE_SIZE;
 pub const MOVE_THRESH: f32 = 0.1;
 
 // PALETTE

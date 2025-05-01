@@ -3,9 +3,18 @@ Baleog:
     atlas: sprites
     index: 30
   components:
-    cost: 1
+    cost: 2
     health: [1, 1]
+    on_spawn: "baleog_spawn"
     player:
+  script: >
+    pub fn baleog_spawn(world, entity) {
+      let commands = [];
+      for player in world.query(["player", "position", "health"], []) {
+        commands.push(RuneCommand::Heal(player, 1));
+      }
+      commands
+    }
 
 Erik:
   sprite:

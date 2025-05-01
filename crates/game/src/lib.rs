@@ -30,7 +30,7 @@ fn main() {
     let engine = EngineBuilder::new()
         .with_title("RGLK".to_string())
         .resizable(true)
-        .with_logical_size(800., 450.)
+        .with_logical_size(800., 600.)
         .build(GameState::default(), Box::new(scenes::MainMenu));
     engine.run();
 }

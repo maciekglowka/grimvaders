@@ -15,9 +15,8 @@ use crate::{
 
 pub struct Pay(u32);
 pub struct RedrawHand;
-pub struct OrderSpawn(pub Entity, pub Position);
+pub struct SummonUnit(pub Entity, pub Position);
 pub struct SpawnUnit(pub Entity, pub Position);
-pub struct OrderMove(pub Entity, pub Position);
 pub struct MoveUnit(pub Entity, pub Position);
 pub struct Attack(pub Entity, pub Entity);
 pub struct AttackTown(pub Entity);
@@ -48,10 +47,9 @@ impl RuneCommand {
 pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
     scheduler.add_system(pay);
     scheduler.add_system(redraw_hand);
-    scheduler.add_system(order_spawn);
+    scheduler.add_system(summon_unit);
     scheduler.add_system(spawn_unit);
     scheduler.add_system_with_priority(handle_on_spawn, 1);
-    scheduler.add_system(order_move);
     scheduler.add_system(move_unit);
     scheduler.add_system(attack);
     scheduler.add_system(attack_town);
@@ -83,8 +81,8 @@ fn redraw_hand(
     Ok(())
 }
 
-fn order_spawn(
-    cmd: &mut OrderSpawn,
+fn summon_unit(
+    cmd: &mut SummonUnit,
     world: &mut World,
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
@@ -143,8 +141,8 @@ fn handle_on_spawn(
     Ok(())
 }
 
-fn order_move(
-    cmd: &mut OrderMove,
+fn move_unit(
+    cmd: &mut MoveUnit,
     world: &mut World,
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
@@ -155,16 +153,8 @@ fn order_move(
     if get_entity_at(world, cmd.1).is_some() {
         return Err(CommandError::Break);
     }
-    cx.send(MoveUnit(cmd.0, cmd.1));
-    cx.send(Pay(cost));
-    Ok(())
-}
-
-fn move_unit(cmd: &mut MoveUnit, world: &mut World) -> Result<(), CommandError> {
-    if get_entity_at(world, cmd.1).is_some() {
-        return Err(CommandError::Break);
-    }
     world.0.components.position.insert(cmd.0, cmd.1);
+    cx.send(Pay(cost));
     Ok(())
 }
 

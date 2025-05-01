@@ -23,7 +23,7 @@ pub(crate) fn next_wave(env: &mut GameEnv) {
 
     for x in 0..BOARD_W {
         for (y, &entity) in layout[x].iter().enumerate() {
-            env.scheduler.send(commands::PlaceUnit(
+            env.scheduler.send(commands::SpawnUnit(
                 entity,
                 Position::new(x as i32, (BOARD_H + y) as i32),
             ));

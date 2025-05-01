@@ -42,7 +42,7 @@ fn handle_input_player(
             } else {
                 match state.input_mode {
                     InputMode::HandUnit(entity) => {
-                        state.input_queue.push(InputEvent::SpawnUnit(entity, tile));
+                        state.input_queue.push(InputEvent::SummonUnit(entity, tile));
                         state.input_mode = InputMode::None;
                     }
                     InputMode::BoardUnit(entity) => {
@@ -158,8 +158,8 @@ pub(super) fn draw_status(world: &World, context: &mut Context) {
     let _ = context.graphics.draw_text(
         "default",
         &format!(
-            "H: {} | G: {}",
-            world.0.resources.player_data.health, world.0.resources.player_data.gold
+            "H: {} | F: {}",
+            world.0.resources.player_data.health, world.0.resources.player_data.food
         ),
         Vector2f::new(bounds.0.x + GAP, bounds.1.y - GAP - BASE_TEXT_SIZE),
         UI_Z,

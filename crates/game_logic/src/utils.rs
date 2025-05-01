@@ -1,4 +1,3 @@
-use rogalik::math::vectors::Vector2i;
 use wunderkammer::prelude::*;
 
 use crate::{

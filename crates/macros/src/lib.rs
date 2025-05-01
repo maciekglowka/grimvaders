@@ -26,11 +26,6 @@ fn impl_rune_adapter(ast: &syn::DeriveInput) -> TokenStream {
             }
             )*
 
-            // #[rune::function]
-            // fn get_player(&self) -> Option<Ent> {
-            //     Some(crate::get_player_entity(&self)?.into())
-            // }
-
             pub(crate) fn module() -> Result<Module, rune::ContextError> {
                 let mut module = Module::new();
                 module.ty::<World>()?;

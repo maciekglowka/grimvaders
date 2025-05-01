@@ -35,7 +35,8 @@ pub struct BattleGraphics {
 }
 
 struct Observers {
-    place_unit: Observer<commands::PlaceUnit>,
+    spawn_unit: Observer<commands::SpawnUnit>,
+    move_unit: Observer<commands::MoveUnit>,
     attack: Observer<commands::Attack>,
     attack_town: Observer<commands::AttackTown>,
     kill: Observer<commands::Kill>,
@@ -43,7 +44,8 @@ struct Observers {
 
 pub fn battle_init(state: &mut BattleGraphics, env: &mut GameEnv) {
     let observers = Observers {
-        place_unit: env.scheduler.observe(),
+        spawn_unit: env.scheduler.observe(),
+        move_unit: env.scheduler.observe(),
         attack: env.scheduler.observe(),
         attack_town: env.scheduler.observe(),
         kill: env.scheduler.observe(),
@@ -82,8 +84,16 @@ fn handle_events(state: &mut BattleGraphics, world: &World) -> Option<()> {
     while state
         .observers
         .as_ref()?
-        .place_unit
+        .spawn_unit
         .map_next(|a| place_unit_sprite(a.0, a.1, world, &mut state.unit_sprites))
+        .is_some()
+    {}
+
+    while state
+        .observers
+        .as_ref()?
+        .move_unit
+        .map_next(|a| move_unit_sprite(a.0, world, &mut state.unit_sprites))
         .is_some()
     {}
 

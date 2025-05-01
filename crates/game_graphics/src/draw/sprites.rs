@@ -85,10 +85,6 @@ pub(crate) fn place_unit_sprite(
     sprites: &mut Vec<UnitSprite>,
 ) {
     let origin = tile_to_sprite(position);
-    if let Some(sprite) = get_unit_sprite_mut(entity, sprites) {
-        sprite.origin = origin;
-        return;
-    }
     let sprite = UnitSprite::new(entity, world).with_origin(origin);
     sprites.push(sprite);
 }
@@ -98,11 +94,11 @@ pub(crate) fn remove_unit_sprite(entity: Entity, sprites: &mut Vec<UnitSprite>) 
 }
 
 pub(crate) fn move_unit_sprite(entity: Entity, world: &World, sprites: &mut Vec<UnitSprite>) {
-    // if let Some(sprite) = get_card_sprite_mut(entity, sprites) {
-    //     if let Some(position) = world.0.components.position.get(entity) {
-    //         sprite.add_translations(&vec![card_to_world(*position)]);
-    //     }
-    // }
+    if let Some(sprite) = get_unit_sprite_mut(entity, sprites) {
+        if let Some(position) = world.0.components.position.get(entity) {
+            sprite.add_translations(&vec![tile_to_sprite(*position)]);
+        }
+    }
 }
 
 pub(crate) fn attack_unit_sprite(

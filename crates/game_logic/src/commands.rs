@@ -15,8 +15,9 @@ use crate::{
 
 pub struct Pay(u32);
 pub struct RedrawHand;
+pub struct SummonUnit(pub Entity, pub Position);
 pub struct SpawnUnit(pub Entity, pub Position);
-pub struct PlaceUnit(pub Entity, pub Position);
+pub struct MoveUnit(pub Entity, pub Position);
 pub struct Attack(pub Entity, pub Entity);
 pub struct AttackTown(pub Entity);
 pub struct Damage(pub Entity, pub u32);
@@ -46,9 +47,10 @@ impl RuneCommand {
 pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
     scheduler.add_system(pay);
     scheduler.add_system(redraw_hand);
+    scheduler.add_system(summon_unit);
     scheduler.add_system(spawn_unit);
     scheduler.add_system_with_priority(handle_on_spawn, 1);
-    scheduler.add_system(place_unit);
+    scheduler.add_system(move_unit);
     scheduler.add_system(attack);
     scheduler.add_system(attack_town);
     scheduler.add_system(damage);
@@ -59,7 +61,7 @@ pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
 // Handlers
 
 fn pay(cmd: &mut Pay, world: &mut World) -> Result<(), CommandError> {
-    world.0.resources.player_data.gold = world.0.resources.player_data.gold.saturating_sub(cmd.0);
+    world.0.resources.player_data.food = world.0.resources.player_data.food.saturating_sub(cmd.0);
     Ok(())
 }
 
@@ -69,7 +71,7 @@ fn redraw_hand(
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
     let cost = 1;
-    if world.0.resources.player_data.gold < cost {
+    if world.0.resources.player_data.food < cost {
         return Err(CommandError::Break);
     }
 
@@ -79,8 +81,8 @@ fn redraw_hand(
     Ok(())
 }
 
-fn spawn_unit(
-    cmd: &mut SpawnUnit,
+fn summon_unit(
+    cmd: &mut SummonUnit,
     world: &mut World,
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
@@ -97,15 +99,23 @@ fn spawn_unit(
         .cost
         .get(cmd.0)
         .ok_or(CommandError::Break)?;
-    if cost > data.gold {
+    if cost > data.food {
         return Err(CommandError::Break);
     }
 
     data.hand.retain(|a| *a != cmd.0);
 
-    cx.send(PlaceUnit(cmd.0, cmd.1));
+    cx.send(SpawnUnit(cmd.0, cmd.1));
     cx.send(Pay(cost));
 
+    Ok(())
+}
+
+fn spawn_unit(cmd: &mut SpawnUnit, world: &mut World) -> Result<(), CommandError> {
+    if get_entity_at(world, cmd.1).is_some() {
+        return Err(CommandError::Break);
+    }
+    world.0.components.position.insert(cmd.0, cmd.1);
     Ok(())
 }
 
@@ -131,11 +141,20 @@ fn handle_on_spawn(
     Ok(())
 }
 
-fn place_unit(cmd: &mut PlaceUnit, world: &mut World) -> Result<(), CommandError> {
+fn move_unit(
+    cmd: &mut MoveUnit,
+    world: &mut World,
+    cx: &mut SchedulerContext,
+) -> Result<(), CommandError> {
+    let cost = 1;
+    if world.0.resources.player_data.food < cost {
+        return Err(CommandError::Break);
+    }
     if get_entity_at(world, cmd.1).is_some() {
         return Err(CommandError::Break);
     }
     world.0.components.position.insert(cmd.0, cmd.1);
+    cx.send(Pay(cost));
     Ok(())
 }
 

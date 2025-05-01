@@ -11,7 +11,7 @@ pub struct PlayerData {
     pub hand: Vec<Entity>,
     pub level: u32,
     pub health: u32,
-    pub gold: u32,
+    pub food: u32,
 }
 
 pub(crate) fn player_game_init(world: &mut World) {

@@ -68,18 +68,14 @@ fn handle_command_queue(env: &mut GameEnv) -> bool {
 fn handle_input_events(env: &mut GameEnv) -> Option<()> {
     while let Some(event) = env.input.as_ref().unwrap().next() {
         match event {
-            InputEvent::SpawnUnit(entity, target) => {
-                env.scheduler.send(commands::SpawnUnit(entity, target));
+            InputEvent::SummonUnit(entity, target) => {
+                env.scheduler.send(commands::SummonUnit(entity, target));
             }
             InputEvent::MoveUnit(entity, target) => {
-                env.scheduler.send(commands::PlaceUnit(entity, target));
+                env.scheduler.send(commands::MoveUnit(entity, target));
             }
             InputEvent::Done => env.world.0.resources.battle_state.mode = BattleMode::Attack,
             InputEvent::RedrawHand => env.scheduler.send(commands::RedrawHand),
-            // InputEvent::PerformAction(entity, target) => {
-            //     env.scheduler.send(commands::PerformAction(entity, target));
-            // }
-            // InputEvent::RedrawHand => env.scheduler.send(commands::RedrawHand),
             _ => (),
         }
     }

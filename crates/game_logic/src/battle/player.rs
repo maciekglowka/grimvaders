@@ -12,5 +12,5 @@ pub(super) fn player_battle_exit(world: &mut World) {}
 
 pub(super) fn player_next_turn(env: &mut GameEnv) {
     crate::player::draw_hand(&mut env.world);
-    env.world.0.resources.player_data.gold += 5;
+    env.world.0.resources.player_data.food += 5;
 }

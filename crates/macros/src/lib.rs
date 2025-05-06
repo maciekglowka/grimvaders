@@ -13,25 +13,25 @@ fn impl_rune_adapter(ast: &syn::DeriveInput) -> TokenStream {
     let syn::Data::Struct(data_struct) = &ast.data else {
         panic!("Rune Adapter: Not a data struct!")
     };
-    let get_members = data_struct.fields.members();
-    let mod_members = data_struct.fields.members();
+    let members = data_struct.fields.members();
 
     let gen = quote! {
         impl World {
-            #(
             #[rune::function]
-            fn #get_members(&self, entity: Ent) -> Option<rune::Value> {
-                let val = self.0.components.#get_members.get(entity.into())?;
-                Some(rune::runtime::to_value(val.clone()).ok()?)
+            fn get(&self, component: String, entity: Ent) -> Option<rune::Value> {
+                match component.as_str() {
+                    #(stringify!(#members) => Some(
+                            rune::runtime::to_value(self.0.components.#members.get(entity.into())?.clone()).ok()?
+                        ),
+                    )*
+                    _ => None
+                }
             }
-            )*
 
             pub(crate) fn module() -> Result<Module, rune::ContextError> {
                 let mut module = Module::new();
                 module.ty::<World>()?;
-                #(
-                module.function_meta(World::#mod_members)?;
-                )*
+                module.function_meta(World::get)?;
                 module.function_meta(World::query)?;
                 Ok(module)
             }

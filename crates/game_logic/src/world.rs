@@ -51,6 +51,7 @@ pub struct Components {
     // handlers end
     pub player: ComponentStorage<()>,
     pub position: ComponentStorage<Position>,
+    pub tile: ComponentStorage<Tile>,
 }
 
 #[derive(Default)]

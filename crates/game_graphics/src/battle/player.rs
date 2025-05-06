@@ -1,6 +1,6 @@
 use rogalik::prelude::*;
 
-use game_logic::{components::Targeting, get_entity_at, is_on_board, InputEvent, World};
+use game_logic::{get_entity_at, is_on_board, InputEvent, World};
 
 use crate::{
     draw::units::draw_deck_unit,

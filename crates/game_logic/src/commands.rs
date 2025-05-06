@@ -4,7 +4,7 @@ use rune::{ast::Comma, Any};
 use wunderkammer::prelude::*;
 
 use crate::{
-    components::{Position, Targeting},
+    components::Position,
     globals::{BOARD_H, BOARD_W, HAND_SIZE},
     scripting::run_command_script,
     utils::{get_entity_at, spawn_by_name},

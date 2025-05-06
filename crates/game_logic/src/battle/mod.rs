@@ -28,6 +28,7 @@ pub struct BattleState {
 
 pub fn battle_init(env: &mut GameEnv) {
     env.world.0.resources.player_data.level += 1;
+    board::tiles_init(env);
     player::player_battle_init(&mut env.world);
     next_turn(env);
 }
@@ -36,6 +37,7 @@ pub fn battle_exit(env: &mut GameEnv) {
     // purge pending commands
     while handle_command_queue(env) {}
     player::player_battle_exit(&mut env.world);
+    board::clear_board(env);
 }
 
 pub fn battle_update(env: &mut GameEnv) {

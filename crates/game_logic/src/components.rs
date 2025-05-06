@@ -1,5 +1,4 @@
-use rogalik::math::vectors::Vector2i;
-use rune::{Any, ToValue};
+use rune::Any;
 use serde::Deserialize;
 use std::ops::{Add, AddAssign, Sub, SubAssign};
 use wunderkammer::prelude::*;
@@ -8,12 +7,12 @@ use game_data::EntityData;
 
 use crate::World;
 
-#[derive(Any, Clone, Copy, Debug, Default, Deserialize, PartialEq, Eq)]
-pub enum Targeting {
-    #[default]
-    None,
-    Neighbour,
-    Any,
+#[derive(Any, Clone, Copy, Debug, Deserialize)]
+pub enum Tile {
+    Plains,
+    Meadow,
+    Field,
+    Forest,
 }
 
 #[derive(Any, Clone, Debug, Default, Deserialize)]

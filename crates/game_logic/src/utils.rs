@@ -19,8 +19,15 @@ pub(crate) fn spawn_by_name(name: &str, world: &mut World) -> Option<Entity> {
 }
 
 pub fn get_entity_at(world: &World, position: Position) -> Option<Entity> {
-    query_iter!(world.0, With(position))
+    query_iter!(world.0, Without(tile), With(position))
         .filter(|(_, p)| **p == position)
         .map(|(e, _)| e)
+        .next()
+}
+
+pub fn get_tile_at(world: &World, position: Position) -> Option<Entity> {
+    query_iter!(world.0, With(tile, position))
+        .filter(|(_, _, p)| **p == position)
+        .map(|(e, _, _)| e)
         .next()
 }

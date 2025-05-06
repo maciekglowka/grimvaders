@@ -16,7 +16,7 @@ pub struct GameEnv {
 pub struct World(pub WorldStorage<Components, Resources>);
 impl World {
     #[rune::function]
-    pub fn query(&self, with: Vec<String>, without: Vec<String>) -> Vec<Ent> {
+    fn query(&self, with: Vec<String>, without: Vec<String>) -> Vec<Ent> {
         //
         if with.is_empty() {
             return Vec::new();
@@ -35,6 +35,15 @@ impl World {
                 .collect();
         }
         entities.iter().map(|&e| e.into()).collect()
+    }
+    #[rune::function]
+    fn get_tile_at(&self, position: Position) -> Option<Tile> {
+        let entity = crate::get_tile_at(self, position)?;
+        self.0.components.tile.get(entity).copied()
+    }
+    #[rune::function]
+    fn get_entity_at(&self, position: Position) -> Option<Ent> {
+        Some(crate::get_entity_at(self, position)?.into())
     }
 }
 

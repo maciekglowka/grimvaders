@@ -4,6 +4,7 @@ use rune::{ast::Comma, Any};
 use wunderkammer::prelude::*;
 
 use crate::{
+    battle::BattleMode,
     components::Position,
     globals::{BOARD_H, BOARD_W, HAND_SIZE},
     scripting::run_command_script,
@@ -14,7 +15,9 @@ use crate::{
 // Commands
 
 pub struct Pay(u32);
+pub struct GainFood(u32);
 pub struct RedrawHand;
+pub struct Fight;
 pub struct SummonUnit(pub Entity, pub Position);
 pub struct SpawnUnit(pub Entity, pub Position);
 pub struct MoveUnit(pub Entity, pub Position);
@@ -29,6 +32,10 @@ pub struct Kill(pub Entity);
 #[derive(Any, Clone, Copy, Debug)]
 pub enum RuneCommand {
     #[rune(constructor)]
+    None,
+    #[rune(constructor)]
+    GainFood(#[rune(get)] u32),
+    #[rune(constructor)]
     Damage(#[rune(get)] Ent, #[rune(get)] u32),
     #[rune(constructor)]
     Heal(#[rune(get)] Ent, #[rune(get)] u32),
@@ -36,6 +43,8 @@ pub enum RuneCommand {
 impl RuneCommand {
     pub fn send(&self, cx: &mut SchedulerContext) {
         match self {
+            Self::None => (),
+            Self::GainFood(v) => cx.send(GainFood(*v)),
             Self::Damage(e, v) => cx.send(Damage(e.into(), *v)),
             Self::Heal(e, v) => cx.send(Heal(e.into(), *v)),
         }
@@ -46,7 +55,10 @@ impl RuneCommand {
 
 pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
     scheduler.add_system(pay);
+    scheduler.add_system(gain_food);
     scheduler.add_system(redraw_hand);
+    scheduler.add_system(fight);
+    scheduler.add_system_with_priority(handle_on_fight, 1);
     scheduler.add_system(summon_unit);
     scheduler.add_system(spawn_unit);
     scheduler.add_system_with_priority(handle_on_spawn, 1);
@@ -65,6 +77,11 @@ fn pay(cmd: &mut Pay, world: &mut World) -> Result<(), CommandError> {
     Ok(())
 }
 
+fn gain_food(cmd: &mut GainFood, world: &mut World) -> Result<(), CommandError> {
+    world.0.resources.player_data.food += cmd.0;
+    Ok(())
+}
+
 fn redraw_hand(
     _: &mut RedrawHand,
     world: &mut World,
@@ -78,6 +95,30 @@ fn redraw_hand(
     crate::player::draw_hand(world);
 
     cx.send(Pay(cost));
+    Ok(())
+}
+
+fn fight(_: &mut Fight, world: &mut World) -> Result<(), CommandError> {
+    world.0.resources.battle_state.mode = BattleMode::Fight;
+    Ok(())
+}
+
+fn handle_on_fight(
+    _: &mut Fight,
+    world: &mut World,
+    cx: &mut SchedulerContext,
+) -> Result<(), CommandError> {
+    let on_fight = query_iter!(world.0, With(position, on_fight))
+        .map(|(e, _, s)| (e, s.to_string()))
+        .collect::<Vec<_>>();
+
+    for (entity, script) in on_fight {
+        if let Some(commands) = run_command_script(&script, entity.into(), world) {
+            for c in commands {
+                c.send(cx);
+            }
+        }
+    }
     Ok(())
 }
 

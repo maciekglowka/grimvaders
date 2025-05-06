@@ -1,9 +1,10 @@
 use anyhow::Result;
-use rune::{Module, ToValue, Value, Vm};
+use rune::{Module, Value, Vm};
 use std::sync::Arc;
 
 use crate::{
     commands::RuneCommand,
+    components::Tile,
     world::{Ent, World},
 };
 
@@ -12,6 +13,7 @@ pub(crate) fn init_rune(world: &World) -> Result<Vm> {
 
     let mut command_module = Module::new();
     command_module.ty::<RuneCommand>()?;
+    command_module.ty::<Tile>()?;
     context.install(command_module)?;
 
     let world_module = World::module()?;

@@ -32,6 +32,8 @@ fn impl_rune_adapter(ast: &syn::DeriveInput) -> TokenStream {
                 let mut module = Module::new();
                 module.ty::<World>()?;
                 module.function_meta(World::get)?;
+                module.function_meta(World::get_entity_at)?;
+                module.function_meta(World::get_tile_at)?;
                 module.function_meta(World::query)?;
                 Ok(module)
             }

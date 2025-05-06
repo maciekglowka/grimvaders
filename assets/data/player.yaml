@@ -16,6 +16,25 @@ Baleog:
       commands
     }
 
+Peasant:
+  sprite:
+    atlas: sprites
+    index: 129
+  components:
+    cost: 2
+    health: [1, 1]
+    on_fight: "peasant_fight"
+    player:
+  script: >
+    pub fn peasant_fight(world, entity) {
+      let position = world.get("position", entity).unwrap();
+      let tile = world.get_tile_at(position).unwrap();
+      match tile {
+        Tile::Field => RuneCommand::GainFood(1),
+        _ => RuneCommand::None
+      }
+    }
+
 Erik:
   sprite:
     atlas: sprites

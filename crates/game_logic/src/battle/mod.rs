@@ -17,7 +17,7 @@ pub(crate) mod utils;
 pub enum BattleMode {
     #[default]
     Plan,
-    Attack,
+    Fight,
 }
 
 #[derive(Default)]
@@ -48,7 +48,7 @@ pub fn battle_update(env: &mut GameEnv) {
         BattleMode::Plan => {
             handle_input_events(env);
         }
-        BattleMode::Attack => {
+        BattleMode::Fight => {
             if !npcs::next_attack(env) {
                 next_turn(env);
             }
@@ -76,7 +76,9 @@ fn handle_input_events(env: &mut GameEnv) -> Option<()> {
             InputEvent::MoveUnit(entity, target) => {
                 env.scheduler.send(commands::MoveUnit(entity, target));
             }
-            InputEvent::Done => env.world.0.resources.battle_state.mode = BattleMode::Attack,
+            InputEvent::Done => {
+                env.scheduler.send(commands::Fight);
+            }
             InputEvent::RedrawHand => env.scheduler.send(commands::RedrawHand),
             _ => (),
         }

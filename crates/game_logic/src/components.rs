@@ -16,7 +16,7 @@ pub enum Tile {
 }
 
 #[derive(Any, Clone, Debug, Default, Deserialize)]
-pub struct ValueDefault(u32, u32);
+pub struct ValueDefault(#[rune(get)] u32, #[rune(get)] u32);
 impl ValueDefault {
     pub fn new(val: u32) -> Self {
         Self(val, val)

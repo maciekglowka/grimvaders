@@ -6,9 +6,8 @@ use wunderkammer::prelude::*;
 use crate::{
     battle::BattleMode,
     components::Position,
-    globals::{BOARD_H, BOARD_W, HAND_SIZE},
     scripting::run_command_script,
-    utils::{get_entity_at, spawn_by_name},
+    utils::get_entity_at,
     world::{Ent, World},
 };
 
@@ -24,7 +23,7 @@ pub struct MoveUnit(pub Entity, pub Position);
 pub struct Attack(pub Entity, pub Entity);
 pub struct AttackTown(pub Entity);
 pub struct Damage(pub Entity, pub u32);
-pub struct Heal(pub Entity, pub u32);
+pub struct GainHealth(pub Entity, pub u32);
 pub struct Kill(pub Entity);
 
 // Rune
@@ -38,7 +37,7 @@ pub enum RuneCommand {
     #[rune(constructor)]
     Damage(#[rune(get)] Ent, #[rune(get)] u32),
     #[rune(constructor)]
-    Heal(#[rune(get)] Ent, #[rune(get)] u32),
+    GainHealth(#[rune(get)] Ent, #[rune(get)] u32),
 }
 impl RuneCommand {
     pub fn send(&self, cx: &mut SchedulerContext) {
@@ -46,7 +45,7 @@ impl RuneCommand {
             Self::None => (),
             Self::GainFood(v) => cx.send(GainFood(*v)),
             Self::Damage(e, v) => cx.send(Damage(e.into(), *v)),
-            Self::Heal(e, v) => cx.send(Heal(e.into(), *v)),
+            Self::GainHealth(e, v) => cx.send(GainHealth(e.into(), *v)),
         }
     }
 }
@@ -66,7 +65,7 @@ pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
     scheduler.add_system(attack);
     scheduler.add_system(attack_town);
     scheduler.add_system(damage);
-    scheduler.add_system(heal);
+    scheduler.add_system(gain_health);
     scheduler.add_system(kill);
 }
 
@@ -187,15 +186,15 @@ fn move_unit(
     world: &mut World,
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
-    let cost = 1;
-    if world.0.resources.player_data.food < cost {
-        return Err(CommandError::Break);
-    }
+    // let cost = 1;
+    // if world.0.resources.player_data.food < cost {
+    //     return Err(CommandError::Break);
+    // }
     if get_entity_at(world, cmd.1).is_some() {
         return Err(CommandError::Break);
     }
     world.0.components.position.insert(cmd.0, cmd.1);
-    cx.send(Pay(cost));
+    // cx.send(Pay(cost));
     Ok(())
 }
 
@@ -264,7 +263,7 @@ fn damage(
     Ok(())
 }
 
-fn heal(cmd: &mut Heal, world: &mut World) -> Result<(), CommandError> {
+fn gain_health(cmd: &mut GainHealth, world: &mut World) -> Result<(), CommandError> {
     let health = world
         .0
         .components

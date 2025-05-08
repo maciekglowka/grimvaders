@@ -18,7 +18,7 @@ fn impl_rune_adapter(ast: &syn::DeriveInput) -> TokenStream {
     let gen = quote! {
         impl World {
             #[rune::function]
-            fn get(&self, component: String, entity: Ent) -> Option<rune::Value> {
+            fn get(&self, component: String, entity: &Ent) -> Option<rune::Value> {
                 match component.as_str() {
                     #(stringify!(#members) => Some(
                             rune::runtime::to_value(self.0.components.#members.get(entity.into())?.clone()).ok()?

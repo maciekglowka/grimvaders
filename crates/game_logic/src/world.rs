@@ -37,13 +37,13 @@ impl World {
         entities.iter().map(|&e| e.into()).collect()
     }
     #[rune::function]
-    fn get_tile_at(&self, position: Position) -> Option<Tile> {
-        let entity = crate::get_tile_at(self, position)?;
+    fn get_tile_at(&self, position: &Position) -> Option<Tile> {
+        let entity = crate::get_tile_at(self, *position)?;
         self.0.components.tile.get(entity).copied()
     }
     #[rune::function]
-    fn get_entity_at(&self, position: Position) -> Option<Ent> {
-        Some(crate::get_entity_at(self, position)?.into())
+    fn get_entity_at(&self, position: &Position) -> Option<Ent> {
+        Some(crate::get_entity_at(self, *position)?.into())
     }
 }
 

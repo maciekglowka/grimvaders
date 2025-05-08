@@ -3,7 +3,7 @@ use rogalik::prelude::*;
 use game_logic::{get_entity_at, is_on_board, InputEvent, World};
 
 use crate::{
-    draw::units::draw_deck_unit,
+    draw::units::{draw_deck_unit, draw_entity_description},
     globals::{BASE_TEXT_SIZE, BUTTON_SIZE, GAP, OVERLAY_Z, SPRITE_SIZE, TILE_SIZE, UI_Z},
     input::{ButtonState, InputState},
     ui::{Button, Span},
@@ -129,6 +129,10 @@ fn handle_hand(
             world,
             context,
         );
+
+        if button.mouse_over(input_state) {
+            draw_entity_description(entity, world, context);
+        }
 
         if take_input && button.clicked(input_state) {
             if selected {

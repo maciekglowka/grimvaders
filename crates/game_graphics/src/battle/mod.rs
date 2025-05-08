@@ -69,6 +69,7 @@ pub fn battle_draw(
     let mut is_animating = false;
 
     board::draw_board(world, context);
+    board::draw_board_description(world, input_state, context);
 
     for sprite in state.unit_sprites.iter_mut() {
         sprite.draw(world, context);

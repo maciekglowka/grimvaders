@@ -3,7 +3,11 @@ use wunderkammer::prelude::*;
 
 use game_logic::World;
 
-use crate::globals::{DIGITS_TEXT_SIZE, GAP, OVERLAY_Z, SPRITE_SIZE, UI_Z};
+use crate::{
+    globals::{BASE_TEXT_SIZE, DIGITS_TEXT_SIZE, GAP, OVERLAY_Z, SPRITE_SIZE, UI_Z},
+    ui::TextBox,
+    utils::get_viewport_bounds,
+};
 
 use super::sprites::get_sprite_data;
 
@@ -58,4 +62,29 @@ pub(crate) fn draw_deck_unit(
             SpriteParams::default(),
         );
     }
+}
+
+pub(crate) fn draw_entity_description(entity: Entity, world: &World, context: &mut Context) {
+    let Some(name) = world.0.components.name.get(entity) else {
+        return;
+    };
+    draw_description(name, world, context);
+}
+
+pub(crate) fn draw_description(name: &str, world: &World, context: &mut Context) {
+    let Some(data) = world.0.resources.data.entities.get(name) else {
+        return;
+    };
+    let mut content = name.to_string();
+    if let Some(descr) = &data.description {
+        content = format!("{}, {}", content, descr);
+    };
+    let text = TextBox::owned(content);
+    let bounds = get_viewport_bounds(context);
+    text.draw(
+        Vector2f::new(bounds.0.x + GAP, bounds.1.y - 2. * (BASE_TEXT_SIZE + GAP)),
+        bounds.1.x - bounds.0.x - 2. * GAP,
+        UI_Z,
+        context,
+    );
 }

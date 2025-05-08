@@ -75,7 +75,7 @@ impl<'a> Button<'a> {
         state.click == ButtonState::Down && self.mouse_over(state)
     }
 
-    fn mouse_over(&self, state: &InputState) -> bool {
+    pub fn mouse_over(&self, state: &InputState) -> bool {
         let v = state.mouse_world_position;
         v.x >= self.origin.x
             && v.y >= self.origin.y

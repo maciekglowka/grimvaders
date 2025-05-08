@@ -1,10 +1,10 @@
 use anyhow::Result;
-use rune::{Module, Value, Vm};
+use rune::{Diagnostics, Module, Value, Vm};
 use std::sync::Arc;
 
 use crate::{
     commands::RuneCommand,
-    components::Tile,
+    components::{Tile, ValueDefault},
     world::{Ent, World},
 };
 
@@ -14,6 +14,7 @@ pub(crate) fn init_rune(world: &World) -> Result<Vm> {
     let mut command_module = Module::new();
     command_module.ty::<RuneCommand>()?;
     command_module.ty::<Tile>()?;
+    command_module.ty::<ValueDefault>()?;
     context.install(command_module)?;
 
     let world_module = World::module()?;
@@ -28,7 +29,19 @@ pub(crate) fn init_rune(world: &World) -> Result<Vm> {
         }
     }
 
-    let result = rune::prepare(&mut sources).with_context(&context).build();
+    let mut diagnostics = Diagnostics::new();
+
+    let result = rune::prepare(&mut sources)
+        .with_context(&context)
+        .with_diagnostics(&mut diagnostics)
+        .build();
+
+    if !diagnostics.is_empty() {
+        let mut writer =
+            rune::termcolor::StandardStream::stderr(rune::termcolor::ColorChoice::default());
+        diagnostics.emit(&mut writer, &sources).unwrap();
+    }
+
     let unit = result.unwrap();
     let vm = Vm::new(Arc::new(context.runtime()?), Arc::new(unit));
 

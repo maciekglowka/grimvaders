@@ -1,20 +1,3 @@
-Baleog:
-  sprite:
-    atlas: sprites
-    index: 30
-  components:
-    cost: 2
-    health: [1, 1]
-    on_spawn: "baleog_spawn"
-    player:
-  script: >
-    pub fn baleog_spawn(world, entity) {
-      let commands = [];
-      for player in world.query(["player", "position", "health"], []) {
-        commands.push(RuneCommand::Heal(player, 1));
-      }
-      commands
-    }
 
 Peasant:
   sprite:
@@ -34,12 +17,59 @@ Peasant:
         _ => RuneCommand::None
       }
     }
+  description: >
+    On fight start: gain +1 food, when on a field tile.
 
-Erik:
+Sheep:
   sprite:
     atlas: sprites
-    index: 31
+    index: 370
   components:
     cost: 2
-    health: [2, 2]
+    health: [1, 1]
+    on_fight: "sheep_fight"
+    player:
+  script: >
+    pub fn sheep_fight(world, entity) {
+      let position = world.get("position", entity).unwrap();
+      let tile = world.get_tile_at(position).unwrap();
+      match tile {
+        Tile::Meadow => RuneCommand::GainHealth(entity, 1),
+        _ => RuneCommand::None
+      }
+    }
+  description: >
+    On fight start: gain +1 health, when on a meadow tile.
+
+Shepherd:
+  sprite:
+    atlas: sprites
+    index: 74
+  components:
+    cost: 3
+    health: [0, 0]
+    on_spawn: "shepherd_spawn"
+    player:
+  script: >
+    pub fn shepherd_spawn(world, entity) {
+      let sum = 0;
+      for player in world.query(["player", "position"], []) {
+        if world.get("name", player) == Some("Sheep") {
+          if let Some(health) = world.get("health", player) {
+            sum += health.0;
+          }
+        }
+      }
+      RuneCommand::GainHealth(entity, sum)
+    }
+  description: >
+    On spawn: gain health equal to the sum of all sheep health.
+
+Pikeman:
+  sprite:
+    atlas: sprites
+    index: 26
+  components:
+    cost: 3
+    health: [3, 3]
     player:

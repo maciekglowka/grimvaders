@@ -69,7 +69,7 @@ pub struct Resources {
     pub data: game_data::GameData,
     pub player_data: PlayerData,
     // serialize as none
-    pub(crate) vm: Option<rune::Vm>,
+    pub vm: Option<rune::Vm>,
 }
 
 #[derive(Any, Clone, Copy, Debug)]

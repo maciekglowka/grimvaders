@@ -6,7 +6,7 @@ pub mod deck;
 mod events;
 pub mod globals;
 mod player;
-mod scripting;
+pub mod scripting;
 pub mod shop;
 pub mod startup;
 mod utils;

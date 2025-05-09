@@ -8,7 +8,7 @@ use crate::{
     world::{Ent, World},
 };
 
-pub(crate) fn init_rune(world: &World) -> Result<Vm> {
+pub fn init_rune(world: &World) -> Result<Vm> {
     let mut context = rune_modules::default_context().unwrap();
 
     let mut command_module = Module::new();
@@ -44,6 +44,7 @@ pub(crate) fn init_rune(world: &World) -> Result<Vm> {
 
     let unit = result.unwrap();
     let vm = Vm::new(Arc::new(context.runtime()?), Arc::new(unit));
+    log::debug!("Rune VM created successfully");
 
     Ok(vm)
 }

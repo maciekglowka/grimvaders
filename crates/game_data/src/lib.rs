@@ -4,16 +4,15 @@ use std::collections::HashMap;
 #[derive(Clone, Default)]
 pub struct GameData {
     pub entities: HashMap<String, EntityData>,
-    pub players: Vec<String>,
-    pub npcs: Vec<String>,
+    pub categories: HashMap<String, Vec<String>>,
 }
 impl GameData {
-    pub fn add_entities(&mut self, s: &str) -> Vec<String> {
+    pub fn add_entities(&mut self, s: &str, category: &str) {
         let map: HashMap<String, EntityData> =
             serde_yaml::from_str(s).expect("Can't parse yaml data!");
         let inserted = map.keys().map(|s| s.to_string()).collect();
         self.entities.extend(map);
-        inserted
+        self.categories.insert(category.to_string(), inserted);
     }
 }
 

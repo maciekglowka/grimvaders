@@ -13,6 +13,7 @@ name = "game"
 
 [dependencies]
 env_logger = "0.11"
+log = { workspace = true }
 rogalik = { workspace = true }
 wunderkammer = { workspace = true }
 

@@ -6,6 +6,7 @@ mod scenes;
 
 #[derive(Default)]
 struct GameState {
+    data_assets: assets::DataAssets,
     main_camera: ResourceId,
     env: game_logic::GameEnv,
 }
@@ -13,6 +14,7 @@ struct GameState {
 impl Game for GameState {
     fn setup(&mut self, context: &mut Context) {
         assets::load_assets(context);
+        self.data_assets = assets::load_data_assets(context);
         self.main_camera = context.graphics.create_camera(1., get_camera_center());
         context
             .graphics
@@ -21,6 +23,19 @@ impl Game for GameState {
     fn resize(&mut self, context: &mut rogalik::engine::Context) {
         let (w, h) = get_target_resolution(context);
         context.graphics.set_rendering_resolution(w, h);
+    }
+    fn reload_assets(&mut self, context: &mut rogalik::engine::Context) {
+        if !assets::load_data(
+            &self.data_assets,
+            &mut self.env.world.0.resources.data,
+            context,
+            true,
+        ) {
+            return;
+        };
+        if let Ok(vm) = game_logic::scripting::init_rune(&self.env.world) {
+            self.env.world.0.resources.vm = Some(vm);
+        }
     }
 }
 

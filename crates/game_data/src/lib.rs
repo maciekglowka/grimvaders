@@ -20,18 +20,12 @@ impl GameData {
 pub struct EntityData {
     pub components: HashMap<String, serde_yaml::Value>,
     pub sprite: SpriteData,
-    pub min_level: Option<u32>,
-    pub max_level: Option<u32>,
-    #[serde(default = "one")]
-    pub chance: f32,
+    pub tier: Option<u32>,
+    pub score: Option<u32>,
     #[serde(default)]
     pub script: Option<String>,
     #[serde(default)]
     pub description: Option<String>,
-}
-
-fn one() -> f32 {
-    1.
 }
 
 #[derive(Clone, Deserialize, Default)]

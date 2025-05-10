@@ -2,6 +2,7 @@ Rat:
   sprite:
     atlas: sprites
     index: 423
+  score: 1
   components:
     health: [1, 1]
 
@@ -9,6 +10,7 @@ Bat:
   sprite:
     atlas: sprites
     index: 418
+  score: 2
   components:
     health: [2, 2]
 
@@ -16,6 +18,6 @@ Bear:
   sprite:
     atlas: sprites
     index: 422
+  score: 3
   components:
     health: [3, 3]
-  min_level: 2

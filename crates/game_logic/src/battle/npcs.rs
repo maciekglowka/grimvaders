@@ -1,24 +1,50 @@
 use rand::prelude::*;
+use rune::alloc::HashSet;
 use wunderkammer::prelude::*;
 
 use crate::{
     commands,
     components::Position,
-    globals::{BOARD_H, BOARD_W},
+    globals::{BOARD_H, BOARD_W, MAX_WAVE_H},
     utils::spawn_by_name,
     GameEnv, World,
 };
 
 pub(crate) fn next_wave(env: &mut GameEnv) {
-    let count = 2 * env.world.0.resources.battle_state.wave;
-    let mut layout = [const { Vec::new() }; BOARD_W];
+    let target_score = 2 * env.world.0.resources.battle_state.wave;
+    let mut score = 0;
+
     let mut rng = thread_rng();
 
-    for _ in 0..count {
-        let entity = spawn_by_name("Rat", &mut env.world).unwrap();
+    let pool = get_pool(10, &env.world);
+    let mut layout = [const { Vec::new() }; BOARD_W];
+
+    loop {
+        let filtered = pool
+            .iter()
+            .filter(|(_, s)| *s <= target_score - score)
+            .collect::<Vec<_>>();
+        if filtered.is_empty() {
+            break;
+        };
+
+        let Ok((name, entity_score)) = filtered.choose_weighted(&mut rng, |(_, s)| s) else {
+            break;
+        };
+
+        let entity = spawn_by_name(name, &mut env.world).unwrap();
+        score += entity_score;
         env.world.0.components.npc.insert(entity, ());
-        let col = rng.gen_range(0..BOARD_W);
-        layout[col].push(entity);
+
+        let layout_weights = layout
+            .iter()
+            .enumerate()
+            .map(|(i, v)| (i, MAX_WAVE_H.saturating_sub(v.len())))
+            .collect::<Vec<_>>();
+        let Ok((col, _)) = layout_weights.choose_weighted(&mut rng, |(_, w)| *w) else {
+            break;
+        };
+        layout[*col].push(entity);
     }
 
     for x in 0..BOARD_W {
@@ -60,4 +86,36 @@ fn next_target(col: i32, world: &World) -> Option<Entity> {
         .collect::<Vec<_>>();
     players.sort_by(|a, b| b.1.y.cmp(&a.1.y));
     players.first().map(|(e, _)| *e)
+}
+
+fn get_pool(tier: u32, world: &World) -> Vec<(String, u32)> {
+    world.0.resources.data.categories["npcs"]
+        .iter()
+        .filter(|&n| {
+            world
+                .0
+                .resources
+                .data
+                .entities
+                .get(n)
+                .unwrap()
+                .tier
+                .unwrap_or(1)
+                <= tier
+        })
+        .map(|n| {
+            (
+                n.to_string(),
+                world
+                    .0
+                    .resources
+                    .data
+                    .entities
+                    .get(n)
+                    .unwrap()
+                    .score
+                    .unwrap_or(1),
+            )
+        })
+        .collect()
 }

@@ -29,7 +29,7 @@ enum InputMode {
 pub struct BattleGraphics {
     input_mode: InputMode,
     pub input_queue: ObservableQueue<InputEvent>,
-    observers: Option<Observers>,
+    observers: Vec<Box<dyn ErasedObserver>>,
     unit_sprites: Vec<UnitSprite>,
     bubbles: Vec<Bubble>,
 }
@@ -43,21 +43,10 @@ struct Observers {
 }
 
 pub fn battle_init(state: &mut BattleGraphics, env: &mut GameEnv) {
-    let observers = Observers {
-        spawn_unit: env.scheduler.observe(),
-        move_unit: env.scheduler.observe(),
-        attack: env.scheduler.observe(),
-        attack_town: env.scheduler.observe(),
-        kill: env.scheduler.observe(),
-    };
-    state.observers = Some(observers);
+    subscribe_events(env, state);
 }
 
-pub fn battle_exit(_state: &mut BattleGraphics, _env: &mut GameEnv) {
-    // if let Some(events) = state.game_events.take() {
-    //     world.0.resources.game_events.unsubscribe(events);
-    // }
-}
+pub fn battle_exit(_state: &mut BattleGraphics, _env: &mut GameEnv) {}
 
 pub fn battle_draw(
     state: &mut BattleGraphics,
@@ -81,46 +70,65 @@ pub fn battle_draw(
     is_animating
 }
 
-fn handle_events(state: &mut BattleGraphics, world: &World) -> Option<()> {
-    while state
-        .observers
-        .as_ref()?
-        .spawn_unit
-        .map_next(|a| place_unit_sprite(a.0, a.1, world, &mut state.unit_sprites))
-        .is_some()
-    {}
+fn handle_events(state: &mut BattleGraphics, world: &World) {
+    let mut observers = std::mem::take(&mut state.observers);
+    for observer in observers.iter_mut() {
+        observer.handle(world, state);
+    }
+    state.observers = observers;
+}
 
-    while state
-        .observers
-        .as_ref()?
-        .move_unit
-        .map_next(|a| move_unit_sprite(a.0, world, &mut state.unit_sprites))
-        .is_some()
-    {}
+fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
+    let mut observers: Vec<Box<dyn ErasedObserver>> = Vec::new();
 
-    while state
-        .observers
-        .as_ref()?
-        .attack
-        .map_next(|a| attack_unit_sprite(a.0, a.1, world, &mut state.unit_sprites))
-        .is_some()
-    {}
+    observers.push(Box::new(CommandObserver::new(
+        &mut env.scheduler,
+        |c: &commands::SpawnUnit, w, s| place_unit_sprite(c.0, c.1, w, &mut s.unit_sprites),
+    )));
+    observers.push(Box::new(CommandObserver::new(
+        &mut env.scheduler,
+        |c: &commands::MoveUnit, w, s| move_unit_sprite(c.0, w, &mut s.unit_sprites),
+    )));
+    observers.push(Box::new(CommandObserver::new(
+        &mut env.scheduler,
+        |c: &commands::Attack, w, s| attack_unit_sprite(c.0, c.1, w, &mut s.unit_sprites),
+    )));
+    observers.push(Box::new(CommandObserver::new(
+        &mut env.scheduler,
+        |c: &commands::AttackTown, w, s| attack_town(c.0, w, &mut s.unit_sprites),
+    )));
+    observers.push(Box::new(CommandObserver::new(
+        &mut env.scheduler,
+        |c: &commands::Kill, _, s| remove_unit_sprite(c.0, &mut s.unit_sprites),
+    )));
 
-    while state
-        .observers
-        .as_ref()?
-        .attack_town
-        .map_next(|a| attack_town(a.0, world, &mut state.unit_sprites))
-        .is_some()
-    {}
+    state.observers = observers;
+}
 
-    while state
-        .observers
-        .as_ref()?
-        .kill
-        .map_next(|a| remove_unit_sprite(a.0, &mut state.unit_sprites))
-        .is_some()
-    {}
-
-    Some(())
+trait ErasedObserver {
+    fn handle(&mut self, world: &World, state: &mut BattleGraphics);
+}
+struct CommandObserver<T> {
+    handler: Box<dyn FnMut(&T, &World, &mut BattleGraphics)>,
+    observer: Observer<T>,
+}
+impl<T: 'static> CommandObserver<T> {
+    pub fn new(
+        scheduler: &mut Scheduler<World>,
+        handler: impl FnMut(&T, &World, &mut BattleGraphics) + 'static,
+    ) -> Self {
+        Self {
+            handler: Box::new(handler),
+            observer: scheduler.observe(),
+        }
+    }
+}
+impl<T> ErasedObserver for CommandObserver<T> {
+    fn handle(&mut self, world: &World, state: &mut BattleGraphics) {
+        while self
+            .observer
+            .map_next(|c| (self.handler)(c, world, state))
+            .is_some()
+        {}
+    }
 }

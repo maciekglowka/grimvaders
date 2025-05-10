@@ -13,7 +13,7 @@ Peasant:
       let position = world.get("position", entity).unwrap();
       let tile = world.get_tile_at(position).unwrap();
       match tile {
-        Tile::Field => RuneCommand::GainFood(1),
+        Tile::Field => RuneCommand::ChangeFood(1),
         _ => RuneCommand::None
       }
     }
@@ -34,7 +34,7 @@ Sheep:
       let position = world.get("position", entity).unwrap();
       let tile = world.get_tile_at(position).unwrap();
       match tile {
-        Tile::Meadow => RuneCommand::GainHealth(entity, 1),
+        Tile::Meadow => RuneCommand::ChangeHealth(entity, 1),
         _ => RuneCommand::None
       }
     }
@@ -60,7 +60,7 @@ Shepherd:
           }
         }
       }
-      RuneCommand::GainHealth(entity, sum)
+      RuneCommand::ChangeHealth(entity, sum)
     }
   description: >
     On spawn: gain health equal to the sum of all sheep health.

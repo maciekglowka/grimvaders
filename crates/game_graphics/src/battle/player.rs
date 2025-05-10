@@ -19,7 +19,7 @@ pub(super) fn handle_player_ui(
     input_state: &InputState,
     take_input: bool,
 ) {
-    draw_status(world, context);
+    draw_status(state, world, context);
     handle_hand(state, world, context, input_state, take_input);
     if take_input {
         handle_input_player(state, world, context, input_state);
@@ -157,15 +157,19 @@ fn handle_hand(
     }
 }
 
-pub(super) fn draw_status(world: &World, context: &mut Context) {
-    let bounds = get_viewport_bounds(context);
+pub(super) fn draw_status(state: &super::BattleGraphics, world: &World, context: &mut Context) {
+    let text = format!(
+        "H: {} | F: {}",
+        world.0.resources.player_data.health, world.0.resources.player_data.food
+    );
+    let w = context
+        .graphics
+        .text_dimensions("default", &text, BASE_TEXT_SIZE)
+        .x;
     let _ = context.graphics.draw_text(
         "default",
-        &format!(
-            "H: {} | F: {}",
-            world.0.resources.player_data.health, world.0.resources.player_data.food
-        ),
-        Vector2f::new(bounds.0.x + GAP, bounds.1.y - GAP - BASE_TEXT_SIZE),
+        &text,
+        state.status_origin - Vector2f::new(0.5 * w, 0.),
         UI_Z,
         BASE_TEXT_SIZE,
         SpriteParams::default(),

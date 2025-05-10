@@ -1,6 +1,5 @@
 use anyhow::Result;
-use rand::prelude::*;
-use rune::{ast::Comma, Any};
+use rune::Any;
 use wunderkammer::prelude::*;
 
 use crate::{
@@ -13,8 +12,7 @@ use crate::{
 
 // Commands
 
-pub struct Pay(u32);
-pub struct GainFood(u32);
+pub struct ChangeFood(pub i32);
 pub struct RedrawHand;
 pub struct Fight;
 pub struct SummonUnit(pub Entity, pub Position);
@@ -22,8 +20,7 @@ pub struct SpawnUnit(pub Entity, pub Position);
 pub struct MoveUnit(pub Entity, pub Position);
 pub struct Attack(pub Entity, pub Entity);
 pub struct AttackTown(pub Entity);
-pub struct Damage(pub Entity, pub u32);
-pub struct GainHealth(pub Entity, pub u32);
+pub struct ChangeHealth(pub Entity, pub i32);
 pub struct Kill(pub Entity);
 
 // Rune
@@ -33,19 +30,16 @@ pub enum RuneCommand {
     #[rune(constructor)]
     None,
     #[rune(constructor)]
-    GainFood(#[rune(get)] u32),
+    ChangeFood(#[rune(get)] i32),
     #[rune(constructor)]
-    Damage(#[rune(get)] Ent, #[rune(get)] u32),
-    #[rune(constructor)]
-    GainHealth(#[rune(get)] Ent, #[rune(get)] u32),
+    ChangeHealth(#[rune(get)] Ent, #[rune(get)] i32),
 }
 impl RuneCommand {
     pub fn send(&self, cx: &mut SchedulerContext) {
         match self {
             Self::None => (),
-            Self::GainFood(v) => cx.send(GainFood(*v)),
-            Self::Damage(e, v) => cx.send(Damage(e.into(), *v)),
-            Self::GainHealth(e, v) => cx.send(GainHealth(e.into(), *v)),
+            Self::ChangeFood(v) => cx.send(ChangeFood(*v)),
+            Self::ChangeHealth(e, v) => cx.send(ChangeHealth(e.into(), *v)),
         }
     }
 }
@@ -53,8 +47,7 @@ impl RuneCommand {
 // Register
 
 pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
-    scheduler.add_system(pay);
-    scheduler.add_system(gain_food);
+    scheduler.add_system(change_food);
     scheduler.add_system(redraw_hand);
     scheduler.add_system(fight);
     scheduler.add_system_with_priority(handle_on_fight, 1);
@@ -64,20 +57,23 @@ pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
     scheduler.add_system(move_unit);
     scheduler.add_system(attack);
     scheduler.add_system(attack_town);
-    scheduler.add_system(damage);
-    scheduler.add_system(gain_health);
+    scheduler.add_system(change_health);
     scheduler.add_system(kill);
 }
 
 // Handlers
 
-fn pay(cmd: &mut Pay, world: &mut World) -> Result<(), CommandError> {
-    world.0.resources.player_data.food = world.0.resources.player_data.food.saturating_sub(cmd.0);
-    Ok(())
-}
-
-fn gain_food(cmd: &mut GainFood, world: &mut World) -> Result<(), CommandError> {
-    world.0.resources.player_data.food += cmd.0;
+fn change_food(cmd: &mut ChangeFood, world: &mut World) -> Result<(), CommandError> {
+    if cmd.0 < 0 {
+        world.0.resources.player_data.food = world
+            .0
+            .resources
+            .player_data
+            .food
+            .saturating_sub((-cmd.0) as u32);
+    } else {
+        world.0.resources.player_data.food += cmd.0 as u32;
+    }
     Ok(())
 }
 
@@ -93,7 +89,7 @@ fn redraw_hand(
 
     crate::player::draw_hand(world);
 
-    cx.send(Pay(cost));
+    cx.send(ChangeFood(-(cost as i32)));
     Ok(())
 }
 
@@ -146,7 +142,7 @@ fn summon_unit(
     data.hand.retain(|a| *a != cmd.0);
 
     cx.send(SpawnUnit(cmd.0, cmd.1));
-    cx.send(Pay(cost));
+    cx.send(ChangeFood(-(cost as i32)));
 
     Ok(())
 }
@@ -184,7 +180,7 @@ fn handle_on_spawn(
 fn move_unit(
     cmd: &mut MoveUnit,
     world: &mut World,
-    cx: &mut SchedulerContext,
+    _: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
     // let cost = 1;
     // if world.0.resources.player_data.food < cost {
@@ -216,8 +212,8 @@ fn attack(
         .get(cmd.1)
         .ok_or(CommandError::Break)?;
 
-    cx.send(Damage(cmd.1, health_0.current()));
-    cx.send(Damage(cmd.0, health_1.current()));
+    cx.send(ChangeHealth(cmd.1, -(health_0.current() as i32)));
+    cx.send(ChangeHealth(cmd.0, -(health_1.current() as i32)));
     Ok(())
 }
 
@@ -244,8 +240,8 @@ fn attack_town(
     Ok(())
 }
 
-fn damage(
-    cmd: &mut Damage,
+fn change_health(
+    cmd: &mut ChangeHealth,
     world: &mut World,
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
@@ -256,21 +252,14 @@ fn damage(
         .get_mut(cmd.0)
         .ok_or(CommandError::Break)?;
 
-    health.sub(cmd.1);
-    if health.current() == 0 {
-        cx.send(Kill(cmd.0));
+    if cmd.1 < 0 {
+        health.sub((-cmd.1) as u32);
+        if health.current() == 0 {
+            cx.send(Kill(cmd.0));
+        }
+    } else {
+        health.add(cmd.1 as u32);
     }
-    Ok(())
-}
-
-fn gain_health(cmd: &mut GainHealth, world: &mut World) -> Result<(), CommandError> {
-    let health = world
-        .0
-        .components
-        .health
-        .get_mut(cmd.0)
-        .ok_or(CommandError::Break)?;
-    health.add(cmd.1);
     Ok(())
 }
 

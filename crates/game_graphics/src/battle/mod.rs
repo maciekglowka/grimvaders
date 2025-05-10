@@ -9,11 +9,13 @@ use crate::{
     draw::{
         bubbles::Bubble,
         sprites::{
-            animate_card_sprite, attack_town, attack_unit_sprite, move_unit_sprite,
-            place_unit_sprite, remove_unit_sprite, UnitSprite,
+            animate_card_sprite, attack_town, attack_unit_sprite, get_unit_sprite,
+            move_unit_sprite, place_unit_sprite, remove_unit_sprite, UnitSprite,
         },
     },
+    globals::{BASE_TEXT_SIZE, GAP, PRIMARY_COLOR, RED_COLOR},
     input::InputState,
+    utils::get_viewport_bounds,
 };
 use game_logic::{commands, GameEnv, InputEvent, World};
 
@@ -32,14 +34,7 @@ pub struct BattleGraphics {
     observers: Vec<Box<dyn ErasedObserver>>,
     unit_sprites: Vec<UnitSprite>,
     bubbles: Vec<Bubble>,
-}
-
-struct Observers {
-    spawn_unit: Observer<commands::SpawnUnit>,
-    move_unit: Observer<commands::MoveUnit>,
-    attack: Observer<commands::Attack>,
-    attack_town: Observer<commands::AttackTown>,
-    kill: Observer<commands::Kill>,
+    status_origin: Vector2f,
 }
 
 pub fn battle_init(state: &mut BattleGraphics, env: &mut GameEnv) {
@@ -54,6 +49,9 @@ pub fn battle_draw(
     context: &mut Context,
     input_state: &InputState,
 ) -> bool {
+    let bounds = get_viewport_bounds(context);
+    state.status_origin = Vector2f::new(0.5 * (bounds.0.x + bounds.1.x), bounds.0.y + GAP);
+
     let _ = handle_events(state, world);
     let mut is_animating = false;
 
@@ -92,6 +90,30 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
     observers.push(Box::new(CommandObserver::new(
         &mut env.scheduler,
         |c: &commands::Attack, w, s| attack_unit_sprite(c.0, c.1, w, &mut s.unit_sprites),
+    )));
+    observers.push(Box::new(CommandObserver::new(
+        &mut env.scheduler,
+        |c: &commands::ChangeHealth, _, s| {
+            if let Some(sprite) = get_unit_sprite(c.0, &s.unit_sprites) {
+                s.bubbles.push(Bubble::new(
+                    sprite.origin,
+                    RED_COLOR,
+                    Some(format!("{:+}", c.1)),
+                    None,
+                ));
+            }
+        },
+    )));
+    observers.push(Box::new(CommandObserver::new(
+        &mut env.scheduler,
+        |c: &commands::ChangeFood, _, s| {
+            s.bubbles.push(Bubble::new(
+                s.status_origin + Vector2f::new(0., BASE_TEXT_SIZE),
+                PRIMARY_COLOR,
+                Some(format!("{:+}", c.0)),
+                None,
+            ));
+        },
     )));
     observers.push(Box::new(CommandObserver::new(
         &mut env.scheduler,

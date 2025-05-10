@@ -46,29 +46,9 @@ impl ValueDefault {
     }
 }
 
-macro_rules! handle_component {
-    ($world:ident, $component:ident, $entity:ident, $value:ident, $type:ty) => {
-        $world.0.components.$component.insert(
-            $entity,
-            serde_yaml::from_value::<$type>($value.clone())
-                .expect(&format!("Could not parse {:?}", $value)),
-        )
-    };
-}
-
 pub(crate) fn insert_components(entity: Entity, world: &mut World, data: &EntityData) {
     for (k, v) in data.components.iter() {
-        match k.as_str() {
-            "cost" => handle_component!(world, cost, entity, v, u32),
-            "health" => handle_component!(world, health, entity, v, ValueDefault),
-            // handlers
-            "on_spawn" => handle_component!(world, on_spawn, entity, v, String),
-            "on_fight" => handle_component!(world, on_fight, entity, v, String),
-            "on_kill" => handle_component!(world, on_kill, entity, v, String),
-            // handlers
-            "player" => handle_component!(world, player, entity, v, ()),
-            a => panic!("Unknown component {}", a),
-        }
+        crate::world::Components::insert_from_yaml(entity, k, v, world);
     }
 }
 
@@ -79,7 +59,7 @@ pub(crate) const ORTHO: [Position; 4] = [
     Position { x: -1, y: 0 },
 ];
 
-#[derive(Any, Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Any, Clone, Copy, Debug, Hash, PartialEq, Deserialize)]
 pub struct Position {
     #[rune(get)]
     pub x: i32,

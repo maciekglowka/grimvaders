@@ -59,6 +59,7 @@ pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
     scheduler.add_system(attack_town);
     scheduler.add_system(change_health);
     scheduler.add_system(kill);
+    scheduler.add_system_with_priority(handle_on_kill, 1);
 }
 
 // Handlers
@@ -273,5 +274,27 @@ fn kill(cmd: &mut Kill, world: &mut World) -> Result<(), CommandError> {
     } else {
         world.0.despawn(cmd.0);
     }
+    Ok(())
+}
+
+fn handle_on_kill(
+    cmd: &mut Kill,
+    world: &mut World,
+    cx: &mut SchedulerContext,
+) -> Result<(), CommandError> {
+    let on_kill = world
+        .0
+        .components
+        .on_kill
+        .get(cmd.0)
+        .ok_or(CommandError::Continue)?
+        .clone();
+
+    if let Some(commands) = run_command_script(&on_kill, cmd.0.into(), world) {
+        for c in commands {
+            c.send(cx);
+        }
+    }
+
     Ok(())
 }

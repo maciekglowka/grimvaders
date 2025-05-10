@@ -13,7 +13,7 @@ use crate::{
             move_unit_sprite, place_unit_sprite, remove_unit_sprite, UnitSprite,
         },
     },
-    globals::{BASE_TEXT_SIZE, GAP, PRIMARY_COLOR, RED_COLOR},
+    globals::{BASE_TEXT_SIZE, GAP, PRIMARY_COLOR, RED_COLOR, TILE_SIZE},
     input::InputState,
     utils::get_viewport_bounds,
 };
@@ -96,7 +96,7 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
         |c: &commands::ChangeHealth, _, s| {
             if let Some(sprite) = get_unit_sprite(c.0, &s.unit_sprites) {
                 s.bubbles.push(Bubble::new(
-                    sprite.origin,
+                    sprite.origin + Vector2f::new(0., TILE_SIZE),
                     RED_COLOR,
                     Some(format!("{:+}", c.1)),
                     None,
@@ -108,7 +108,7 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
         &mut env.scheduler,
         |c: &commands::ChangeFood, _, s| {
             s.bubbles.push(Bubble::new(
-                s.status_origin + Vector2f::new(0., BASE_TEXT_SIZE),
+                s.status_origin + Vector2f::new(0., 2. * BASE_TEXT_SIZE),
                 PRIMARY_COLOR,
                 Some(format!("{:+}", c.0)),
                 None,

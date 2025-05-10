@@ -3,7 +3,7 @@ use std::collections::*;
 use wunderkammer::prelude::*;
 
 use crate::{components::*, player::PlayerData};
-use macros::RuneAdapter;
+use macros::{ComponentGen, RuneAdapter};
 
 #[derive(Default)]
 pub struct GameEnv {
@@ -47,7 +47,7 @@ impl World {
     }
 }
 
-#[derive(Any, Default, ComponentSet, RuneAdapter)]
+#[derive(Any, Default, ComponentSet, RuneAdapter, ComponentGen)]
 pub struct Components {
     pub cost: ComponentStorage<u32>,
     pub health: ComponentStorage<ValueDefault>,

@@ -8,8 +8,6 @@ pub fn rune_adapter_derive(input: TokenStream) -> TokenStream {
 }
 
 fn impl_rune_adapter(ast: &syn::DeriveInput) -> TokenStream {
-    // let name = &ast.ident;
-
     let syn::Data::Struct(data_struct) = &ast.data else {
         panic!("Rune Adapter: Not a data struct!")
     };
@@ -36,6 +34,36 @@ fn impl_rune_adapter(ast: &syn::DeriveInput) -> TokenStream {
                 module.function_meta(World::get_tile_at)?;
                 module.function_meta(World::query)?;
                 Ok(module)
+            }
+        }
+    };
+    gen.into()
+}
+
+#[proc_macro_derive(ComponentGen)]
+pub fn component_gen_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_component_gen(&ast)
+}
+
+fn impl_component_gen(ast: &syn::DeriveInput) -> TokenStream {
+    let syn::Data::Struct(data_struct) = &ast.data else {
+        panic!("Not a data struct!")
+    };
+    let members = data_struct.fields.members();
+
+    let gen = quote! {
+        impl Components {
+            pub(crate) fn insert_from_yaml(entity: Entity, component: &str, data: &serde_yaml::Value, world: &mut World)  {
+                match component {
+                    #(stringify!(#members) =>
+                        world.0.components.#members.insert(
+                            entity,
+                            serde_yaml::from_value(data.clone()).expect("Can't deserialize component data!")
+                        ),
+                    )*
+                    _ => ()
+                };
             }
         }
     };

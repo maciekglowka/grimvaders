@@ -73,3 +73,23 @@ Pikeman:
     cost: 3
     health: [3, 3]
     player:
+
+Martyr:
+  sprite:
+    atlas: sprites
+    index: 24
+  components:
+    cost: 3
+    health: [2, 2]
+    on_kill: "martyr_kill"
+    player:
+  script: >
+    pub fn martyr_kill(world, entity) {
+      let commands  = [];
+      for player in world.query(["player", "position"], []) {
+        commands.push(RuneCommand::ChangeHealth(player, 1));
+      }
+      commands
+    }
+  description: >
+    On kill: add 1 health for each player unit.

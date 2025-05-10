@@ -1,3 +1,4 @@
+use core::f32;
 use rogalik::prelude::*;
 use std::collections::VecDeque;
 use wunderkammer::prelude::*;
@@ -7,7 +8,7 @@ use game_logic::{components::Position, globals::BOARD_H, World};
 
 use crate::{
     globals::{DIGITS_TEXT_SIZE, MOVE_SPEED, MOVE_THRESH, OVERLAY_Z, SPRITE_SIZE, UNIT_Z},
-    utils::{move_towards, tile_to_sprite, tile_to_world},
+    utils::{tile_to_sprite, tile_to_world},
 };
 
 #[derive(Default)]
@@ -41,12 +42,13 @@ impl UnitSprite {
         self
     }
     pub fn add_translations(&mut self, path: &[Vector2f]) {
-        if let Some(EntityAnimation::Translate(animation)) = &mut self.animation {
+        if let Some(EntityAnimation::Translate(_, animation)) = &mut self.animation {
             animation.extend(path);
         } else {
-            self.animation = Some(EntityAnimation::Translate(VecDeque::from_iter(
-                path.iter().copied(),
-            )));
+            self.animation = Some(EntityAnimation::Translate(
+                self.origin,
+                VecDeque::from_iter(path.iter().copied()),
+            ));
         }
     }
     pub fn draw(&self, world: &World, context: &mut Context) {
@@ -64,7 +66,7 @@ impl UnitSprite {
 }
 
 pub enum EntityAnimation {
-    Translate(VecDeque<Vector2f>),
+    Translate(Vector2f, VecDeque<Vector2f>),
 }
 
 pub(crate) fn get_unit_sprite(entity: Entity, sprites: &Vec<UnitSprite>) -> Option<&UnitSprite> {
@@ -108,13 +110,13 @@ pub(crate) fn attack_unit_sprite(
     sprites: &mut Vec<UnitSprite>,
 ) {
     if let Some(sprite) = get_unit_sprite_mut(source, sprites) {
-        if let Some(position) = world.0.components.position.get(source) {
-            if let Some(target_position) = world.0.components.position.get(target) {
-                let origin = tile_to_sprite(*position);
-                let dest = tile_to_sprite(*target_position);
-                let path = vec![dest, origin];
-                sprite.add_translations(&path);
-            }
+        if let Some(target_position) = world.0.components.position.get(target) {
+            // let tile_in_front = Position::new(target_position.x, target_position.y + 1);
+            // let next_origin = tile_to_sprite(tile_in_front);
+            let dest = tile_to_sprite(*target_position);
+            // let path = vec![dest];
+            let path = vec![dest, sprite.origin];
+            sprite.add_translations(&path);
         }
     }
 }
@@ -122,7 +124,6 @@ pub(crate) fn attack_unit_sprite(
 pub(crate) fn attack_town(source: Entity, world: &World, sprites: &mut Vec<UnitSprite>) {
     if let Some(sprite) = get_unit_sprite_mut(source, sprites) {
         if let Some(position) = world.0.components.position.get(source) {
-            // let origin = tile_to_sprite(*position);
             let dest = tile_to_sprite(Position::new(position.x, -1));
             let path = vec![dest];
             sprite.add_translations(&path);
@@ -134,18 +135,22 @@ pub(crate) fn get_sprite_data<'a>(name: &str, world: &'a World) -> Option<&'a Sp
     Some(&world.0.resources.data.entities.get(name)?.sprite)
 }
 
-pub(crate) fn animate_card_sprite(sprite: &mut UnitSprite, delta: f32) -> bool {
+pub(crate) fn animate_unit_sprite(sprite: &mut UnitSprite, delta: f32) -> bool {
     let Some(animation) = &mut sprite.animation else {
         return false;
     };
     match animation {
-        EntityAnimation::Translate(path) => {
+        EntityAnimation::Translate(origin, path) => {
             if let Some(target) = path.get(0) {
                 if (*target - sprite.origin).len() <= MOVE_THRESH {
                     sprite.origin = *target;
-                    path.pop_front();
+                    *origin = path.pop_front().unwrap();
                 } else {
-                    sprite.origin = move_towards(sprite.origin, *target, delta * MOVE_SPEED)
+                    let d = *target - *origin;
+                    let step = d.normalized() * MOVE_SPEED * delta;
+                    // TODO avoid sqrt?
+                    let t = (sprite.origin + step - *origin).len() / d.len();
+                    sprite.origin = sprite.origin.lerp(target, ease(t));
                 }
             } else {
                 sprite.animation = None
@@ -153,4 +158,8 @@ pub(crate) fn animate_card_sprite(sprite: &mut UnitSprite, delta: f32) -> bool {
         }
     }
     true
+}
+
+fn ease(val: f32) -> f32 {
+    -(f32::cos(std::f32::consts::PI * val) - 1.) / 2.
 }

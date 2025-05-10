@@ -1,7 +1,7 @@
 use rogalik::prelude::*;
 
 use crate::{
-    globals::{BUBBLE_AGE, BUBBLE_SPEED, BUBBLE_Z, DIGITS_TEXT_SIZE, ICON_SIZE},
+    globals::{BUBBLE_AGE, BUBBLE_SPEED, BUBBLE_WAIT_AGE, BUBBLE_Z, DIGITS_TEXT_SIZE, ICON_SIZE},
     ui::Span,
 };
 
@@ -24,21 +24,27 @@ impl Bubble {
     }
 }
 
-pub(crate) fn update_bubbles(bubbles: &mut Vec<Bubble>, context: &mut Context) {
-    move_bubbles(bubbles);
+pub(crate) fn update_bubbles(bubbles: &mut Vec<Bubble>, context: &mut Context) -> bool {
+    let wait = move_bubbles(bubbles);
     remove_old_bubbles(bubbles);
     draw_bubbles(bubbles, context);
+    wait
 }
 
 fn remove_old_bubbles(bubbles: &mut Vec<Bubble>) {
     bubbles.retain(|a| a.age < BUBBLE_AGE);
 }
 
-fn move_bubbles(bubbles: &mut Vec<Bubble>) {
+fn move_bubbles(bubbles: &mut Vec<Bubble>) -> bool {
+    let mut wait = false;
     for bubble in bubbles.iter_mut() {
         bubble.origin += Vector2f::new(0., BUBBLE_SPEED);
         bubble.age += 1;
+        if bubble.age < BUBBLE_WAIT_AGE {
+            wait = true;
+        }
     }
+    wait
 }
 
 fn draw_bubbles(bubbles: &mut Vec<Bubble>, context: &mut Context) {

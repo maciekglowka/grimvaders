@@ -92,4 +92,4 @@ Martyr:
       commands
     }
   description: >
-    On kill: add 1 health for each player unit.
+    On kill: increase health of each player's unit by 1 .

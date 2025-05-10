@@ -159,8 +159,10 @@ fn handle_hand(
 
 pub(super) fn draw_status(state: &super::BattleGraphics, world: &World, context: &mut Context) {
     let text = format!(
-        "H: {} | F: {}",
-        world.0.resources.player_data.health, world.0.resources.player_data.food
+        "Health: {} | Food: {} | Wave: {}",
+        world.0.resources.player_data.health,
+        world.0.resources.player_data.food,
+        world.0.resources.battle_state.wave
     );
     let w = context
         .graphics

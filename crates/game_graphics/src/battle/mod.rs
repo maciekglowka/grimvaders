@@ -9,7 +9,7 @@ use crate::{
     draw::{
         bubbles::Bubble,
         sprites::{
-            animate_card_sprite, attack_town, attack_unit_sprite, get_unit_sprite,
+            animate_unit_sprite, attack_town, attack_unit_sprite, get_unit_sprite,
             move_unit_sprite, place_unit_sprite, remove_unit_sprite, UnitSprite,
         },
     },
@@ -60,10 +60,10 @@ pub fn battle_draw(
 
     for sprite in state.unit_sprites.iter_mut() {
         sprite.draw(world, context);
-        is_animating |= animate_card_sprite(sprite, context.time.get_delta());
+        is_animating |= animate_unit_sprite(sprite, context.time.get_delta());
     }
 
-    crate::draw::bubbles::update_bubbles(&mut state.bubbles, context);
+    is_animating |= crate::draw::bubbles::update_bubbles(&mut state.bubbles, context);
     player::handle_player_ui(world, state, context, input_state, !is_animating);
     is_animating
 }

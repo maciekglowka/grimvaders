@@ -1,4 +1,3 @@
-use core::f32;
 use rogalik::prelude::*;
 use std::collections::VecDeque;
 use wunderkammer::prelude::*;
@@ -7,7 +6,9 @@ use game_data::SpriteData;
 use game_logic::{components::Position, globals::BOARD_H, World};
 
 use crate::{
-    globals::{DIGITS_TEXT_SIZE, MOVE_SPEED, MOVE_THRESH, OVERLAY_Z, SPRITE_SIZE, UNIT_Z},
+    globals::{
+        DIGITS_TEXT_SIZE, MOVE_SPEED, MOVE_THRESH, OVERLAY_Z, SPRITE_SIZE, TILE_SIZE, UNIT_Z,
+    },
     utils::{tile_to_sprite, tile_to_world},
 };
 
@@ -45,10 +46,9 @@ impl UnitSprite {
         if let Some(EntityAnimation::Translate(_, animation)) = &mut self.animation {
             animation.extend(path);
         } else {
-            self.animation = Some(EntityAnimation::Translate(
-                self.origin,
-                VecDeque::from_iter(path.iter().copied()),
-            ));
+            let mut path = VecDeque::from_iter(path.iter().copied());
+            path.push_front(self.origin);
+            self.animation = Some(EntityAnimation::Translate(0., path));
         }
     }
     pub fn draw(&self, world: &World, context: &mut Context) {
@@ -66,7 +66,7 @@ impl UnitSprite {
 }
 
 pub enum EntityAnimation {
-    Translate(Vector2f, VecDeque<Vector2f>),
+    Translate(f32, VecDeque<Vector2f>),
 }
 
 pub(crate) fn get_unit_sprite(entity: Entity, sprites: &Vec<UnitSprite>) -> Option<&UnitSprite> {
@@ -140,24 +140,27 @@ pub(crate) fn animate_unit_sprite(sprite: &mut UnitSprite, delta: f32) -> bool {
         return false;
     };
     match animation {
-        EntityAnimation::Translate(origin, path) => {
-            if let Some(target) = path.get(0) {
-                if (*target - sprite.origin).len() <= MOVE_THRESH {
-                    sprite.origin = *target;
-                    *origin = path.pop_front().unwrap();
-                } else {
-                    let d = *target - *origin;
-                    let step = d.normalized() * MOVE_SPEED * delta;
-                    // TODO avoid sqrt?
-                    let t = (sprite.origin + step - *origin).len() / d.len();
-                    sprite.origin = sprite.origin.lerp(target, ease(t));
-                }
-            } else {
+        EntityAnimation::Translate(t, path) => {
+            if path.len() < 2 {
                 sprite.animation = None
+            } else {
+                if (path[1] - sprite.origin).len() <= MOVE_THRESH {
+                    path.pop_front();
+                    *t = 0.;
+                } else {
+                    // TODO do not calculate each frame
+                    let total = translation_time(path[0], path[1]);
+                    *t += delta / total;
+                    sprite.origin = path[0].lerp(&path[1], ease(*t));
+                }
             }
         }
     }
     true
+}
+
+fn translation_time(a: Vector2f, b: Vector2f) -> f32 {
+    (b - a).len() / MOVE_SPEED
 }
 
 fn ease(val: f32) -> f32 {

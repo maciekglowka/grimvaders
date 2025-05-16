@@ -31,3 +31,8 @@ pub(super) fn world_to_tile(v: Vector2f) -> Position {
         (v.y / TILE_SIZE).floor() as i32,
     )
 }
+
+pub fn is_mouse_over(origin: Vector2f, size: Vector2f, state: &crate::input::InputState) -> bool {
+    let v = state.mouse_world_position;
+    v.x >= origin.x && v.y >= origin.y && v.x <= origin.x + size.x && v.y <= origin.y + size.y
+}

@@ -76,10 +76,11 @@ impl<'a> Button<'a> {
     }
 
     pub fn mouse_over(&self, state: &InputState) -> bool {
-        let v = state.mouse_world_position;
-        v.x >= self.origin.x
-            && v.y >= self.origin.y
-            && v.x <= self.origin.x + self.size.x
-            && v.y <= self.origin.y + self.size.y
+        crate::utils::is_mouse_over(self.origin, self.size, state)
+        // let v = state.mouse_world_position;
+        // v.x >= self.origin.x
+        //     && v.y >= self.origin.y
+        //     && v.x <= self.origin.x + self.size.x
+        //     && v.y <= self.origin.y + self.size.y
     }
 }

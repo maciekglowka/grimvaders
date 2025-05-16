@@ -4,7 +4,8 @@ use wunderkammer::prelude::*;
 use game_logic::{shop::ShopState, InputEvent, World};
 
 use crate::{
-    globals::{BASE_TEXT_SIZE, BUTTON_SIZE, GAP},
+    draw::units::{draw_deck_unit, draw_entity_description},
+    globals::{BUTTON_SIZE, GAP, SPRITE_SIZE},
     input::InputState,
     ui::{Button, Span},
     utils::get_viewport_bounds,
@@ -30,26 +31,24 @@ pub fn shop_draw(
     let mut origin = center - Vector2f::new(0.5 * logic_state.choices.len() as f32 * w, 0.);
 
     for i in 0..logic_state.choices.len() {
-        if let Some((name, price)) = &logic_state.choices[i] {
+        if let Some(entity) = &logic_state.choices[i] {
             let button = Button::new(
                 origin - Vector2f::new(0., BUTTON_SIZE + GAP),
                 Vector2f::new(button_w, BUTTON_SIZE),
                 0,
             )
-            .with_span(Span::new().with_text_owned(format!("Buy {}", price)));
+            .with_span(Span::new().with_text_borrowed("Pick"));
             button.draw(context, input_state);
 
             if button.clicked(input_state) {
-                // state.input_queue.push(InputEvent::BuyUnit(i));
+                state.input_queue.push(InputEvent::PickUnit(i));
             }
 
-            // draw_action_card(
-            //     name,
-            //     origin + Vector2f::new(0.5 * (button_w - CARD_W), 0.),
-            //     false,
-            //     world,
-            //     context,
-            // );
+            draw_deck_unit(*entity, origin, 0, world, context);
+
+            if crate::utils::is_mouse_over(origin, Vector2f::splat(SPRITE_SIZE), input_state) {
+                draw_entity_description(*entity, world, context);
+            }
         }
 
         origin.x += w;
@@ -60,7 +59,7 @@ pub fn shop_draw(
         Vector2f::new(button_w, BUTTON_SIZE),
         0,
     )
-    .with_span(Span::new().with_text_borrowed("Done"));
+    .with_span(Span::new().with_text_borrowed("Skip"));
     done.draw(context, input_state);
     if done.clicked(input_state) {
         state.input_queue.push(InputEvent::Done);

@@ -4,7 +4,8 @@ use wunderkammer::prelude::*;
 use game_logic::{InputEvent, World};
 
 use crate::{
-    globals::{BASE_TEXT_SIZE, BUTTON_SIZE, GAP, TILE_SIZE},
+    draw::units::{draw_deck_unit, draw_entity_description},
+    globals::{BASE_TEXT_SIZE, BUTTON_SIZE, GAP, SPRITE_SIZE, TILE_SIZE},
     input::InputState,
     ui::{Button, Span},
     utils::get_viewport_bounds,
@@ -28,7 +29,7 @@ pub fn deck_draw(
 
     let _ = context.graphics.draw_text(
         "default",
-        "Too many cards in the deck. Please discard {}.",
+        "Too many cards in the deck. Please discard.",
         Vector2f::new(bounds.0.x + GAP, bounds.1.y - GAP - BASE_TEXT_SIZE),
         0,
         BASE_TEXT_SIZE,
@@ -38,24 +39,29 @@ pub fn deck_draw(
     let mut origin = center + Vector2f::new(-2.5 * w, TILE_SIZE + GAP);
 
     for (i, entity) in world.0.resources.player_data.draw.iter().enumerate() {
-        let Some(name) = world.0.components.name.get(*entity) else {
-            continue;
-        };
+        // let Some(name) = world.0.components.name.get(*entity) else {
+        //     continue;
+        // };
+        let selected = state.selected == Some(*entity);
 
-        // draw_action_card(
-        //     name,
-        //     origin,
-        //     state.selected == Some(*entity),
-        //     world,
-        //     context,
-        // );
-        // if is_card_clicked(origin, input_state) {
-        //     if state.selected == Some(*entity) {
-        //         state.selected = None
-        //     } else {
-        //         state.selected = Some(*entity)
-        //     }
-        // }
+        let mut button = Button::new(origin, Vector2f::splat(2. * SPRITE_SIZE), 0);
+        if selected {
+            button = button.with_sprite("sprites", 726);
+        }
+        button.draw(context, input_state);
+        draw_deck_unit(*entity, origin, 0, world, context);
+
+        if button.mouse_over(input_state) {
+            draw_entity_description(*entity, world, context);
+        }
+
+        if button.clicked(input_state) {
+            if state.selected == Some(*entity) {
+                state.selected = None
+            } else {
+                state.selected = Some(*entity)
+            }
+        }
 
         origin.x += w;
         if i % 5 == 4 {
@@ -74,7 +80,7 @@ pub fn deck_draw(
         confirm.draw(context, input_state);
 
         if confirm.clicked(input_state) {
-            // state.input_queue.push(InputEvent::DiscardCard(entity));
+            state.input_queue.push(InputEvent::DiscardUnit(entity));
         }
     }
 }

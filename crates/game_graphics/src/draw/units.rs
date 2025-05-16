@@ -65,14 +65,14 @@ pub(crate) fn draw_deck_unit(
 }
 
 pub(crate) fn draw_entity_description(entity: Entity, world: &World, context: &mut Context) {
-    let Some(name) = world.0.components.name.get(entity) else {
+    let Some(name) = world.components.name.get(entity) else {
         return;
     };
     draw_description(name, world, context);
 }
 
 pub(crate) fn draw_description(name: &str, world: &World, context: &mut Context) {
-    let Some(data) = world.0.resources.data.entities.get(name) else {
+    let Some(data) = world.resources.data.entities.get(name) else {
         return;
     };
     let mut content = name.to_string();

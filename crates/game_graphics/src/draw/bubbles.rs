@@ -40,7 +40,7 @@ fn move_bubbles(bubbles: &mut Vec<Bubble>) -> bool {
     for bubble in bubbles.iter_mut() {
         bubble.origin += Vector2f::new(0., BUBBLE_SPEED);
         bubble.age += 1;
-        if bubble.age < BUBBLE_WAIT_AGE {
+        if bubble.age <= BUBBLE_WAIT_AGE {
             wait = true;
         }
     }

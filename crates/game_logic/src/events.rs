@@ -8,5 +8,6 @@ pub enum InputEvent {
     SummonUnit(Entity, Position),
     RedrawHand,
     Done,
+    PickUnit(usize),
     DiscardUnit(Entity),
 }

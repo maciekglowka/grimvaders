@@ -52,7 +52,7 @@ pub fn battle_draw(
     let bounds = get_viewport_bounds(context);
     state.status_origin = Vector2f::new(0.5 * (bounds.0.x + bounds.1.x), bounds.0.y + GAP);
 
-    let _ = handle_events(state, world);
+    handle_events(state, world);
     let mut is_animating = false;
 
     board::draw_board(world, context);

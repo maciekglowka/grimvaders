@@ -1,11 +1,4 @@
-use crate::{
-    commands,
-    components::Position,
-    events::InputEvent,
-    globals::BOARD_H,
-    utils::{get_entity_at, spawn_by_name},
-    GameEnv,
-};
+use crate::{commands, events::InputEvent, globals::WAVE_COUNT, GameEnv};
 
 pub(crate) mod board;
 mod npcs;
@@ -18,6 +11,7 @@ pub enum BattleMode {
     #[default]
     Plan,
     Fight,
+    Done,
 }
 
 #[derive(Default)]
@@ -44,7 +38,7 @@ pub fn battle_update(env: &mut GameEnv) {
     if handle_command_queue(env) {
         return;
     };
-    match env.world.0.resources.battle_state.mode {
+    match env.world.resources.battle_state.mode {
         BattleMode::Plan => {
             handle_input_events(env);
         }
@@ -53,12 +47,17 @@ pub fn battle_update(env: &mut GameEnv) {
                 next_turn(env);
             }
         }
+        BattleMode::Done => (),
     };
 }
 
 fn next_turn(env: &mut GameEnv) {
-    env.world.0.resources.battle_state.wave += 1;
-    env.world.0.resources.battle_state.mode = BattleMode::Plan;
+    if env.world.resources.battle_state.wave >= WAVE_COUNT {
+        env.world.resources.battle_state.mode = BattleMode::Done;
+        return;
+    }
+    env.world.resources.battle_state.wave += 1;
+    env.world.resources.battle_state.mode = BattleMode::Plan;
     player::player_next_turn(env);
     npcs::next_wave(env);
 }

@@ -14,7 +14,9 @@ impl Scene for Shop {
         game.env.input = Some(self.graphics_state.input_queue.subscribe());
         game_logic::shop::shop_init(&mut self.logic_state, &mut game.env);
     }
-    fn exit(&mut self, game: &mut Self::Game, _context: &mut rogalik::engine::Context) {}
+    fn exit(&mut self, game: &mut Self::Game, _context: &mut rogalik::engine::Context) {
+        game_logic::shop::shop_exit(&mut self.logic_state, &mut game.env);
+    }
 
     fn update(
         &mut self,

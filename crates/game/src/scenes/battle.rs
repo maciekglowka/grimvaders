@@ -34,15 +34,11 @@ impl Scene for Battle {
             game_logic::battle::battle_update(&mut game.env);
         }
 
-        // match game.env.world.0.resources.player_data.status {
-        //     PlayerStatus::GameOver => {
-        //         Some(SceneChange::Switch(Box::new(super::game_over::GameOver)))
-        //     }
-        //     PlayerStatus::Descend => {
-        //         Some(SceneChange::Switch(Box::new(super::shop::Shop::default())))
-        //     }
-        //     _ => None,
-        // }
-        None
+        match game.env.world.resources.battle_state.mode {
+            game_logic::battle::BattleMode::Done => {
+                Some(SceneChange::Switch(Box::new(super::shop::Shop::default())))
+            }
+            _ => None,
+        }
     }
 }

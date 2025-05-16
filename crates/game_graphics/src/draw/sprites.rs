@@ -70,6 +70,9 @@ impl UnitSprite {
 
         super::units::draw_unit_overlay(self.entity, self.origin, world, context);
     }
+    pub fn mouse_over(&self, state: &crate::input::InputState) -> bool {
+        crate::utils::is_mouse_over(self.origin, Vector2f::splat(SPRITE_SIZE), state)
+    }
 }
 
 pub enum EntityAnimation {

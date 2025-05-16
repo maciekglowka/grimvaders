@@ -11,12 +11,13 @@ use crate::{
 };
 
 pub(crate) fn next_wave(env: &mut GameEnv) {
-    let target_score = 2 * env.world.0.resources.battle_state.wave;
+    let tier = env.world.resources.player_data.level;
+    let target_score = tier * env.world.resources.battle_state.wave;
     let mut score = 0;
 
     let mut rng = thread_rng();
 
-    let pool = get_pool(10, &env.world);
+    let pool = get_pool(tier, &env.world);
     let mut layout = [const { Vec::new() }; BOARD_W];
 
     loop {

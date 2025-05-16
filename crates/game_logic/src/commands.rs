@@ -3,7 +3,7 @@ use rune::Any;
 use wunderkammer::prelude::*;
 
 use crate::{
-    battle::BattleMode,
+    battle::{player::remove_player_from_board, BattleMode},
     components::Position,
     scripting::run_command_script,
     utils::get_entity_at,
@@ -260,11 +260,7 @@ fn change_health(
 
 fn kill(cmd: &mut Kill, world: &mut World) -> Result<(), CommandError> {
     if world.components.player.get(cmd.0).is_some() {
-        world.components.position.remove(cmd.0);
-        if let Some(health) = world.components.health.get_mut(cmd.0) {
-            health.restore();
-        }
-        world.resources.player_data.discard.push(cmd.0);
+        remove_player_from_board(cmd.0, world);
     } else {
         world.despawn(cmd.0);
     }

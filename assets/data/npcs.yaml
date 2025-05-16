@@ -18,6 +18,7 @@ Bear:
   sprite:
     atlas: sprites
     index: 422
+  tier: 2
   score: 3
   components:
     health: [3, 3]

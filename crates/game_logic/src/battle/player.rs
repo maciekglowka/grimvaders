@@ -1,8 +1,6 @@
-use rogalik::math::vectors::Vector2i;
-use std::collections::HashMap;
 use wunderkammer::prelude::*;
 
-use crate::{commands, globals::HAND_SIZE, GameEnv, World};
+use crate::{GameEnv, World};
 
 pub(super) fn player_battle_init(world: &mut World) {
     crate::player::reset_deck(world);
@@ -14,12 +12,19 @@ pub(super) fn player_battle_exit(world: &mut World) {
         .collect::<Vec<_>>();
 
     for entity in placed {
-        world.0.components.position.remove(entity);
-        world.0.resources.player_data.discard.push(entity);
+        remove_player_from_board(entity, world);
     }
 }
 
 pub(super) fn player_next_turn(env: &mut GameEnv) {
     crate::player::draw_hand(&mut env.world);
-    env.world.0.resources.player_data.food += 6;
+    env.world.0.resources.player_data.food += 4;
+}
+
+pub(crate) fn remove_player_from_board(entity: Entity, world: &mut World) {
+    world.components.position.remove(entity);
+    if let Some(health) = world.components.health.get_mut(entity) {
+        health.restore();
+    }
+    world.resources.player_data.discard.push(entity);
 }

@@ -21,7 +21,10 @@ pub struct BattleState {
 }
 
 pub fn battle_init(env: &mut GameEnv) {
-    env.world.0.resources.player_data.level += 1;
+    env.world.resources.battle_state.mode = BattleMode::default();
+    env.world.resources.battle_state.wave = 0;
+    env.world.resources.player_data.level += 1;
+
     board::tiles_init(env);
     player::player_battle_init(&mut env.world);
     next_turn(env);

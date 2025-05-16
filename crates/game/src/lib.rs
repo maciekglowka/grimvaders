@@ -27,7 +27,7 @@ impl Game for GameState {
     fn reload_assets(&mut self, context: &mut rogalik::engine::Context) {
         if !assets::load_data(
             &self.data_assets,
-            &mut self.env.world.0.resources.data,
+            &mut self.env.world.resources.data,
             context,
             true,
         ) {

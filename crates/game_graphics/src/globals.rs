@@ -25,7 +25,7 @@ pub const GAP: f32 = 4.;
 
 pub const BUBBLE_SPEED: f32 = 0.5;
 pub const BUBBLE_AGE: u32 = 100;
-pub const BUBBLE_WAIT_AGE: u32 = 20;
+pub const BUBBLE_WAIT_AGE: u32 = 0;
 
 pub const MOVE_SPEED: f32 = 6. * TILE_SIZE;
 pub const MOVE_THRESH: f32 = 0.1;

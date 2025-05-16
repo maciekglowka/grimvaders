@@ -3,14 +3,21 @@ use std::collections::VecDeque;
 use wunderkammer::prelude::*;
 
 use game_data::SpriteData;
-use game_logic::{components::Position, globals::BOARD_H, World};
+use game_logic::{components::Position, World};
 
 use crate::{
-    globals::{
-        DIGITS_TEXT_SIZE, MOVE_SPEED, MOVE_THRESH, OVERLAY_Z, SPRITE_SIZE, TILE_SIZE, UNIT_Z,
-    },
-    utils::{tile_to_sprite, tile_to_world},
+    globals::{MOVE_SPEED, MOVE_THRESH, SPRITE_SIZE, UNIT_Z},
+    utils::tile_to_sprite,
 };
+
+#[derive(Clone, Copy, Default)]
+pub enum Ease {
+    #[default]
+    None,
+    In,
+    Out,
+    InOut,
+}
 
 #[derive(Default)]
 pub struct UnitSprite {
@@ -42,12 +49,12 @@ impl UnitSprite {
         self.origin = v;
         self
     }
-    pub fn add_translations(&mut self, path: &[Vector2f]) {
+    pub fn add_translations(&mut self, path: &[(Vector2f, Ease)]) {
         if let Some(EntityAnimation::Translate(_, animation)) = &mut self.animation {
             animation.extend(path);
         } else {
             let mut path = VecDeque::from_iter(path.iter().copied());
-            path.push_front(self.origin);
+            path.push_front((self.origin, Ease::default()));
             self.animation = Some(EntityAnimation::Translate(0., path));
         }
     }
@@ -66,7 +73,7 @@ impl UnitSprite {
 }
 
 pub enum EntityAnimation {
-    Translate(f32, VecDeque<Vector2f>),
+    Translate(f32, VecDeque<(Vector2f, Ease)>),
 }
 
 pub(crate) fn get_unit_sprite(entity: Entity, sprites: &Vec<UnitSprite>) -> Option<&UnitSprite> {
@@ -98,7 +105,7 @@ pub(crate) fn remove_unit_sprite(entity: Entity, sprites: &mut Vec<UnitSprite>) 
 pub(crate) fn move_unit_sprite(entity: Entity, world: &World, sprites: &mut Vec<UnitSprite>) {
     if let Some(sprite) = get_unit_sprite_mut(entity, sprites) {
         if let Some(position) = world.0.components.position.get(entity) {
-            sprite.add_translations(&vec![tile_to_sprite(*position)]);
+            sprite.add_translations(&vec![(tile_to_sprite(*position), Ease::InOut)]);
         }
     }
 }
@@ -112,10 +119,10 @@ pub(crate) fn attack_unit_sprite(
     if let Some(sprite) = get_unit_sprite_mut(source, sprites) {
         if let Some(target_position) = world.0.components.position.get(target) {
             // let tile_in_front = Position::new(target_position.x, target_position.y + 1);
-            // let next_origin = tile_to_sprite(tile_in_front);
             let dest = tile_to_sprite(*target_position);
+            // let next_origin = 0.5 * (sprite.origin + dest);
             // let path = vec![dest];
-            let path = vec![dest, sprite.origin];
+            let path = vec![(dest, Ease::In), (sprite.origin, Ease::Out)];
             sprite.add_translations(&path);
         }
     }
@@ -125,7 +132,7 @@ pub(crate) fn attack_town(source: Entity, world: &World, sprites: &mut Vec<UnitS
     if let Some(sprite) = get_unit_sprite_mut(source, sprites) {
         if let Some(position) = world.0.components.position.get(source) {
             let dest = tile_to_sprite(Position::new(position.x, -1));
-            let path = vec![dest];
+            let path = vec![(dest, Ease::In)];
             sprite.add_translations(&path);
         }
     }
@@ -143,16 +150,14 @@ pub(crate) fn animate_unit_sprite(sprite: &mut UnitSprite, delta: f32) -> bool {
         EntityAnimation::Translate(t, path) => {
             if path.len() < 2 {
                 sprite.animation = None
+            } else if *t >= 1. {
+                path.pop_front();
+                *t = 0.;
             } else {
-                if (path[1] - sprite.origin).len() <= MOVE_THRESH {
-                    path.pop_front();
-                    *t = 0.;
-                } else {
-                    // TODO do not calculate each frame
-                    let total = translation_time(path[0], path[1]);
-                    *t += delta / total;
-                    sprite.origin = path[0].lerp(&path[1], ease(*t));
-                }
+                // TODO do not calculate each frame
+                let total = translation_time(path[0].0, path[1].0);
+                *t += delta / total;
+                sprite.origin = path[0].0.lerp(&path[1].0, ease(*t, path[1].1));
             }
         }
     }
@@ -163,6 +168,23 @@ fn translation_time(a: Vector2f, b: Vector2f) -> f32 {
     (b - a).len() / MOVE_SPEED
 }
 
-fn ease(val: f32) -> f32 {
-    -(f32::cos(std::f32::consts::PI * val) - 1.) / 2.
+fn ease(val: f32, ease: Ease) -> f32 {
+    match ease {
+        Ease::None => val,
+        Ease::In => ease_in(val),
+        Ease::Out => ease_out(val),
+        Ease::InOut => ease_in_out(val),
+    }
+}
+
+fn ease_in(val: f32) -> f32 {
+    1. - f32::cos(0.5 * val * std::f32::consts::PI)
+}
+
+fn ease_out(val: f32) -> f32 {
+    f32::sin(0.5 * val * std::f32::consts::PI)
+}
+
+fn ease_in_out(val: f32) -> f32 {
+    -0.5 * (f32::cos(std::f32::consts::PI * val) - 1.)
 }

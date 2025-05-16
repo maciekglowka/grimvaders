@@ -66,14 +66,13 @@ pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
 
 fn change_food(cmd: &mut ChangeFood, world: &mut World) -> Result<(), CommandError> {
     if cmd.0 < 0 {
-        world.0.resources.player_data.food = world
-            .0
+        world.resources.player_data.food = world
             .resources
             .player_data
             .food
             .saturating_sub((-cmd.0) as u32);
     } else {
-        world.0.resources.player_data.food += cmd.0 as u32;
+        world.resources.player_data.food += cmd.0 as u32;
     }
     Ok(())
 }
@@ -84,7 +83,7 @@ fn redraw_hand(
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
     let cost = 1;
-    if world.0.resources.player_data.food < cost {
+    if world.resources.player_data.food < cost {
         return Err(CommandError::Break);
     }
 
@@ -95,7 +94,7 @@ fn redraw_hand(
 }
 
 fn fight(_: &mut Fight, world: &mut World) -> Result<(), CommandError> {
-    world.0.resources.battle_state.mode = BattleMode::Fight;
+    world.resources.battle_state.mode = BattleMode::Fight;
     Ok(())
 }
 
@@ -104,7 +103,7 @@ fn handle_on_fight(
     world: &mut World,
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
-    let on_fight = query_iter!(world.0, With(position, on_fight))
+    let on_fight = query_iter!(world, With(position, on_fight))
         .map(|(e, _, s)| (e, s.to_string()))
         .collect::<Vec<_>>();
 
@@ -126,16 +125,17 @@ fn summon_unit(
     if get_entity_at(world, cmd.1).is_some() {
         return Err(CommandError::Break);
     }
-    let data = &mut world.0.resources.player_data;
-    if !data.hand.contains(&cmd.0) {
-        return Err(CommandError::Break);
-    }
     let &cost = world
-        .0
         .components
         .cost
         .get(cmd.0)
         .ok_or(CommandError::Break)?;
+
+    let data = &mut world.resources.player_data;
+
+    if !data.hand.contains(&cmd.0) {
+        return Err(CommandError::Break);
+    }
     if cost > data.food {
         return Err(CommandError::Break);
     }
@@ -152,7 +152,7 @@ fn spawn_unit(cmd: &mut SpawnUnit, world: &mut World) -> Result<(), CommandError
     if get_entity_at(world, cmd.1).is_some() {
         return Err(CommandError::Break);
     }
-    world.0.components.position.insert(cmd.0, cmd.1);
+    world.components.position.insert(cmd.0, cmd.1);
     Ok(())
 }
 
@@ -162,7 +162,6 @@ fn handle_on_spawn(
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
     let on_spawn = world
-        .0
         .components
         .on_spawn
         .get(cmd.0)
@@ -190,7 +189,7 @@ fn move_unit(
     if get_entity_at(world, cmd.1).is_some() {
         return Err(CommandError::Break);
     }
-    world.0.components.position.insert(cmd.0, cmd.1);
+    world.components.position.insert(cmd.0, cmd.1);
     // cx.send(Pay(cost));
     Ok(())
 }
@@ -201,13 +200,11 @@ fn attack(
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
     let health_0 = world
-        .0
         .components
         .health
         .get(cmd.0)
         .ok_or(CommandError::Break)?;
     let health_1 = world
-        .0
         .components
         .health
         .get(cmd.1)
@@ -224,13 +221,11 @@ fn attack_town(
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
     let health = world
-        .0
         .components
         .health
         .get(cmd.0)
         .ok_or(CommandError::Break)?;
-    world.0.resources.player_data.health = world
-        .0
+    world.resources.player_data.health = world
         .resources
         .player_data
         .health
@@ -247,7 +242,6 @@ fn change_health(
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
     let health = world
-        .0
         .components
         .health
         .get_mut(cmd.0)
@@ -265,14 +259,14 @@ fn change_health(
 }
 
 fn kill(cmd: &mut Kill, world: &mut World) -> Result<(), CommandError> {
-    if world.0.components.player.get(cmd.0).is_some() {
-        world.0.components.position.remove(cmd.0);
-        if let Some(health) = world.0.components.health.get_mut(cmd.0) {
+    if world.components.player.get(cmd.0).is_some() {
+        world.components.position.remove(cmd.0);
+        if let Some(health) = world.components.health.get_mut(cmd.0) {
             health.restore();
         }
-        world.0.resources.player_data.discard.push(cmd.0);
+        world.resources.player_data.discard.push(cmd.0);
     } else {
-        world.0.despawn(cmd.0);
+        world.despawn(cmd.0);
     }
     Ok(())
 }
@@ -283,7 +277,6 @@ fn handle_on_kill(
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
     let on_kill = world
-        .0
         .components
         .on_kill
         .get(cmd.0)

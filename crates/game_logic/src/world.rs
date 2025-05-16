@@ -12,8 +12,10 @@ pub struct GameEnv {
     pub input: Option<Observer<crate::InputEvent>>,
 }
 
+type WorldInner = WorldStorage<Components, Resources>;
+
 #[derive(Any, Default)]
-pub struct World(pub WorldStorage<Components, Resources>);
+pub struct World(pub WorldInner);
 impl World {
     #[rune::function]
     fn query(&self, with: Vec<String>, without: Vec<String>) -> Vec<Ent> {
@@ -44,6 +46,17 @@ impl World {
     #[rune::function]
     fn get_entity_at(&self, position: &Position) -> Option<Ent> {
         Some(crate::get_entity_at(self, *position)?.into())
+    }
+}
+impl std::ops::Deref for World {
+    type Target = WorldInner;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+impl std::ops::DerefMut for World {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }
 

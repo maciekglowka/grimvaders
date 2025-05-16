@@ -15,6 +15,7 @@ pub fn load_assets(context: &mut Context) {
 }
 
 fn load_textures(context: &mut Context) {
+    let sprites_texture = Some(context.graphics.load_texture("sprites/sprites.png"));
     context.graphics.load_material(
         "sprites",
         MaterialParams {
@@ -23,10 +24,12 @@ fn load_textures(context: &mut Context) {
                 rows: 22,
                 padding: Some((1., 1.)),
             }),
-            diffuse_path: "sprites/sprites.png",
+            diffuse_texture: sprites_texture,
             ..Default::default()
         },
     );
+
+    let icons_texture = Some(context.graphics.load_texture("ui/icons_small.png"));
     context.graphics.load_material(
         "icons_small",
         MaterialParams {
@@ -35,7 +38,7 @@ fn load_textures(context: &mut Context) {
                 rows: 8,
                 padding: None,
             }),
-            diffuse_path: "ui/icons_small.png",
+            diffuse_texture: icons_texture,
             ..Default::default()
         },
     );
@@ -46,6 +49,20 @@ fn load_textures(context: &mut Context) {
     context
         .graphics
         .load_font("digits", "ui/digits.png", 16, 16, Some((4., 2.)));
+
+    // let noise_shader = context
+    //     .graphics
+    //     .load_shader(ShaderKind::PostProcess, "shaders/noise.wgsl");
+    // let noise_texture =
+    // Some(context.graphics.load_texture("shaders/perlin.png"));
+    // context.graphics.add_post_process(
+    //     "noise",
+    //     PostProcessParams {
+    //         shader: noise_shader,
+    //         texture: noise_texture,
+    //         ..Default::default()
+    //     },
+    // );
 }
 
 pub fn load_data_assets(context: &mut Context) -> DataAssets {

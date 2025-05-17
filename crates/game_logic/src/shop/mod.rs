@@ -11,6 +11,7 @@ pub struct ShopState {
 
 pub fn shop_init(state: &mut ShopState, env: &mut GameEnv) {
     let level = env.world.resources.player_data.level;
+    println!("Tier: {}", level);
     for (i, name) in get_choices(level, &env.world).iter().enumerate() {
         let Some(name) = name else {
             continue;

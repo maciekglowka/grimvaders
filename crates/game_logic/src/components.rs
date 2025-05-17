@@ -7,7 +7,7 @@ use game_data::EntityData;
 
 use crate::World;
 
-#[derive(Any, Clone, Copy, Debug, Deserialize)]
+#[derive(Any, Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
 pub enum Tile {
     Plains,
     Meadow,

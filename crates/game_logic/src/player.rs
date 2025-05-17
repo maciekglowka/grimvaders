@@ -18,12 +18,10 @@ pub(crate) fn player_game_init(world: &mut World) {
     world.0.resources.player_data = PlayerData::default();
     world.0.resources.player_data.health = 5;
 
-    for _ in 0..3 {
-        for name in ["Sheep", "Martyr"] {
-            let entity = crate::utils::spawn_by_name(name, world).unwrap();
-            world.0.components.player.insert(entity, ());
-            world.0.resources.player_data.draw.push_back(entity);
-        }
+    for name in ["Druid", "Peasant", "Villager", "Villager", "Villager"] {
+        let entity = crate::utils::spawn_by_name(name, world).unwrap();
+        world.0.components.player.insert(entity, ());
+        world.0.resources.player_data.draw.push_back(entity);
     }
 }
 
@@ -31,8 +29,8 @@ pub(crate) fn reset_deck(world: &mut World) {
     let mut rng = thread_rng();
 
     let mut deck: Vec<_> = world.0.resources.player_data.draw.drain(..).collect();
-    deck.extend(world.0.resources.player_data.hand.drain(..));
-    deck.extend(world.0.resources.player_data.discard.drain(..));
+    deck.append(&mut world.resources.player_data.hand);
+    deck.append(&mut world.resources.player_data.discard);
     deck.shuffle(&mut rng);
     world.0.resources.player_data.draw = deck.into();
 }
@@ -43,7 +41,7 @@ pub(crate) fn draw_hand(world: &mut World) {
         .resources
         .player_data
         .discard
-        .extend(world.0.resources.player_data.hand.drain(..));
+        .append(&mut world.0.resources.player_data.hand);
 
     if world.0.resources.player_data.draw.len() < HAND_SIZE {
         reset_deck(world);

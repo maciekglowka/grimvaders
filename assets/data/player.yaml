@@ -1,3 +1,11 @@
+Villager:
+  sprite:
+    atlas: sprites
+    index: 25
+  components:
+    cost: 2
+    health: [2, 2]
+    player:
 
 Peasant:
   sprite:
@@ -41,10 +49,36 @@ Sheep:
   description: >
     On fight start: gain +1 health, when on a meadow tile.
 
+Druid:
+  sprite:
+    atlas: sprites
+    index: 122
+  tier: 2
+  components:
+    cost: 3
+    health: [2, 2]
+    on_fight: "druid_fight"
+    player:
+  script: >
+    pub fn druid_fight(world, entity) {
+      let position = world.get("position", entity).unwrap();
+      let tile = world.get_tile_at(position).unwrap();
+      if let Tile::Forest = tile {} else { return }
+
+      let commands  = [];
+      for player in world.get_adjacent_units(entity) {
+        commands.push(RuneCommand::ChangeHealth(player, 1));
+      }
+      commands
+    }
+  description: >
+    On fight start: give +1 to adjacent units, if on a forest tile.
+
 Shepherd:
   sprite:
     atlas: sprites
     index: 74
+  tier: 3
   components:
     cost: 3
     health: [0, 0]
@@ -78,6 +112,7 @@ Martyr:
   sprite:
     atlas: sprites
     index: 24
+  tier: 3
   components:
     cost: 3
     health: [2, 2]
@@ -98,6 +133,7 @@ Santo Subito:
   sprite:
     atlas: sprites
     index: 220
+  tier: 5
   components:
     cost: 4
     health: [3, 3]

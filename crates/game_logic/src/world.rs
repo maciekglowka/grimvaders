@@ -55,6 +55,7 @@ impl World {
             .iter()
             .map(|d| *d + position)
             .filter_map(|p| get_unit_at(self, p))
+            .filter(|e| self.components.player.get(*e).is_some())
             .map(|e| e.into())
             .collect()
     }

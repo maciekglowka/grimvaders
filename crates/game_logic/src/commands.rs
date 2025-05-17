@@ -6,7 +6,7 @@ use crate::{
     battle::{player::remove_player_from_board, BattleMode},
     components::Position,
     scripting::run_command_script,
-    utils::get_entity_at,
+    utils::get_unit_at,
     world::{Ent, World},
 };
 
@@ -122,7 +122,7 @@ fn summon_unit(
     world: &mut World,
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
-    if get_entity_at(world, cmd.1).is_some() {
+    if get_unit_at(world, cmd.1).is_some() {
         return Err(CommandError::Break);
     }
     let &cost = world
@@ -149,7 +149,7 @@ fn summon_unit(
 }
 
 fn spawn_unit(cmd: &mut SpawnUnit, world: &mut World) -> Result<(), CommandError> {
-    if get_entity_at(world, cmd.1).is_some() {
+    if get_unit_at(world, cmd.1).is_some() {
         return Err(CommandError::Break);
     }
     world.components.position.insert(cmd.0, cmd.1);
@@ -186,7 +186,7 @@ fn move_unit(
     // if world.0.resources.player_data.food < cost {
     //     return Err(CommandError::Break);
     // }
-    if get_entity_at(world, cmd.1).is_some() {
+    if get_unit_at(world, cmd.1).is_some() {
         return Err(CommandError::Break);
     }
     world.components.position.insert(cmd.0, cmd.1);
@@ -259,11 +259,7 @@ fn change_health(
 }
 
 fn kill(cmd: &mut Kill, world: &mut World) -> Result<(), CommandError> {
-    if world.components.player.get(cmd.0).is_some() {
-        remove_player_from_board(cmd.0, world);
-    } else {
-        world.despawn(cmd.0);
-    }
+    world.components.killed.insert(cmd.0, ());
     Ok(())
 }
 

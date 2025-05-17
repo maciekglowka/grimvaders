@@ -41,6 +41,9 @@ pub fn battle_update(env: &mut GameEnv) {
     if handle_command_queue(env) {
         return;
     };
+
+    systems::handle_killed(&mut env.world);
+
     match env.world.resources.battle_state.mode {
         BattleMode::Plan => {
             handle_input_events(env);

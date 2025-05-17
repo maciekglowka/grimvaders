@@ -1,6 +1,6 @@
 use rogalik::prelude::*;
 
-use game_logic::{get_entity_at, is_on_board, InputEvent, World};
+use game_logic::{get_unit_at, is_on_board, InputEvent, World};
 
 use crate::{
     draw::units::{draw_deck_unit, draw_entity_description},
@@ -37,7 +37,7 @@ fn handle_input_player(
         let tile = world_to_tile(input_state.mouse_world_position);
 
         if is_on_board(tile) {
-            if let Some(entity) = get_entity_at(world, tile) {
+            if let Some(entity) = get_unit_at(world, tile) {
                 state.input_mode = InputMode::BoardUnit(entity);
             } else {
                 match state.input_mode {

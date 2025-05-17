@@ -86,10 +86,30 @@ Martyr:
   script: >
     pub fn martyr_kill(world, entity) {
       let commands  = [];
+      for player in world.get_adjacent_units(entity) {
+        commands.push(RuneCommand::ChangeHealth(player, 1));
+      }
+      commands
+    }
+  description: >
+    On kill: increase adjacent units' health by 1.
+
+Santo Subito:
+  sprite:
+    atlas: sprites
+    index: 220
+  components:
+    cost: 4
+    health: [3, 3]
+    on_kill: "santo_subito_kill"
+    player:
+  script: >
+    pub fn santo_subito_kill(world, entity) {
+      let commands  = [];
       for player in world.query(["player", "position"], []) {
         commands.push(RuneCommand::ChangeHealth(player, 1));
       }
       commands
     }
   description: >
-    On kill: increase health of each player's unit by 1 .
+    On kill: increase health of each player's unit by 1.

@@ -18,7 +18,7 @@ pub(crate) fn spawn_by_name(name: &str, world: &mut World) -> Option<Entity> {
     Some(entity)
 }
 
-pub fn get_entity_at(world: &World, position: Position) -> Option<Entity> {
+pub fn get_unit_at(world: &World, position: Position) -> Option<Entity> {
     query_iter!(world.0, Without(tile), With(position))
         .filter(|(_, p)| **p == position)
         .map(|(e, _)| e)

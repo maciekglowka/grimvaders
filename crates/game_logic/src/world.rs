@@ -1,8 +1,7 @@
 use rune::{Any, Module};
-use std::collections::*;
 use wunderkammer::prelude::*;
 
-use crate::{components::*, player::PlayerData};
+use crate::{components::*, get_tile_at, get_unit_at, player::PlayerData};
 use macros::{ComponentGen, RuneAdapter};
 
 #[derive(Default)]
@@ -40,12 +39,24 @@ impl World {
     }
     #[rune::function]
     fn get_tile_at(&self, position: &Position) -> Option<Tile> {
-        let entity = crate::get_tile_at(self, *position)?;
+        let entity = get_tile_at(self, *position)?;
         self.0.components.tile.get(entity).copied()
     }
     #[rune::function]
-    fn get_entity_at(&self, position: &Position) -> Option<Ent> {
-        Some(crate::get_entity_at(self, *position)?.into())
+    fn get_unit_at(&self, position: &Position) -> Option<Ent> {
+        Some(get_unit_at(self, *position)?.into())
+    }
+    #[rune::function]
+    fn get_adjacent_units(&self, entity: Ent) -> Vec<Ent> {
+        let Some(position) = self.0.components.position.get(entity.into()) else {
+            return Vec::new();
+        };
+        ORTHO
+            .iter()
+            .map(|d| *d + position)
+            .filter_map(|p| get_unit_at(self, p))
+            .map(|e| e.into())
+            .collect()
     }
 }
 impl std::ops::Deref for World {
@@ -64,6 +75,8 @@ impl std::ops::DerefMut for World {
 pub struct Components {
     pub cost: ComponentStorage<u32>,
     pub health: ComponentStorage<ValueDefault>,
+    // temp marker
+    pub killed: ComponentStorage<()>,
     pub name: ComponentStorage<String>,
     pub npc: ComponentStorage<()>,
     // handlers start

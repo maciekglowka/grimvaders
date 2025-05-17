@@ -3,7 +3,7 @@ use wunderkammer::prelude::*;
 
 use game_logic::{
     components::{Position, Tile},
-    get_entity_at,
+    get_unit_at,
     globals::{BOARD_H, BOARD_W},
     World,
 };
@@ -21,7 +21,7 @@ pub(super) fn draw_board_description(
     context: &mut Context,
 ) {
     let tile = world_to_tile(input_state.mouse_world_position);
-    if let Some(entity) = get_entity_at(world, tile) {
+    if let Some(entity) = get_unit_at(world, tile) {
         draw_entity_description(entity, world, context);
     }
 }

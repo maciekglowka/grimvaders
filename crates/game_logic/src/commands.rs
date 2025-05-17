@@ -3,7 +3,7 @@ use rune::Any;
 use wunderkammer::prelude::*;
 
 use crate::{
-    battle::{player::remove_player_from_board, BattleMode},
+    battle::BattleMode,
     components::Position,
     scripting::run_command_script,
     utils::get_unit_at,

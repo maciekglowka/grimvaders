@@ -63,7 +63,7 @@ Druid:
     pub fn druid_fight(world, entity) {
       let position = world.get("position", entity).unwrap();
       let tile = world.get_tile_at(position).unwrap();
-      if let Tile::Forest = tile {} else { return }
+      if tile != Tile::Forest { return }
 
       let commands  = [];
       for player in world.get_adjacent_units(entity) {

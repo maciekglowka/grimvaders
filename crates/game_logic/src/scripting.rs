@@ -1,5 +1,5 @@
 use anyhow::Result;
-use rune::{Diagnostics, Module, Value, Vm};
+use rune::{runtime::Protocol, Diagnostics, Module, Value, Vm};
 use std::sync::Arc;
 
 use crate::{
@@ -14,6 +14,7 @@ pub fn init_rune(world: &World) -> Result<Vm> {
     let mut command_module = Module::new();
     command_module.ty::<RuneCommand>()?;
     command_module.ty::<Tile>()?;
+    command_module.function_meta(Tile::partial_eq__meta)?;
     command_module.ty::<ValueDefault>()?;
     context.install(command_module)?;
 
@@ -58,15 +59,17 @@ pub(crate) fn run_command_script(
     let mut vm = world.0.resources.vm.take().unwrap();
 
     let result = match vm.call([script], (&*world, entity)) {
+        // Do not early exit here - it will result in a missing Vm
         Ok(output) => match output {
             Value::Vec(_) => rune::from_value(output).ok(),
-            _ => Some(vec![rune::from_value(output).ok()?]),
+            _ => rune::from_value(output).map(|v| vec![v]).ok(),
         },
         Err(e) => {
             log::error!("Script {} failed: {}", script, e);
             None
         }
     };
+    log::debug!("{} result: {:?}", script, result);
     world.0.resources.vm = Some(vm);
     result
 }

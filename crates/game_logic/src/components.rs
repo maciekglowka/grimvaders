@@ -1,4 +1,4 @@
-use rune::Any;
+use rune::{runtime::VmResult, Any};
 use serde::Deserialize;
 use std::ops::{Add, AddAssign, Sub, SubAssign};
 use wunderkammer::prelude::*;
@@ -9,10 +9,20 @@ use crate::World;
 
 #[derive(Any, Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
 pub enum Tile {
+    #[rune(constructor)]
     Plains,
+    #[rune(constructor)]
     Meadow,
+    #[rune(constructor)]
     Field,
+    #[rune(constructor)]
     Forest,
+}
+impl Tile {
+    #[rune::function(keep, instance, protocol = PARTIAL_EQ)]
+    pub fn partial_eq(&self, rhs: &Self) -> VmResult<bool> {
+        VmResult::Ok(self == rhs)
+    }
 }
 
 #[derive(Any, Clone, Debug, Default, Deserialize)]

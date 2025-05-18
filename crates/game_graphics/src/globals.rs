@@ -1,6 +1,6 @@
 use rogalik::prelude::*;
 
-pub const TILE_SIZE: f32 = 32.;
+pub const TILE_SIZE: f32 = 24.;
 pub const SPRITE_SIZE: f32 = 16.;
 pub const SPRITE_OFFSET: Vector2f = Vector2f {
     x: 0.5 * (TILE_SIZE - SPRITE_SIZE),

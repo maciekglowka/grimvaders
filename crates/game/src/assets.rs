@@ -28,6 +28,19 @@ fn load_textures(context: &mut Context) {
             ..Default::default()
         },
     );
+    let tiles_texture = Some(context.graphics.load_texture("sprites/tiles.png"));
+    context.graphics.load_material(
+        "tiles",
+        MaterialParams {
+            atlas: Some(AtlasParams {
+                cols: 8,
+                rows: 1,
+                padding: None,
+            }),
+            diffuse_texture: tiles_texture,
+            ..Default::default()
+        },
+    );
 
     let icons_texture = Some(context.graphics.load_texture("ui/icons_small.png"));
     context.graphics.load_material(

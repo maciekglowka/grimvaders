@@ -77,8 +77,8 @@ fn draw_cursor(
     if let InputMode::BoardUnit(entity) = state.input_mode {
         if let Some(&position) = world.0.components.position.get(entity) {
             let _ = context.graphics.draw_atlas_sprite(
-                "sprites",
-                725,
+                "tiles",
+                0,
                 tile_to_world(position),
                 OVERLAY_Z,
                 Vector2f::splat(TILE_SIZE),
@@ -94,8 +94,8 @@ fn draw_cursor(
     }
 
     let _ = context.graphics.draw_atlas_sprite(
-        "sprites",
-        725,
+        "tiles",
+        0,
         tile_to_world(tile),
         OVERLAY_Z,
         Vector2f::splat(TILE_SIZE),

@@ -3,16 +3,14 @@ use wunderkammer::prelude::*;
 
 use game_logic::{
     components::{Position, Tile},
-    get_unit_at,
-    globals::{BOARD_H, BOARD_W},
-    World,
+    get_unit_at, World,
 };
 
 use crate::{
     draw::units::draw_entity_description,
     globals::{TILE_SIZE, TILE_Z},
     input::InputState,
-    utils::{tile_to_world, world_to_tile},
+    utils::{get_z_offset, tile_to_world, world_to_tile},
 };
 
 pub(super) fn draw_board_description(
@@ -32,10 +30,10 @@ pub(super) fn draw_board(world: &World, context: &mut Context) {
         With(position, tile),
         |_, p: &Position, t: &Tile| {
             let _ = context.graphics.draw_atlas_sprite(
-                "sprites",
+                "tiles",
                 get_tile_sprite(t),
                 tile_to_world(*p),
-                TILE_Z,
+                TILE_Z + get_z_offset(*p),
                 Vector2f::splat(TILE_SIZE),
                 SpriteParams::default(),
             );
@@ -46,8 +44,8 @@ pub(super) fn draw_board(world: &World, context: &mut Context) {
 fn get_tile_sprite(tile: &Tile) -> usize {
     match &tile {
         Tile::Plains => 1,
-        Tile::Meadow => 5,
-        Tile::Field => 98,
-        Tile::Forest => 52,
+        Tile::Meadow => 2,
+        Tile::Field => 3,
+        Tile::Forest => 4,
     }
 }

@@ -11,7 +11,7 @@ pub(crate) fn get_viewport_bounds(context: &Context) -> (Vector2f, Vector2f) {
     camera.get_bounds()
 }
 
-pub(super) fn tile_to_world(p: Position) -> Vector2f {
+pub fn tile_to_world(p: Position) -> Vector2f {
     Vector2f::new(
         0.5 * TILE_SIZE * p.x as f32 - 0.5 * TILE_SIZE * p.y as f32,
         0.25 * TILE_SIZE * p.y as f32 + 0.25 * TILE_SIZE * p.x as f32,

@@ -3,7 +3,9 @@ use wunderkammer::prelude::*;
 
 use game_logic::{
     components::{Position, Tile},
-    get_unit_at, World,
+    get_unit_at,
+    globals::{BOARD_H, BOARD_W, MAX_WAVE_H},
+    World,
 };
 
 use crate::{
@@ -39,13 +41,41 @@ pub(super) fn draw_board(world: &World, context: &mut Context) {
             );
         }
     );
+
+    // Draw Town
+    for x in 0..BOARD_W {
+        let p = Position::new(x as i32, -1);
+        let _ = context.graphics.draw_atlas_sprite(
+            "tiles",
+            7,
+            tile_to_world(p),
+            TILE_Z + get_z_offset(p),
+            Vector2f::splat(TILE_SIZE),
+            SpriteParams::default(),
+        );
+    }
+
+    // Draw NPC zone
+    for y in 0..MAX_WAVE_H {
+        for x in 0..BOARD_W {
+            let p = Position::new(x as i32, (BOARD_H + y) as i32);
+            let _ = context.graphics.draw_atlas_sprite(
+                "tiles",
+                1,
+                tile_to_world(p),
+                TILE_Z + get_z_offset(p),
+                Vector2f::splat(TILE_SIZE),
+                SpriteParams::default(),
+            );
+        }
+    }
 }
 
 fn get_tile_sprite(tile: &Tile) -> usize {
     match &tile {
-        Tile::Plains => 1,
-        Tile::Meadow => 2,
-        Tile::Field => 3,
-        Tile::Forest => 4,
+        Tile::Plains => 2,
+        Tile::Meadow => 3,
+        Tile::Field => 4,
+        Tile::Forest => 5,
     }
 }

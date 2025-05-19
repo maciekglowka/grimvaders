@@ -1,14 +1,14 @@
 use rogalik::prelude::*;
 
-pub const TILE_SIZE: f32 = 24.;
+pub const TILE_SIZE: f32 = 32.;
 pub const SPRITE_SIZE: f32 = 16.;
 pub const SPRITE_OFFSET: Vector2f = Vector2f {
     x: 0.5 * (TILE_SIZE - SPRITE_SIZE),
-    y: 0.5 * (TILE_SIZE - SPRITE_SIZE),
+    y: (TILE_SIZE - SPRITE_SIZE),
 };
 pub const CARD_GAP: f32 = 3.;
 
-pub const BUTTON_SIZE: f32 = SPRITE_SIZE + 2. * GAP;
+pub const BUTTON_SIZE: f32 = SPRITE_SIZE + GAP;
 
 pub const BUBBLE_Z: i32 = 150;
 pub const OVERLAY_Z: i32 = 100;

@@ -1,8 +1,11 @@
+use game_logic::globals::BOARD_W;
 use rogalik::prelude::*;
 
 mod assets;
 mod input;
 mod scenes;
+
+const TOTAL_BOARD_H: usize = game_logic::globals::BOARD_H + game_logic::globals::MAX_WAVE_H;
 
 #[derive(Default)]
 struct GameState {
@@ -51,15 +54,15 @@ fn main() {
 }
 
 fn get_camera_center() -> Vector2f {
-    0.5 * Vector2f::new(
-        game_graphics::globals::TILE_SIZE * game_logic::globals::BOARD_W as f32,
-        game_graphics::globals::TILE_SIZE * game_logic::globals::BOARD_H as f32,
-    )
+    0.5 * game_graphics::utils::tile_to_world(game_logic::components::Position::new(
+        game_logic::globals::BOARD_W as i32,
+        TOTAL_BOARD_H as i32 - 3,
+    ))
 }
 
 fn get_target_resolution(context: &Context) -> (u32, u32) {
     let size = context.get_physical_size();
-    let target_dim = game_graphics::globals::TILE_SIZE * (2. * game_logic::globals::BOARD_H as f32);
+    let target_dim = game_graphics::globals::TILE_SIZE * TOTAL_BOARD_H as f32;
     let min_dim = size.y.min(size.x);
     let scale = (min_dim / target_dim).floor();
     // only even resolutions

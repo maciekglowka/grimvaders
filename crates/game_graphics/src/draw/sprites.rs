@@ -62,6 +62,17 @@ impl UnitSprite {
         let _ = context.graphics.draw_atlas_sprite(
             &self.atlas,
             self.index,
+            self.origin + Vector2f::new(1., -1.),
+            UNIT_Z,
+            Vector2f::splat(SPRITE_SIZE),
+            SpriteParams {
+                color: Color(0, 0, 0, 255),
+                ..Default::default()
+            },
+        );
+        let _ = context.graphics.draw_atlas_sprite(
+            &self.atlas,
+            self.index,
             self.origin,
             UNIT_Z,
             Vector2f::splat(SPRITE_SIZE),

@@ -6,8 +6,8 @@ use game_data::SpriteData;
 use game_logic::{components::Position, World};
 
 use crate::{
-    globals::{MOVE_SPEED, MOVE_THRESH, SPRITE_SIZE, UNIT_Z},
-    utils::tile_to_sprite,
+    globals::{MOVE_SPEED, MOVE_THRESH, SPRITE_SIZE, TILE_SIZE, TILE_Z},
+    utils::{get_z_offset, tile_to_sprite, world_to_tile},
 };
 
 #[derive(Clone, Copy, Default)]
@@ -64,7 +64,7 @@ impl UnitSprite {
             &self.atlas,
             self.index,
             self.origin,
-            UNIT_Z,
+            TILE_Z + 1 + get_z_offset(world_to_tile(self.origin)),
             Vector2f::splat(SPRITE_SIZE),
             SpriteParams::default(),
         );
@@ -125,8 +125,8 @@ pub(crate) fn attack_unit_sprite(
             // let tile_in_front = Position::new(target_position.x, target_position.y + 1);
             let dest = tile_to_sprite(*target_position);
             // let next_origin = 0.5 * (sprite.origin + dest);
-            // let path = vec![dest];
-            let path = vec![(dest, Ease::In), (sprite.origin, Ease::Out)];
+            let path = vec![(dest, Ease::In)];
+            // let path = vec![(dest, Ease::In), (sprite.origin, Ease::Out)];
             sprite.add_translations(&path);
         }
     }
@@ -154,14 +154,18 @@ pub(crate) fn animate_unit_sprite(sprite: &mut UnitSprite, delta: f32) -> bool {
         EntityAnimation::Translate(t, path) => {
             if path.len() < 2 {
                 sprite.animation = None
-            } else if *t >= 1. {
+            } else if *t >= 0.999 {
                 path.pop_front();
+                sprite.origin = path[0].0;
                 *t = 0.;
             } else {
                 // TODO do not calculate each frame
                 let total = translation_time(path[0].0, path[1].0);
-                *t += delta / total;
-                sprite.origin = path[0].0.lerp(&path[1].0, ease(*t, path[1].1));
+                *t += (delta / total).min(1.0);
+                let eased = ease(*t, path[1].1);
+                sprite.origin = path[0].0.lerp(&path[1].0, eased);
+                // TODO calculating dist twice
+                sprite.origin.y += parabole(eased, 0.2 * (path[0].0 - path[1].0).len());
             }
         }
     }
@@ -191,4 +195,8 @@ fn ease_out(val: f32) -> f32 {
 
 fn ease_in_out(val: f32) -> f32 {
     -0.5 * (f32::cos(std::f32::consts::PI * val) - 1.)
+}
+
+fn parabole(t: f32, h: f32) -> f32 {
+    h * f32::sin(t * std::f32::consts::PI)
 }

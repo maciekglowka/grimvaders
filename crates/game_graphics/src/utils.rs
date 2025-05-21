@@ -19,7 +19,8 @@ pub fn tile_to_world(p: Position) -> Vector2f {
 }
 
 pub(super) fn get_z_offset(p: Position) -> i32 {
-    BOARD_H as i32 - p.y + BOARD_W as i32 - p.x
+    // TODO verify multipliers
+    BOARD_H as i32 - 6 * p.y + BOARD_W as i32 - 2 * p.x
 }
 
 pub(super) fn tile_to_sprite(p: Position) -> Vector2f {
@@ -27,10 +28,6 @@ pub(super) fn tile_to_sprite(p: Position) -> Vector2f {
 }
 
 pub(super) fn world_to_tile(v: Vector2f) -> Position {
-    // Position::new(
-    //     (v.x / TILE_SIZE).floor() as i32,
-    //     (v.y / TILE_SIZE).floor() as i32,
-    // )
     Position::new(
         ((v.x + 2.0 * v.y) / TILE_SIZE - 1.0).floor() as i32,
         ((2.0 * v.y - v.x) / TILE_SIZE).floor() as i32,

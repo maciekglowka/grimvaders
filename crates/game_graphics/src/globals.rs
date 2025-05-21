@@ -14,7 +14,7 @@ pub const BUBBLE_Z: i32 = 150;
 pub const OVERLAY_Z: i32 = 100;
 pub const UI_Z: i32 = 200;
 
-pub const UNIT_Z: i32 = 25;
+// pub const UNIT_Z: i32 = 25;
 pub const TILE_Z: i32 = 0;
 
 pub const BASE_TEXT_SIZE: f32 = 8.0;
@@ -25,7 +25,7 @@ pub const GAP: f32 = 4.;
 
 pub const BUBBLE_SPEED: f32 = 0.5;
 pub const BUBBLE_AGE: u32 = 100;
-pub const BUBBLE_WAIT_AGE: u32 = 0;
+pub const BUBBLE_WAIT_AGE: u32 = 5;
 
 pub const MOVE_SPEED: f32 = 6. * TILE_SIZE;
 pub const MOVE_THRESH: f32 = 0.1;

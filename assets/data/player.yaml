@@ -28,6 +28,28 @@ Peasant:
   description: >
     On fight start: gain +1 food, when on a field tile.
 
+Hunter:
+  sprite:
+    atlas: sprites
+    index: 77
+  tier: 2
+  components:
+    cost: 3
+    health: [1, 1]
+    on_fight: "hunter_fight"
+    player:
+  script: >
+    pub fn hunter_fight(world, entity) {
+      let position = world.get("position", entity).unwrap();
+      let tile = world.get_tile_at(position).unwrap();
+      match tile {
+        Tile::Forest => RuneCommand::ChangeFood(2),
+        _ => RuneCommand::None
+      }
+    }
+  description: >
+    On fight start: gain +2 food, when on a forest tile.
+
 Sheep:
   sprite:
     atlas: sprites
@@ -48,31 +70,6 @@ Sheep:
     }
   description: >
     On fight start: gain +1 health, when on a meadow tile.
-
-Druid:
-  sprite:
-    atlas: sprites
-    index: 122
-  tier: 2
-  components:
-    cost: 3
-    health: [2, 2]
-    on_fight: "druid_fight"
-    player:
-  script: >
-    pub fn druid_fight(world, entity) {
-      let position = world.get("position", entity).unwrap();
-      let tile = world.get_tile_at(position).unwrap();
-      if tile != Tile::Forest { return }
-
-      let commands  = [];
-      for player in world.get_adjacent_units(entity) {
-        commands.push(RuneCommand::ChangeHealth(player, 1));
-      }
-      commands
-    }
-  description: >
-    On fight start: give +1 to adjacent units, if on a forest tile.
 
 Shepherd:
   sprite:
@@ -98,6 +95,79 @@ Shepherd:
     }
   description: >
     On spawn: gain health equal to the sum of all sheep health.
+
+Ranger:
+  sprite:
+    atlas: sprites
+    index: 471
+  tier: 2
+  components:
+    cost: 3
+    health: [2, 2]
+    on_fight: "ranger_fight"
+    player:
+  script: >
+    pub fn ranger_fight(world, entity) {
+      let position = world.get("position", entity).unwrap();
+      let tile = world.get_tile_at(position).unwrap();
+      match tile {
+        Tile::Forest => RuneCommand::ChangeHealth(entity, 1),
+        _ => RuneCommand::None
+      }
+    }
+  description: >
+    On fight start: gain +1 health, when on a forest tile.
+
+Herbalist:
+  sprite:
+    atlas: sprites
+    index: 79
+  tier: 2
+  components:
+    cost: 3
+    health: [2, 2]
+    on_fight: "healer_fight"
+    player:
+  script: >
+    pub fn healer_fight(world, entity) {
+      let position = world.get("position", entity).unwrap();
+      let tile = world.get_tile_at(position).unwrap();
+      if tile != Tile::Forest { return }
+
+      let commands  = [];
+      for player in world.get_adjacent_units(entity) {
+        commands.push(RuneCommand::ChangeHealth(player, 1));
+      }
+      commands
+    }
+  description: >
+    On fight start: give +1 to adjacent units, if on a forest tile.
+
+Druid:
+  sprite:
+    atlas: sprites
+    index: 122
+  tier: 4
+  components:
+    cost: 3
+    health: [2, 2]
+    on_fight: "druid_fight"
+    player:
+  script: >
+    pub fn druid_fight(world, entity) {
+      let sum = 0;
+      for player in world.query(["player", "position"], []) {
+
+        let position = world.get("position", player).unwrap();
+        let tile = world.get_tile_at(position).unwrap();
+
+        if tile == Tile::Forest { sum += 1; }
+      }
+      RuneCommand::ChangeHealth(entity, sum)
+    }
+  description: >
+    On fight start: gain +1 for each unit on a forest tile.
+
 
 Pikeman:
   sprite:

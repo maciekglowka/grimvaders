@@ -15,7 +15,24 @@ pub fn load_assets(context: &mut Context) {
 }
 
 fn load_textures(context: &mut Context) {
+    let outline_shader = context
+        .graphics
+        .load_shader(ShaderKind::Sprite, "shaders/outline.wgsl");
+
     let sprites_texture = Some(context.graphics.load_texture("sprites/sprites.png"));
+    context.graphics.load_material(
+        "outline",
+        MaterialParams {
+            atlas: Some(AtlasParams {
+                cols: 49,
+                rows: 22,
+                padding: Some((1., 1.)),
+            }),
+            diffuse_texture: sprites_texture,
+            shader: Some(outline_shader),
+            ..Default::default()
+        },
+    );
     context.graphics.load_material(
         "sprites",
         MaterialParams {
@@ -28,6 +45,7 @@ fn load_textures(context: &mut Context) {
             ..Default::default()
         },
     );
+
     let tiles_texture = Some(context.graphics.load_texture("sprites/tiles.png"));
     context.graphics.load_material(
         "tiles",

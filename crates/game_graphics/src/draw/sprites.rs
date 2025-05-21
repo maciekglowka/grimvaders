@@ -29,11 +29,12 @@ pub struct UnitSprite {
 }
 impl UnitSprite {
     pub fn new(entity: Entity, world: &World) -> Self {
-        let mut atlas = "sprites";
+        let mut atlas = "outline";
         let mut index = 721;
         if let Some(name) = world.0.components.name.get(entity) {
             if let Some(data) = get_sprite_data(name, world) {
-                atlas = &data.atlas;
+                // TEMP
+                // atlas = &data.atlas;
                 index = data.index;
             }
         }
@@ -59,17 +60,6 @@ impl UnitSprite {
         }
     }
     pub fn draw(&self, world: &World, context: &mut Context) {
-        let _ = context.graphics.draw_atlas_sprite(
-            &self.atlas,
-            self.index,
-            self.origin + Vector2f::new(1., -1.),
-            UNIT_Z,
-            Vector2f::splat(SPRITE_SIZE),
-            SpriteParams {
-                color: Color(0, 0, 0, 255),
-                ..Default::default()
-            },
-        );
         let _ = context.graphics.draw_atlas_sprite(
             &self.atlas,
             self.index,

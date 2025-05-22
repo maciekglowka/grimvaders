@@ -18,8 +18,12 @@ fn load_textures(context: &mut Context) {
     let outline_shader = context
         .graphics
         .load_shader(ShaderKind::Sprite, "shaders/outline.wgsl");
+    let disintegrate_shader = context
+        .graphics
+        .load_shader(ShaderKind::Sprite, "shaders/disintegrate.wgsl");
 
     let sprites_texture = Some(context.graphics.load_texture("sprites/sprites.png"));
+
     context.graphics.load_material(
         "outline",
         MaterialParams {
@@ -33,6 +37,7 @@ fn load_textures(context: &mut Context) {
             ..Default::default()
         },
     );
+
     context.graphics.load_material(
         "sprites",
         MaterialParams {
@@ -42,6 +47,20 @@ fn load_textures(context: &mut Context) {
                 padding: Some((1., 1.)),
             }),
             diffuse_texture: sprites_texture,
+            ..Default::default()
+        },
+    );
+
+    context.graphics.load_material(
+        "disintegrate",
+        MaterialParams {
+            atlas: Some(AtlasParams {
+                cols: 49,
+                rows: 22,
+                padding: Some((1., 1.)),
+            }),
+            diffuse_texture: sprites_texture,
+            shader: Some(disintegrate_shader),
             ..Default::default()
         },
     );

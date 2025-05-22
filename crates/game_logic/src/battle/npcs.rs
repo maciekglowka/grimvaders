@@ -12,7 +12,8 @@ use crate::{
 
 pub(crate) fn next_wave(env: &mut GameEnv) {
     let tier = env.world.resources.player_data.level;
-    let target_score = (((tier * env.world.resources.battle_state.wave) as f32) / 2.).ceil() as u32;
+    let target_score =
+        (((tier * env.world.resources.battle_state.wave) as f32) / 1.5).ceil() as u32;
     let mut score = 0;
 
     let mut rng = thread_rng();

@@ -6,7 +6,7 @@ use game_data::SpriteData;
 use game_logic::{components::Position, World};
 
 use crate::{
-    globals::{MOVE_SPEED, MOVE_THRESH, SPRITE_SIZE, TILE_SIZE, TILE_Z},
+    globals::{DISINTEGRATE_SPEED, MOVE_SPEED, SPRITE_SIZE, TILE_Z},
     utils::{get_z_offset, tile_to_sprite, world_to_tile},
 };
 
@@ -26,6 +26,7 @@ pub struct UnitSprite {
     pub atlas: String,
     pub index: usize,
     pub animation: Option<EntityAnimation>,
+    pub remove: bool,
 }
 impl UnitSprite {
     pub fn new(entity: Entity, world: &World) -> Self {
@@ -60,13 +61,24 @@ impl UnitSprite {
         }
     }
     pub fn draw(&self, world: &World, context: &mut Context) {
+        let mut color = Color::default();
+        let mut atlas = self.atlas.as_str();
+
+        if let Some(EntityAnimation::Disintegrate(v)) = self.animation {
+            color.3 = (255. * v) as u8;
+            atlas = "disintegrate";
+        }
+
         let _ = context.graphics.draw_atlas_sprite(
-            &self.atlas,
+            atlas,
             self.index,
             self.origin,
             TILE_Z + 1 + get_z_offset(world_to_tile(self.origin)),
             Vector2f::splat(SPRITE_SIZE),
-            SpriteParams::default(),
+            SpriteParams {
+                color,
+                ..Default::default()
+            },
         );
 
         super::units::draw_unit_overlay(self.entity, self.origin, world, context);
@@ -78,6 +90,7 @@ impl UnitSprite {
 
 pub enum EntityAnimation {
     Translate(f32, VecDeque<(Vector2f, Ease)>),
+    Disintegrate(f32),
 }
 
 pub(crate) fn get_unit_sprite(entity: Entity, sprites: &Vec<UnitSprite>) -> Option<&UnitSprite> {
@@ -104,6 +117,16 @@ pub(crate) fn place_unit_sprite(
 
 pub(crate) fn remove_unit_sprite(entity: Entity, sprites: &mut Vec<UnitSprite>) {
     sprites.retain(|a| a.entity != entity);
+}
+
+pub(crate) fn kill_unit_sprite(entity: Entity, sprites: &mut Vec<UnitSprite>) {
+    if let Some(sprite) = get_unit_sprite_mut(entity, sprites) {
+        sprite.animation = Some(EntityAnimation::Disintegrate(1.));
+    }
+}
+
+pub(crate) fn purge_unit_sprites(sprites: &mut Vec<UnitSprite>) {
+    sprites.retain(|a| !a.remove);
 }
 
 pub(crate) fn move_unit_sprite(entity: Entity, world: &World, sprites: &mut Vec<UnitSprite>) {
@@ -150,6 +173,7 @@ pub(crate) fn animate_unit_sprite(sprite: &mut UnitSprite, delta: f32) -> bool {
     let Some(animation) = &mut sprite.animation else {
         return false;
     };
+    let mut blocking = true;
     match animation {
         EntityAnimation::Translate(t, path) => {
             if path.len() < 2 {
@@ -168,8 +192,17 @@ pub(crate) fn animate_unit_sprite(sprite: &mut UnitSprite, delta: f32) -> bool {
                 sprite.origin.y += parabole(eased, 0.2 * (path[0].0 - path[1].0).len());
             }
         }
+        EntityAnimation::Disintegrate(v) => {
+            *v -= DISINTEGRATE_SPEED * delta;
+            if *v <= 0. {
+                sprite.remove = true;
+            }
+            if *v <= 0.5 {
+                blocking = false;
+            }
+        }
     }
-    true
+    blocking
 }
 
 fn translation_time(a: Vector2f, b: Vector2f) -> f32 {

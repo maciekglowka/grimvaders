@@ -159,10 +159,11 @@ fn handle_hand(
 
 pub(super) fn draw_status(state: &super::BattleGraphics, world: &World, context: &mut Context) {
     let text = format!(
-        "Health: {} | Food: {} | Wave: {}",
+        "Health: {} | Food: {} | Wave: {}/{}",
         world.0.resources.player_data.health,
         world.0.resources.player_data.food,
-        world.0.resources.battle_state.wave
+        world.0.resources.battle_state.wave,
+        game_logic::globals::WAVE_COUNT
     );
     let w = context
         .graphics

@@ -10,7 +10,7 @@ use crate::{
         bubbles::Bubble,
         sprites::{
             animate_unit_sprite, attack_town, attack_unit_sprite, get_unit_sprite,
-            move_unit_sprite, place_unit_sprite, remove_unit_sprite, UnitSprite,
+            kill_unit_sprite, move_unit_sprite, place_unit_sprite, purge_unit_sprites, UnitSprite,
         },
     },
     globals::{BASE_TEXT_SIZE, GAP, PRIMARY_COLOR, RED_COLOR, TILE_SIZE},
@@ -62,6 +62,7 @@ pub fn battle_draw(
         sprite.draw(world, context);
         is_animating |= animate_unit_sprite(sprite, context.time.get_delta());
     }
+    purge_unit_sprites(&mut state.unit_sprites);
 
     is_animating |= crate::draw::bubbles::update_bubbles(&mut state.bubbles, context);
     player::handle_player_ui(world, state, context, input_state, !is_animating);
@@ -121,7 +122,7 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
     )));
     observers.push(Box::new(CommandObserver::new(
         &mut env.scheduler,
-        |c: &commands::Kill, _, s| remove_unit_sprite(c.0, &mut s.unit_sprites),
+        |c: &commands::Kill, _, s| kill_unit_sprite(c.0, &mut s.unit_sprites),
     )));
 
     state.observers = observers;

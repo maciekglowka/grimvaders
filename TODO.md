@@ -3,8 +3,11 @@
 ## Player Units
 
 - healer - trigger on meadow, not forest
-- scarecrow - bonus on field (what?)
+- scarecrow - cost 1food, 1hp, if on field give hp to unit behind
 - a unit with high hp but dies after one hit
+- 2hp unit; on damage if standing, give hp to adjacent
+- on spawn +2hp for each basic unit
+- merchant - on spawn +1hp for all food producers
 
 
 ## NPCs

@@ -6,6 +6,8 @@ Villager:
     cost: 2
     health: [2, 2]
     player:
+    tags:
+      - !Basic
 
 Peasant:
   sprite:
@@ -16,6 +18,8 @@ Peasant:
     health: [1, 1]
     on_fight: "peasant_fight"
     player:
+    tags:
+      - !FoodProducer
   script: >
     pub fn peasant_fight(world, entity) {
       let position = world.get("position", entity).unwrap();
@@ -38,6 +42,8 @@ Hunter:
     health: [1, 1]
     on_fight: "hunter_fight"
     player:
+    tags:
+      - !FoodProducer
   script: >
     pub fn hunter_fight(world, entity) {
       let position = world.get("position", entity).unwrap();
@@ -49,6 +55,27 @@ Hunter:
     }
   description: >
     On fight start: gain +2 food, when on a forest tile.
+
+Merchant:
+  sprite:
+    atlas: sprites
+    index: 78
+  tier: 4
+  components:
+    cost: 3
+    health: [2, 2]
+    on_spawn: "merchant_spawn"
+    player:
+  script: >
+    pub fn merchant_spawn(world, entity) {
+      let commands  = [];
+      for player in world.get_units_with_tag(Tag::FoodProducer) {
+        commands.push(RuneCommand::ChangeHealth(player, 1));
+      }
+      commands
+    }
+  description: >
+    On spawn: give +1 to all food producers.
 
 Sheep:
   sprite:
@@ -132,7 +159,7 @@ Herbalist:
     pub fn healer_fight(world, entity) {
       let position = world.get("position", entity).unwrap();
       let tile = world.get_tile_at(position).unwrap();
-      if tile != Tile::Forest { return }
+      if tile != Tile::Meadow { return }
 
       let commands  = [];
       for player in world.get_adjacent_units(entity) {
@@ -141,7 +168,7 @@ Herbalist:
       commands
     }
   description: >
-    On fight start: give +1 to adjacent units, if on a forest tile.
+    On fight start: give +1 to adjacent units, if on a meadow tile.
 
 Druid:
   sprite:
@@ -177,6 +204,8 @@ Pikeman:
     cost: 3
     health: [3, 3]
     player:
+    tags:
+      - !Basic
 
 Martyr:
   sprite:

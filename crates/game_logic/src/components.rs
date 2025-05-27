@@ -25,6 +25,28 @@ impl Tile {
     }
 }
 
+#[derive(Any, Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
+pub enum Tag {
+    #[rune(constructor)]
+    Basic,
+    #[rune(constructor)]
+    FoodProducer,
+}
+impl From<Tag> for String {
+    fn from(value: Tag) -> Self {
+        match value {
+            Tag::Basic => "Basic",
+            Tag::FoodProducer => "Food Producer",
+        }
+        .to_string()
+    }
+}
+impl From<&Tag> for String {
+    fn from(value: &Tag) -> Self {
+        <Tag as Into<String>>::into(*value)
+    }
+}
+
 #[derive(Any, Clone, Debug, Default, Deserialize)]
 pub struct ValueDefault(#[rune(get)] u32, #[rune(get)] u32);
 impl ValueDefault {

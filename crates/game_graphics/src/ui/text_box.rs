@@ -46,7 +46,7 @@ impl<'a> TextBox<'a> {
             for word in words {
                 let w = context
                     .graphics
-                    .text_dimensions("default", word, self.text_size as f32)
+                    .text_dimensions("default", word, self.text_size)
                     .x;
                 if line_width + w > width {
                     line_width = 0.;
@@ -56,9 +56,9 @@ impl<'a> TextBox<'a> {
                 let _ = context.graphics.draw_text(
                     "default",
                     word,
-                    origin + Vector2f::new(line_width, -(self.text_size as f32) - v_offset),
+                    origin + Vector2f::new(line_width, -(self.text_size) - v_offset),
                     z,
-                    self.text_size as f32,
+                    self.text_size,
                     SpriteParams {
                         color: self.text_color,
                         ..Default::default()

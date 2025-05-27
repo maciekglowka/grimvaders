@@ -1,3 +1,4 @@
+use rand::prelude::*;
 use wunderkammer::prelude::*;
 
 use crate::{
@@ -30,4 +31,8 @@ pub fn get_tile_at(world: &World, position: Position) -> Option<Entity> {
         .filter(|(_, _, p)| **p == position)
         .map(|(e, _, _)| e)
         .next()
+}
+
+pub(crate) fn take_random<T, R: Rng + ?Sized>(values: &mut Vec<T>, rng: &mut R) -> T {
+    values.remove(rng.gen_range(0..values.len()))
 }

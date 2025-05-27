@@ -68,19 +68,26 @@ pub(crate) fn draw_entity_description(entity: Entity, world: &World, context: &m
     let Some(name) = world.components.name.get(entity) else {
         return;
     };
-    draw_description(name, world, context);
+    draw_description(entity, name, world, context);
 }
 
-pub(crate) fn draw_description(name: &str, world: &World, context: &mut Context) {
+pub(crate) fn draw_description(entity: Entity, name: &str, world: &World, context: &mut Context) {
     let Some(data) = world.resources.data.entities.get(name) else {
         return;
     };
     let mut content = name.to_string();
     if let Some(descr) = &data.description {
-        content = format!("{}, {}", content, descr);
+        content = format!("{} - {}", content, descr);
     };
+
+    if let Some(tags) = world.components.tags.get(entity) {
+        let names: Vec<String> = tags.iter().map(|a| a.into()).collect();
+        content = format!("{} - {}", content, names.join(", "));
+    }
+
     let text = TextBox::owned(content);
     let bounds = get_viewport_bounds(context);
+
     text.draw(
         Vector2f::new(bounds.0.x + GAP, bounds.1.y - 2. * (BASE_TEXT_SIZE + GAP)),
         bounds.1.x - bounds.0.x - 2. * GAP,

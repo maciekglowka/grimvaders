@@ -63,10 +63,13 @@ fn get_choices(tier: u32, world: &World) -> [Option<String>; SHOP_SIZE] {
     let mut output = [const { None }; SHOP_SIZE];
     let mut rng = thread_rng();
 
-    for i in 0..SHOP_SIZE {
-        if let Ok((_, name)) = filtered.choose_weighted(&mut rng, |a| a.0) {
-            output[i] = Some(name.to_string());
-        }
+    for (i, name) in filtered
+        .choose_multiple_weighted(&mut rng, SHOP_SIZE, |a| a.0)
+        .unwrap()
+        .map(|a| Some(a.1.to_string()))
+        .enumerate()
+    {
+        output[i] = name
     }
     output
 }

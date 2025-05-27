@@ -42,10 +42,12 @@ impl World {
         let entity = get_tile_at(self, *position)?;
         self.0.components.tile.get(entity).copied()
     }
+
     #[rune::function]
     fn get_unit_at(&self, position: &Position) -> Option<Ent> {
         Some(get_unit_at(self, *position)?.into())
     }
+
     #[rune::function]
     fn get_adjacent_units(&self, entity: Ent) -> Vec<Ent> {
         let Some(position) = self.0.components.position.get(entity.into()) else {
@@ -57,6 +59,14 @@ impl World {
             .filter_map(|p| get_unit_at(self, p))
             .filter(|e| self.components.player.get(*e).is_some())
             .map(|e| e.into())
+            .collect()
+    }
+
+    #[rune::function]
+    fn get_units_with_tag(&self, tag: &Tag) -> Vec<Ent> {
+        query_iter!(self.0, With(player, position, tags))
+            .filter(|(_, _, _, t)| t.contains(tag))
+            .map(|(e, _, _, _)| e.into())
             .collect()
     }
 }
@@ -87,6 +97,7 @@ pub struct Components {
     // handlers end
     pub player: ComponentStorage<()>,
     pub position: ComponentStorage<Position>,
+    pub tags: ComponentStorage<Vec<Tag>>,
     pub tile: ComponentStorage<Tile>,
 }
 

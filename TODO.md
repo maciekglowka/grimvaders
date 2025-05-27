@@ -2,13 +2,19 @@
 
 ## Player Units
 
-- ranger - +HP if in the forest
-- druid -> healer
-- druid - +HP for all the units in forests (on spawn)
-- hunter - +Food when in the forest (on fight start)
-
+- healer - trigger on meadow, not forest
+- scarecrow - cost 1food, 1hp, if on field give hp to unit behind
+- a unit with high hp but dies after one hit
+- 2hp unit; on damage if standing, give hp to adjacent
+- on spawn +2hp for each basic unit
+- merchant - on spawn +1hp for all food producers
+- on spawn double food
+- take x food and gain hp, or give hp
+- strong unit, but loses extra hp on damage
 
 ## NPCs
 
 - `barrage` (hit all the player units in the column or hit other units in column for some small dmg, like 1)
 - change column after hit (if survived)
+- heal after damaged (if survived)
+- deal extra damage after damaged? (if survived)

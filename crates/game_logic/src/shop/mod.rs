@@ -64,7 +64,7 @@ fn get_choices(tier: u32, world: &World) -> [Option<String>; SHOP_SIZE] {
     let mut rng = thread_rng();
 
     for (i, name) in filtered
-        .choose_multiple_weighted(&mut rng, SHOP_SIZE, |a| a.0)
+        .choose_multiple_weighted(&mut rng, SHOP_SIZE.min(filtered.len()), |a| a.0)
         .unwrap()
         .map(|a| Some(a.1.to_string()))
         .enumerate()

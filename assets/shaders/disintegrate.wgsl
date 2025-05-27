@@ -58,9 +58,9 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     let val = NOISE[n];
 
     let ratio = step(1. - in.color.a, val);
-    let col_offset = 0.5 * cos(3.14 * val) * cos(10. * globals.time);
+    let r_offset = cos(3.14 * (1. / val));
 
-    return vec4(tex.r + col_offset, tex.g - col_offset, tex.b, tex.a * ratio);
+    return vec4(tex.r + r_offset, tex.g, tex.b, tex.a * ratio);
 
 }
 

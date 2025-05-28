@@ -94,6 +94,7 @@ pub struct Components {
     pub on_spawn: ComponentStorage<String>,
     pub on_fight: ComponentStorage<String>,
     pub on_kill: ComponentStorage<String>,
+    pub on_damage: ComponentStorage<String>,
     // handlers end
     pub player: ComponentStorage<()>,
     pub position: ComponentStorage<Position>,

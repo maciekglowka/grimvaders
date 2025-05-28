@@ -1,3 +1,5 @@
+# Basic
+ 
 Villager:
   sprite:
     atlas: sprites
@@ -8,6 +10,19 @@ Villager:
     player:
     tags:
       - !Basic
+
+Pikeman:
+  sprite:
+    atlas: sprites
+    index: 26
+  components:
+    cost: 3
+    health: [3, 3]
+    player:
+    tags:
+      - !Basic
+
+# Field units
 
 Peasant:
   sprite:
@@ -21,7 +36,7 @@ Peasant:
     tags:
       - !FoodProducer
   script: >
-    pub fn peasant_fight(world, entity) {
+    pub fn peasant_fight(world, entity, _) {
       let position = world.get("position", entity).unwrap();
       let tile = world.get_tile_at(position).unwrap();
       match tile {
@@ -32,50 +47,33 @@ Peasant:
   description: >
     On fight start: gain +1 food, when on a field tile.
 
-Hunter:
+
+# Meadow units
+
+Herbalist:
   sprite:
     atlas: sprites
-    index: 77
+    index: 79
   tier: 2
   components:
     cost: 3
-    health: [1, 1]
-    on_fight: "hunter_fight"
+    health: [2, 2]
+    on_fight: "healer_fight"
     player:
-    tags:
-      - !FoodProducer
   script: >
-    pub fn hunter_fight(world, entity) {
+    pub fn healer_fight(world, entity, _) {
       let position = world.get("position", entity).unwrap();
       let tile = world.get_tile_at(position).unwrap();
-      match tile {
-        Tile::Forest => RuneCommand::ChangeFood(2),
-        _ => RuneCommand::None
-      }
-    }
-  description: >
-    On fight start: gain +2 food, when on a forest tile.
+      if tile != Tile::Meadow { return }
 
-Merchant:
-  sprite:
-    atlas: sprites
-    index: 78
-  tier: 4
-  components:
-    cost: 3
-    health: [2, 2]
-    on_spawn: "merchant_spawn"
-    player:
-  script: >
-    pub fn merchant_spawn(world, entity) {
       let commands  = [];
-      for player in world.get_units_with_tag(Tag::FoodProducer) {
+      for player in world.get_adjacent_units(entity) {
         commands.push(RuneCommand::ChangeHealth(player, 1));
       }
       commands
     }
   description: >
-    On spawn: give +1 to all food producers.
+    On fight start: give +1 to adjacent units, if on a meadow tile.
 
 Sheep:
   sprite:
@@ -87,7 +85,7 @@ Sheep:
     on_fight: "sheep_fight"
     player:
   script: >
-    pub fn sheep_fight(world, entity) {
+    pub fn sheep_fight(world, entity, _) {
       let position = world.get("position", entity).unwrap();
       let tile = world.get_tile_at(position).unwrap();
       match tile {
@@ -109,7 +107,7 @@ Shepherd:
     on_spawn: "shepherd_spawn"
     player:
   script: >
-    pub fn shepherd_spawn(world, entity) {
+    pub fn shepherd_spawn(world, entity, _) {
       let sum = 0;
       for player in world.query(["player", "position"], []) {
         if world.get("name", player) == Some("Sheep") {
@@ -123,6 +121,32 @@ Shepherd:
   description: >
     On spawn: gain health equal to the sum of all sheep health.
 
+# Forest units
+
+Hunter:
+  sprite:
+    atlas: sprites
+    index: 77
+  tier: 2
+  components:
+    cost: 3
+    health: [1, 1]
+    on_fight: "hunter_fight"
+    player:
+    tags:
+      - !FoodProducer
+  script: >
+    pub fn hunter_fight(world, entity, _) {
+      let position = world.get("position", entity).unwrap();
+      let tile = world.get_tile_at(position).unwrap();
+      match tile {
+        Tile::Forest => RuneCommand::ChangeFood(2),
+        _ => RuneCommand::None
+      }
+    }
+  description: >
+    On fight start: gain +2 food, when on a forest tile.
+
 Ranger:
   sprite:
     atlas: sprites
@@ -134,7 +158,7 @@ Ranger:
     on_fight: "ranger_fight"
     player:
   script: >
-    pub fn ranger_fight(world, entity) {
+    pub fn ranger_fight(world, entity, _) {
       let position = world.get("position", entity).unwrap();
       let tile = world.get_tile_at(position).unwrap();
       match tile {
@@ -145,30 +169,6 @@ Ranger:
   description: >
     On fight start: gain +1 health, when on a forest tile.
 
-Herbalist:
-  sprite:
-    atlas: sprites
-    index: 79
-  tier: 2
-  components:
-    cost: 3
-    health: [2, 2]
-    on_fight: "healer_fight"
-    player:
-  script: >
-    pub fn healer_fight(world, entity) {
-      let position = world.get("position", entity).unwrap();
-      let tile = world.get_tile_at(position).unwrap();
-      if tile != Tile::Meadow { return }
-
-      let commands  = [];
-      for player in world.get_adjacent_units(entity) {
-        commands.push(RuneCommand::ChangeHealth(player, 1));
-      }
-      commands
-    }
-  description: >
-    On fight start: give +1 to adjacent units, if on a meadow tile.
 
 Druid:
   sprite:
@@ -181,7 +181,7 @@ Druid:
     on_fight: "druid_fight"
     player:
   script: >
-    pub fn druid_fight(world, entity) {
+    pub fn druid_fight(world, entity, _) {
       let sum = 0;
       for player in world.query(["player", "position"], []) {
 
@@ -195,17 +195,30 @@ Druid:
   description: >
     On fight start: gain +1 for each unit on a forest tile.
 
+# Food bonus units
 
-Pikeman:
+Merchant:
   sprite:
     atlas: sprites
-    index: 26
+    index: 78
+  tier: 4
   components:
     cost: 3
-    health: [3, 3]
+    health: [2, 2]
+    on_spawn: "merchant_spawn"
     player:
-    tags:
-      - !Basic
+  script: >
+    pub fn merchant_spawn(world, entity, _) {
+      let commands  = [];
+      for player in world.get_units_with_tag(Tag::FoodProducer) {
+        commands.push(RuneCommand::ChangeHealth(player, 1));
+      }
+      commands
+    }
+  description: >
+    On spawn: give +1 to all food producers.
+
+# Health bonus units
 
 Martyr:
   sprite:
@@ -218,7 +231,7 @@ Martyr:
     on_kill: "martyr_kill"
     player:
   script: >
-    pub fn martyr_kill(world, entity) {
+    pub fn martyr_kill(world, entity, _) {
       let commands  = [];
       for player in world.get_adjacent_units(entity) {
         commands.push(RuneCommand::ChangeHealth(player, 1));
@@ -239,7 +252,7 @@ Santo Subito:
     on_kill: "santo_subito_kill"
     player:
   script: >
-    pub fn santo_subito_kill(world, entity) {
+    pub fn santo_subito_kill(world, entity, _) {
       let commands  = [];
       for player in world.query(["player", "position"], []) {
         commands.push(RuneCommand::ChangeHealth(player, 1));
@@ -248,3 +261,22 @@ Santo Subito:
     }
   description: >
     On kill: increase health of each player's unit by 1.
+
+# Other
+
+Clay Statue:
+  sprite:
+    atlas: sprites
+    index: 469
+  tier: 4
+  components:
+    cost: 3
+    health: [6, 6]
+    on_damage: "clay_statue_damage"
+    player:
+  script: >
+    pub fn clay_statue_damage(world, entity) {
+      RuneCommand::Kill(entity)
+    }
+  description: >
+    Breaks when damaged.

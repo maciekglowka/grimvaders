@@ -30,16 +30,23 @@ pub enum RuneCommand {
     #[rune(constructor)]
     None,
     #[rune(constructor)]
+    SpawnUnit(#[rune(get)] Ent, #[rune(get)] Position),
+    #[rune(constructor)]
     ChangeFood(#[rune(get)] i32),
     #[rune(constructor)]
     ChangeHealth(#[rune(get)] Ent, #[rune(get)] i32),
+    #[rune(constructor)]
+    Kill(#[rune(get)] Ent),
 }
 impl RuneCommand {
     pub fn send(&self, cx: &mut SchedulerContext) {
         match self {
             Self::None => (),
+            // This probably will never be used in the rune script
+            Self::SpawnUnit(e, p) => cx.send(SpawnUnit(e.into(), *p)),
             Self::ChangeFood(v) => cx.send(ChangeFood(*v)),
             Self::ChangeHealth(e, v) => cx.send(ChangeHealth(e.into(), *v)),
+            Self::Kill(e) => cx.send(Kill(e.into())),
         }
     }
 }
@@ -58,6 +65,7 @@ pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
     scheduler.add_system(attack);
     scheduler.add_system(attack_town);
     scheduler.add_system(change_health);
+    scheduler.add_system_with_priority(handle_on_damage, 1);
     scheduler.add_system(kill);
     scheduler.add_system_with_priority(handle_on_kill, 1);
 }
@@ -103,12 +111,16 @@ fn handle_on_fight(
     world: &mut World,
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
-    let on_fight = query_iter!(world, With(position, on_fight))
-        .map(|(e, _, s)| (e, s.to_string()))
+    let mut on_fight = query_iter!(world, With(position, on_fight))
+        .map(|(e, p, s)| (e, *p, s.to_string()))
         .collect::<Vec<_>>();
 
-    for (entity, script) in on_fight {
-        if let Some(commands) = run_command_script(&script, entity.into(), world) {
+    // Apply consistent front to back order.
+    on_fight.sort_by(|a, b| b.1.y.cmp(&a.1.y).then_with(|| a.1.x.cmp(&b.1.x)));
+
+    for (entity, _, script) in on_fight {
+        if let Some(commands) = run_command_script(&script, entity.into(), world, RuneCommand::None)
+        {
             for c in commands {
                 c.send(cx);
             }
@@ -168,7 +180,12 @@ fn handle_on_spawn(
         .ok_or(CommandError::Continue)?
         .clone();
 
-    if let Some(commands) = run_command_script(&on_spawn, cmd.0.into(), world) {
+    if let Some(commands) = run_command_script(
+        &on_spawn,
+        cmd.0.into(),
+        world,
+        RuneCommand::SpawnUnit(cmd.0.into(), cmd.1),
+    ) {
         for c in commands {
             c.send(cx);
         }
@@ -258,6 +275,48 @@ fn change_health(
     Ok(())
 }
 
+fn handle_on_damage(
+    cmd: &mut ChangeHealth,
+    world: &mut World,
+    cx: &mut SchedulerContext,
+) -> Result<(), CommandError> {
+    // Handle only damage
+    if cmd.1 >= 0 {
+        return Ok(());
+    }
+
+    // Only trigger when the unit is still alive
+    if world
+        .components
+        .health
+        .get(cmd.0)
+        .ok_or(CommandError::Break)?
+        .current()
+        == 0
+    {
+        return Ok(());
+    }
+    let on_damage = world
+        .components
+        .on_damage
+        .get(cmd.0)
+        .ok_or(CommandError::Continue)?
+        .clone();
+
+    if let Some(commands) = run_command_script(
+        &on_damage,
+        cmd.0.into(),
+        world,
+        RuneCommand::ChangeHealth(cmd.0.into(), cmd.1),
+    ) {
+        for c in commands {
+            c.send(cx);
+        }
+    }
+
+    Ok(())
+}
+
 fn kill(cmd: &mut Kill, world: &mut World) -> Result<(), CommandError> {
     world.components.killed.insert(cmd.0, ());
     Ok(())
@@ -275,7 +334,12 @@ fn handle_on_kill(
         .ok_or(CommandError::Continue)?
         .clone();
 
-    if let Some(commands) = run_command_script(&on_kill, cmd.0.into(), world) {
+    if let Some(commands) = run_command_script(
+        &on_kill,
+        cmd.0.into(),
+        world,
+        RuneCommand::Kill(cmd.0.into()),
+    ) {
         for c in commands {
             c.send(cx);
         }

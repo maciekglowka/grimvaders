@@ -113,6 +113,30 @@ fn load_textures(context: &mut Context) {
     //         ..Default::default()
     //     },
     // );
+
+    let scanline_shader = context
+        .graphics
+        .load_shader(ShaderKind::PostProcess, "shaders/scanline.wgsl");
+
+    context.graphics.add_post_process(
+        "scanline",
+        PostProcessParams {
+            shader: scanline_shader,
+            ..Default::default()
+        },
+    );
+
+    let glow_shader = context
+        .graphics
+        .load_shader(ShaderKind::PostProcess, "shaders/glow.wgsl");
+
+    context.graphics.add_post_process(
+        "glow",
+        PostProcessParams {
+            shader: glow_shader,
+            ..Default::default()
+        },
+    );
 }
 
 pub fn load_data_assets(context: &mut Context) -> DataAssets {

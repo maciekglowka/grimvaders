@@ -4,7 +4,7 @@ use wunderkammer::prelude::*;
 use game_logic::World;
 
 use crate::{
-    globals::{BASE_TEXT_SIZE, DIGITS_TEXT_SIZE, GAP, OVERLAY_Z, SPRITE_SIZE, UI_Z},
+    globals::{BASE_TEXT_SIZE, DIGITS_TEXT_SIZE, GAP, OVERLAY_Z, SPRITE_SIZE, TEXT_LINE_GAP, UI_Z},
     ui::TextBox,
     utils::get_viewport_bounds,
 };
@@ -75,23 +75,38 @@ pub(crate) fn draw_description(entity: Entity, name: &str, world: &World, contex
     let Some(data) = world.resources.data.entities.get(name) else {
         return;
     };
-    let mut content = name.to_string();
+
+    let bounds = get_viewport_bounds(context);
+    let mut origin = Vector2f::new(bounds.0.x + GAP, bounds.1.y - BASE_TEXT_SIZE - GAP);
+
+    let _ = context.graphics.draw_text(
+        "default",
+        name,
+        origin,
+        UI_Z,
+        BASE_TEXT_SIZE,
+        SpriteParams::default(),
+    );
+
+    let gap = TEXT_LINE_GAP * BASE_TEXT_SIZE;
+    origin.y -= BASE_TEXT_SIZE + 2. * gap;
+
     if let Some(descr) = &data.description {
-        content = format!("{} - {}", content, descr);
+        let text = TextBox::borrowed(descr);
+
+        let h = text.draw(origin, bounds.1.x - bounds.0.x - 2. * GAP, UI_Z, context);
+        origin.y -= h - BASE_TEXT_SIZE;
     };
 
     if let Some(tags) = world.components.tags.get(entity) {
         let names: Vec<String> = tags.iter().map(|a| a.into()).collect();
-        content = format!("{} - {}", content, names.join(", "));
+        let _ = context.graphics.draw_text(
+            "default",
+            &names.join(", "),
+            origin,
+            UI_Z,
+            BASE_TEXT_SIZE,
+            SpriteParams::default(),
+        );
     }
-
-    let text = TextBox::owned(content);
-    let bounds = get_viewport_bounds(context);
-
-    text.draw(
-        Vector2f::new(bounds.0.x + GAP, bounds.1.y - 2. * (BASE_TEXT_SIZE + GAP)),
-        bounds.1.x - bounds.0.x - 2. * GAP,
-        UI_Z,
-        context,
-    );
 }

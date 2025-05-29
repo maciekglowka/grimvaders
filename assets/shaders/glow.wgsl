@@ -47,22 +47,30 @@ var<uniform> uniform: Uniform;
 @group(1) @binding(0)
 var<uniform> globals: GlobalsUniform;
 
+
+const KERNEL_DIM = 2;
+const THRESH_MIN = 0.05;
+const THRESH_MAX = 0.125;
+
 @fragment
 fn fs_main(vs: VertexOutput) -> @location(0) vec4<f32> {
     let col = textureSample(input_image, input_sampler, vs.uv);
 
-    let dx = 1.0 / f32(globals.rw);
-    let dy = 1.0 / f32(globals.rh);
+    let dx = 1.0 / f32(globals.vw);
+    let dy = 1.0 / f32(globals.vh);
 
-    var n = textureSample(input_image, input_sampler, vs.uv - vec2(dx, 0.0));
-    n += textureSample(input_image, input_sampler, vs.uv + vec2(dx, 0.0));
-    n += textureSample(input_image, input_sampler, vs.uv - vec2(0.0, dy));
-    n += textureSample(input_image, input_sampler, vs.uv + vec2(0.0, dy));
+    var n = vec4(0.);
 
-    n /= 4.;
+    for (var x=-KERNEL_DIM; x<=KERNEL_DIM; x++) {
+        for (var y=-KERNEL_DIM; y<=KERNEL_DIM; y++) {
+            let g = textureSample(input_image, input_sampler, vs.uv + vec2(f32(x) * dx, f32(y) * dy));
+            n += max(vec4(0.), g - col);
+        }
+    }
 
-    let thresh = 0.125;
-    var glow = max(vec4(0., 0., 0., 0.), n - col);
-    glow = smoothstep(vec4(0.125), vec4(0.25), glow) * glow;
-    return col + 0.4 * glow;
+    n /= f32((2 * KERNEL_DIM + 1) * (2 * KERNEL_DIM + 1));
+
+    let glow = smoothstep(vec4(THRESH_MIN), vec4(THRESH_MAX), n) * n;
+    // return glow;
+    return col + 0.2 * glow;
 }

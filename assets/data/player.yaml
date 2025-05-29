@@ -2,8 +2,8 @@
  
 Villager:
   sprite:
-    atlas: sprites
-    index: 25
+    atlas: units
+    tag: Villager
   components:
     cost: 2
     health: [2, 2]
@@ -13,8 +13,8 @@ Villager:
 
 Pikeman:
   sprite:
-    atlas: sprites
-    index: 26
+    atlas: units
+    tag: Pikeman
   components:
     cost: 3
     health: [3, 3]
@@ -26,8 +26,8 @@ Pikeman:
 
 Peasant:
   sprite:
-    atlas: sprites
-    index: 129
+    atlas: units
+    tag: Peasant
   components:
     cost: 2
     health: [1, 1]

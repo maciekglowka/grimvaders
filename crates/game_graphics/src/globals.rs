@@ -1,14 +1,14 @@
 use rogalik::prelude::*;
 
 pub const TILE_SIZE: f32 = 32.;
-pub const SPRITE_SIZE: f32 = 16.;
+pub const SPRITE_SIZE: f32 = 32.;
 pub const SPRITE_OFFSET: Vector2f = Vector2f {
-    x: 0.5 * (TILE_SIZE - SPRITE_SIZE),
-    y: (TILE_SIZE - SPRITE_SIZE),
+    x: 0.,
+    y: 0.5 * TILE_SIZE,
 };
 pub const CARD_GAP: f32 = 3.;
 
-pub const BUTTON_SIZE: f32 = SPRITE_SIZE + GAP;
+pub const BUTTON_SIZE: f32 = 0.5 * SPRITE_SIZE + GAP;
 
 pub const BUBBLE_Z: i32 = 150;
 pub const OVERLAY_Z: i32 = 100;
@@ -18,6 +18,7 @@ pub const UI_Z: i32 = 200;
 pub const TILE_Z: i32 = 0;
 
 pub const BASE_TEXT_SIZE: f32 = 8.0;
+pub const TEXT_LINE_GAP: f32 = 0.1;
 pub const DIGITS_TEXT_SIZE: f32 = 6.0;
 pub const ICON_SIZE: f32 = 5.0;
 
@@ -32,7 +33,8 @@ pub const MOVE_THRESH: f32 = 0.1;
 pub const DISINTEGRATE_SPEED: f32 = 2.;
 
 // PALETTE
-pub const BACKGROUND_COLOR: Color = Color(40, 35, 40, 255);
-pub const PRIMARY_COLOR: Color = Color(163, 162, 154, 255);
+pub const BACKGROUND_COLOR: Color = Color(70, 39, 64, 255);
+pub const BUTTON_TEXT_COLOR: Color = Color(70, 39, 64, 255);
+pub const FOOD_COLOR: Color = Color(163, 162, 154, 255);
 pub const RED_COLOR: Color = Color(197, 105, 129, 255);
-pub const BLUE_COLOR: Color = Color(84, 92, 126, 255);
+// pub const BLUE_COLOR: Color = Color(84, 92, 126, 255);

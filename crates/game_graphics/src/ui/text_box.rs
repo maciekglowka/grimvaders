@@ -1,7 +1,7 @@
 use rogalik::prelude::*;
 use std::borrow::Cow;
 
-use crate::globals::{BASE_TEXT_SIZE, PRIMARY_COLOR};
+use crate::globals::{BASE_TEXT_SIZE, FOOD_COLOR, TEXT_LINE_GAP};
 
 pub struct TextBox<'a> {
     text_color: Color,
@@ -12,14 +12,16 @@ impl<'a> TextBox<'a> {
     pub fn borrowed(text: &'a str) -> Self {
         Self {
             text_size: BASE_TEXT_SIZE,
-            text_color: PRIMARY_COLOR,
+            // TODO
+            text_color: FOOD_COLOR,
             text: Cow::Borrowed(text),
         }
     }
     pub fn owned(text: String) -> Self {
         Self {
             text_size: BASE_TEXT_SIZE,
-            text_color: PRIMARY_COLOR,
+            // TODO
+            text_color: FOOD_COLOR,
             text: Cow::Owned(text),
         }
     }
@@ -31,10 +33,12 @@ impl<'a> TextBox<'a> {
         self.text_size = size;
         self
     }
+
+    /// Returns box height.
     pub fn draw(&self, origin: Vector2f, width: f32, z: i32, context: &mut Context) -> f32 {
         let paragraphs = self.text.split('\n');
         let mut v_offset = 0.;
-        let line_height = 1.1 * self.text_size;
+        let line_height = (1. + TEXT_LINE_GAP) * self.text_size;
         let space = context
             .graphics
             .text_dimensions("default", " ", self.text_size)
@@ -48,6 +52,7 @@ impl<'a> TextBox<'a> {
                     .graphics
                     .text_dimensions("default", word, self.text_size)
                     .x;
+
                 if line_width + w > width {
                     line_width = 0.;
                     v_offset += line_height;
@@ -56,7 +61,7 @@ impl<'a> TextBox<'a> {
                 let _ = context.graphics.draw_text(
                     "default",
                     word,
-                    origin + Vector2f::new(line_width, -(self.text_size) - v_offset),
+                    origin + Vector2f::new(line_width, -v_offset),
                     z,
                     self.text_size,
                     SpriteParams {

@@ -6,7 +6,7 @@ use game_data::SpriteData;
 use game_logic::{components::Position, World};
 
 use crate::{
-    globals::{DISINTEGRATE_SPEED, MOVE_SPEED, SPRITE_SIZE, TILE_Z},
+    globals::{DISINTEGRATE_SPEED, MOVE_SPEED, SPRITE_OFFSET, SPRITE_SIZE, TILE_Z},
     utils::{get_z_offset, tile_to_sprite, world_to_tile},
 };
 
@@ -25,18 +25,20 @@ pub struct UnitSprite {
     pub origin: Vector2f,
     pub atlas: String,
     pub index: usize,
+    pub frames: Option<usize>,
     pub animation: Option<EntityAnimation>,
     pub remove: bool,
 }
 impl UnitSprite {
     pub fn new(entity: Entity, world: &World) -> Self {
-        let mut atlas = "outline";
-        let mut index = 721;
+        let mut atlas = "units";
+        let mut index = 0;
+        let mut frames = None;
         if let Some(name) = world.0.components.name.get(entity) {
             if let Some(data) = get_sprite_data(name, world) {
-                // TEMP
-                // atlas = &data.atlas;
+                atlas = &data.atlas;
                 index = data.index;
+                frames = data.frames;
             }
         }
 
@@ -44,6 +46,7 @@ impl UnitSprite {
             entity,
             atlas: atlas.to_string(),
             index,
+            frames,
             ..Default::default()
         }
     }
@@ -73,7 +76,7 @@ impl UnitSprite {
             atlas,
             self.index,
             self.origin,
-            TILE_Z + 1 + get_z_offset(world_to_tile(self.origin)),
+            TILE_Z + 1 + get_z_offset(world_to_tile(self.origin - SPRITE_OFFSET)),
             Vector2f::splat(SPRITE_SIZE),
             SpriteParams {
                 color,

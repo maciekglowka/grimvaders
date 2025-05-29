@@ -1,6 +1,8 @@
 use serde::Deserialize;
 use std::collections::HashMap;
 
+pub mod sprites;
+
 #[derive(Clone, Default)]
 pub struct GameData {
     pub entities: HashMap<String, EntityData>,
@@ -32,5 +34,8 @@ pub struct EntityData {
 #[derive(Clone, Deserialize, Default)]
 pub struct SpriteData {
     pub atlas: String,
+    #[serde(default)]
     pub index: usize,
+    pub frames: Option<usize>,
+    pub tag: Option<String>,
 }

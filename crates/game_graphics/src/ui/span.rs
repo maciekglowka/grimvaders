@@ -1,7 +1,7 @@
 use rogalik::prelude::*;
 use std::borrow::Cow;
 
-use crate::globals::{BASE_TEXT_SIZE, PRIMARY_COLOR};
+use crate::globals::{BASE_TEXT_SIZE, BUTTON_TEXT_COLOR};
 
 #[derive(Debug, Clone)]
 pub enum SpanItem<'a> {
@@ -26,7 +26,7 @@ impl<'a> Span<'a> {
             text_size: BASE_TEXT_SIZE,
             sprite_size: BASE_TEXT_SIZE,
             sprite_color: Color(255, 255, 255, 255),
-            text_color: PRIMARY_COLOR,
+            text_color: BUTTON_TEXT_COLOR,
             items: Vec::new(),
         }
     }

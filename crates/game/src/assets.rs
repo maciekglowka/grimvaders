@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use game_data::GameData;
 
 const DATA_FILES: [&str; 2] = ["player", "npcs"];
+const SPRITE_DATA: &str = include_str!("../../../assets/sprites/units.json");
 
 #[derive(Default)]
 pub struct DataAssets {
@@ -11,10 +12,10 @@ pub struct DataAssets {
 }
 
 pub fn load_assets(context: &mut Context) {
-    load_textures(context);
+    load_graphics(context);
 }
 
-fn load_textures(context: &mut Context) {
+fn load_graphics(context: &mut Context) {
     let outline_shader = context
         .graphics
         .load_shader(ShaderKind::Sprite, "shaders/outline.wgsl");
@@ -22,22 +23,40 @@ fn load_textures(context: &mut Context) {
         .graphics
         .load_shader(ShaderKind::Sprite, "shaders/disintegrate.wgsl");
 
-    let sprites_texture = Some(context.graphics.load_texture("sprites/sprites.png"));
+    // Units sprites
+
+    let units_texture = Some(context.graphics.load_texture("sprites/units.png"));
+    let units_data = game_data::sprites::load_sprite_sheet_data(SPRITE_DATA);
+
+    let units_atlas = Some(AtlasParams {
+        cols: units_data.meta.size.w / game_graphics::globals::SPRITE_SIZE as usize,
+        rows: units_data.meta.size.h / game_graphics::globals::SPRITE_SIZE as usize,
+        padding: None,
+    });
 
     context.graphics.load_material(
-        "outline",
+        "units",
         MaterialParams {
-            atlas: Some(AtlasParams {
-                cols: 49,
-                rows: 22,
-                padding: Some((1., 1.)),
-            }),
-            diffuse_texture: sprites_texture,
+            atlas: units_atlas,
+            diffuse_texture: units_texture,
             shader: Some(outline_shader),
             ..Default::default()
         },
     );
 
+    context.graphics.load_material(
+        "disintegrate",
+        MaterialParams {
+            atlas: units_atlas,
+            diffuse_texture: units_texture,
+            shader: Some(disintegrate_shader),
+            ..Default::default()
+        },
+    );
+
+    // Other sprites
+
+    let sprites_texture = Some(context.graphics.load_texture("sprites/sprites.png"));
     context.graphics.load_material(
         "sprites",
         MaterialParams {
@@ -51,19 +70,7 @@ fn load_textures(context: &mut Context) {
         },
     );
 
-    context.graphics.load_material(
-        "disintegrate",
-        MaterialParams {
-            atlas: Some(AtlasParams {
-                cols: 49,
-                rows: 22,
-                padding: Some((1., 1.)),
-            }),
-            diffuse_texture: sprites_texture,
-            shader: Some(disintegrate_shader),
-            ..Default::default()
-        },
-    );
+    // Tiles
 
     let tiles_texture = Some(context.graphics.load_texture("sprites/tiles.png"));
     context.graphics.load_material(
@@ -75,6 +82,22 @@ fn load_textures(context: &mut Context) {
                 padding: None,
             }),
             diffuse_texture: tiles_texture,
+            ..Default::default()
+        },
+    );
+
+    // Ui
+
+    let ui_texture = Some(context.graphics.load_texture("ui/ui.png"));
+    context.graphics.load_material(
+        "ui",
+        MaterialParams {
+            atlas: Some(AtlasParams {
+                cols: 5,
+                rows: 1,
+                padding: None,
+            }),
+            diffuse_texture: ui_texture,
             ..Default::default()
         },
     );
@@ -118,13 +141,13 @@ fn load_textures(context: &mut Context) {
         .graphics
         .load_shader(ShaderKind::PostProcess, "shaders/scanline.wgsl");
 
-    context.graphics.add_post_process(
-        "scanline",
-        PostProcessParams {
-            shader: scanline_shader,
-            ..Default::default()
-        },
-    );
+    // context.graphics.add_post_process(
+    //     "scanline",
+    //     PostProcessParams {
+    //         shader: scanline_shader,
+    //         ..Default::default()
+    //     },
+    // );
 
     let glow_shader = context
         .graphics
@@ -173,6 +196,12 @@ pub fn load_data(
         load_data_item(k, asset.data.get(), data);
         store.mark_read(*v);
     }
+
+    if updated {
+        let units_data = game_data::sprites::load_sprite_sheet_data(SPRITE_DATA);
+        game_data::sprites::update_sprite_data(data, &units_data);
+    }
+
     updated
 }
 

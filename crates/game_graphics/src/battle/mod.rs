@@ -13,7 +13,7 @@ use crate::{
             kill_unit_sprite, move_unit_sprite, place_unit_sprite, purge_unit_sprites, UnitSprite,
         },
     },
-    globals::{BASE_TEXT_SIZE, GAP, PRIMARY_COLOR, RED_COLOR, TILE_SIZE},
+    globals::{BASE_TEXT_SIZE, FOOD_COLOR, GAP, RED_COLOR, TILE_SIZE},
     input::InputState,
     utils::get_viewport_bounds,
 };
@@ -110,7 +110,7 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
         |c: &commands::ChangeFood, _, s| {
             s.bubbles.push(Bubble::new(
                 s.status_origin + Vector2f::new(0., 2. * BASE_TEXT_SIZE),
-                PRIMARY_COLOR,
+                FOOD_COLOR,
                 Some(format!("{:+}", c.0)),
                 None,
             ));

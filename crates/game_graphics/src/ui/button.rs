@@ -2,7 +2,7 @@ use rogalik::prelude::*;
 
 use super::Span;
 use crate::{
-    globals::{PRIMARY_COLOR, RED_COLOR, SPRITE_SIZE},
+    globals::SPRITE_SIZE,
     input::{ButtonState, InputState},
 };
 
@@ -22,10 +22,10 @@ impl<'a> Button<'a> {
             origin,
             size,
             z,
-            sprite_atlas: "sprites",
-            sprite_index: 725,
+            sprite_atlas: "ui",
+            sprite_index: 0,
             span: None,
-            slice: Some((4, Vector2f::splat(SPRITE_SIZE))),
+            slice: Some((8, Vector2f::splat(SPRITE_SIZE))),
         }
     }
     pub fn with_span(mut self, span: Span<'a>) -> Self {
@@ -42,26 +42,31 @@ impl<'a> Button<'a> {
     //     self
     // }
     pub fn draw(&self, context: &mut Context, state: &InputState) {
+        let mut idx = self.sprite_index;
+        let mut text_shift = 0.;
+        if self.mouse_over(state) {
+            idx = self.sprite_index + 1;
+        }
+        if self.pressed(state) {
+            idx = self.sprite_index + 2;
+            text_shift = -2.;
+        }
+
         let _ = context.graphics.draw_atlas_sprite(
             self.sprite_atlas,
-            self.sprite_index,
+            idx,
             self.origin,
             self.z,
             self.size,
             SpriteParams {
                 slice: self.slice,
-                color: if self.pressed(state) {
-                    RED_COLOR
-                } else {
-                    PRIMARY_COLOR
-                },
                 ..Default::default()
             },
         );
         if let Some(span) = &self.span {
             let span_offset = Vector2f::new(
                 0.5 * (self.size.x - span.width(context)),
-                self.size.y - 0.5 * (self.size.y - span.height() as f32),
+                self.size.y - 0.5 * (self.size.y - span.height()) + text_shift + 1.,
             );
             span.draw(self.origin + span_offset, self.z + 1, context);
         }
@@ -77,10 +82,5 @@ impl<'a> Button<'a> {
 
     pub fn mouse_over(&self, state: &InputState) -> bool {
         crate::utils::is_mouse_over(self.origin, self.size, state)
-        // let v = state.mouse_world_position;
-        // v.x >= self.origin.x
-        //     && v.y >= self.origin.y
-        //     && v.x <= self.origin.x + self.size.x
-        //     && v.y <= self.origin.y + self.size.y
     }
 }

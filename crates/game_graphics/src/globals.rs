@@ -17,7 +17,7 @@ pub const UI_Z: i32 = 200;
 // pub const UNIT_Z: i32 = 25;
 pub const TILE_Z: i32 = 0;
 
-pub const BASE_TEXT_SIZE: f32 = 8.0;
+pub const BASE_TEXT_SIZE: f32 = 11.0;
 pub const TEXT_LINE_GAP: f32 = 0.1;
 pub const DIGITS_TEXT_SIZE: f32 = 6.0;
 pub const ICON_SIZE: f32 = 5.0;

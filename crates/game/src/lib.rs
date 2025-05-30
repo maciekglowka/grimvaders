@@ -5,7 +5,7 @@ mod assets;
 mod input;
 mod scenes;
 
-const TOTAL_BOARD_H: usize = game_logic::globals::BOARD_H + game_logic::globals::MAX_WAVE_H;
+const TOTAL_BOARD_H: usize = game_logic::globals::BOARD_H + game_logic::globals::MAX_WAVE_H + 1;
 
 #[derive(Default)]
 struct GameState {
@@ -48,7 +48,7 @@ fn main() {
     let engine = EngineBuilder::new()
         .with_title("RGLK".to_string())
         .resizable(true)
-        .with_logical_size(800., 600.)
+        .with_logical_size(1280., 720.)
         .build(GameState::default(), Box::new(scenes::MainMenu));
     engine.run();
 }
@@ -62,7 +62,7 @@ fn get_camera_center() -> Vector2f {
 
 fn get_target_resolution(context: &Context) -> (u32, u32) {
     let size = context.get_physical_size();
-    let target_dim = game_graphics::globals::TILE_SIZE * TOTAL_BOARD_H as f32;
+    let target_dim = game_graphics::globals::TILE_SIZE * TOTAL_BOARD_H as f32 / 1.5;
     let min_dim = size.y.min(size.x);
     let scale = (min_dim / target_dim).floor();
     // only even resolutions

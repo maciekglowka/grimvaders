@@ -115,9 +115,12 @@ fn load_graphics(context: &mut Context) {
             ..Default::default()
         },
     );
+    // context
+    //     .graphics
+    //     .load_font("default", "ui/font.png", 16, 16, Some((11., 8.)));
     context
         .graphics
-        .load_font("default", "ui/font.png", 16, 16, Some((11., 8.)));
+        .load_font("default", "ui/monogram.png", 8, 16, Some((0., 1.)));
 
     context
         .graphics

@@ -66,7 +66,7 @@ impl<'a> Button<'a> {
         if let Some(span) = &self.span {
             let span_offset = Vector2f::new(
                 0.5 * (self.size.x - span.width(context)),
-                self.size.y - 0.5 * (self.size.y - span.height()) + text_shift + 1.,
+                self.size.y - 0.5 * (self.size.y - span.height()) + text_shift + 2.,
             );
             span.draw(self.origin + span_offset, self.z + 1, context);
         }

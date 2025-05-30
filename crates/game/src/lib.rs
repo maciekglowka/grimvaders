@@ -1,11 +1,16 @@
-use game_logic::globals::BOARD_W;
 use rogalik::prelude::*;
+
+use game_graphics::utils::tile_to_world;
+use game_logic::{
+    components::Position,
+    globals::{BOARD_H, BOARD_W, MAX_WAVE_H},
+};
 
 mod assets;
 mod input;
 mod scenes;
 
-const TOTAL_BOARD_H: usize = game_logic::globals::BOARD_H + game_logic::globals::MAX_WAVE_H + 1;
+const TOTAL_BOARD_H: usize = BOARD_H + MAX_WAVE_H + 1;
 
 #[derive(Default)]
 struct GameState {
@@ -18,7 +23,8 @@ impl Game for GameState {
     fn setup(&mut self, context: &mut Context) {
         assets::load_assets(context);
         self.data_assets = assets::load_data_assets(context);
-        self.main_camera = context.graphics.create_camera(1., get_camera_center());
+        self.main_camera = context.graphics.create_camera(1., Vector2f::ZERO);
+
         context
             .graphics
             .set_clear_color(game_graphics::globals::BACKGROUND_COLOR);
@@ -26,6 +32,11 @@ impl Game for GameState {
     fn resize(&mut self, context: &mut rogalik::engine::Context) {
         let (w, h) = get_target_resolution(context);
         context.graphics.set_rendering_resolution(w, h);
+        context
+            .graphics
+            .get_camera_mut(self.main_camera)
+            .unwrap()
+            .set_target(get_camera_center(w, h));
     }
     fn reload_assets(&mut self, context: &mut rogalik::engine::Context) {
         if !assets::load_data(
@@ -53,11 +64,29 @@ fn main() {
     engine.run();
 }
 
-fn get_camera_center() -> Vector2f {
-    0.5 * game_graphics::utils::tile_to_world(game_logic::components::Position::new(
-        game_logic::globals::BOARD_W as i32,
-        TOTAL_BOARD_H as i32 - 3,
-    ))
+fn get_camera_center(vw: u32, vh: u32) -> Vector2f {
+    let bottom_left = tile_to_world(Position::new(0, 0));
+    let bottom_right = tile_to_world(Position::new(BOARD_W as i32, 0));
+    let upper_left = tile_to_world(Position::new(0, TOTAL_BOARD_H as i32));
+    let upper_right = tile_to_world(Position::new(BOARD_W as i32, TOTAL_BOARD_H as i32));
+
+    // let mut board_inner_size = (game_graphics::utils::tile_to_world(
+    //     game_logic::components::Position::new(game_logic::globals::BOARD_W as
+    // i32, 0), ) - game_graphics::utils::tile_to_world(
+    //     game_logic::components::Position::new(0, TOTAL_BOARD_H as i32 + 1),
+    // ));
+
+    let board_inner_size =
+        Vector2f::new(bottom_right.x - upper_left.x, upper_right.y - bottom_left.y);
+
+    // 0.5 * game_graphics::utils::tile_to_world(game_logic::components::Position::new(
+    //     game_logic::globals::BOARD_W as i32,
+    //     TOTAL_BOARD_H as i32 - 3,
+    // ))
+    Vector2f::new(
+        0.5 * (vw as f32 - board_inner_size.x),
+        0.5 * board_inner_size.y,
+    )
 }
 
 fn get_target_resolution(context: &Context) -> (u32, u32) {

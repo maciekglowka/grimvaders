@@ -1,23 +1,23 @@
-Rat:
+Gnome:
   sprite:
-    atlas: sprites
-    index: 423
+    atlas: units
+    tag: Gnome
   score: 1
   components:
     health: [1, 1]
 
-Bat:
+Shadow:
   sprite:
-    atlas: sprites
-    index: 418
+    atlas: units
+    tag: Shadow
   score: 2
   components:
     health: [2, 2]
 
-Bear:
+Ghost:
   sprite:
-    atlas: sprites
-    index: 422
+    atlas: units
+    tag: Ghost
   tier: 2
   score: 3
   components:

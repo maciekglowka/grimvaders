@@ -52,8 +52,8 @@ Peasant:
 
 Herbalist:
   sprite:
-    atlas: sprites
-    index: 79
+    atlas: units
+    tag: Herbalist
   tier: 2
   components:
     cost: 3
@@ -77,8 +77,8 @@ Herbalist:
 
 Sheep:
   sprite:
-    atlas: sprites
-    index: 370
+    atlas: units
+    tag: Sheep
   components:
     cost: 2
     health: [1, 1]
@@ -96,37 +96,37 @@ Sheep:
   description: >
     On fight start: gain +1 health, when on a meadow tile.
 
-Shepherd:
-  sprite:
-    atlas: sprites
-    index: 74
-  tier: 3
-  components:
-    cost: 3
-    health: [0, 0]
-    on_spawn: "shepherd_spawn"
-    player:
-  script: >
-    pub fn shepherd_spawn(world, entity, _) {
-      let sum = 0;
-      for player in world.query(["player", "position"], []) {
-        if world.get("name", player) == Some("Sheep") {
-          if let Some(health) = world.get("health", player) {
-            sum += health.0;
-          }
-        }
-      }
-      RuneCommand::ChangeHealth(entity, sum)
-    }
-  description: >
-    On spawn: gain health equal to the sum of all sheep health.
+# Shepherd:
+#   sprite:
+#     atlas: sprites
+#     tag: Shepherd
+#   tier: 3
+#   components:
+#     cost: 3
+#     health: [0, 0]
+#     on_spawn: "shepherd_spawn"
+#     player:
+#   script: >
+#     pub fn shepherd_spawn(world, entity, _) {
+#       let sum = 0;
+#       for player in world.query(["player", "position"], []) {
+#         if world.get("name", player) == Some("Sheep") {
+#           if let Some(health) = world.get("health", player) {
+#             sum += health.0;
+#           }
+#         }
+#       }
+#       RuneCommand::ChangeHealth(entity, sum)
+#     }
+#   description: >
+#     On spawn: gain health equal to the sum of all sheep health.
 
 # Forest units
 
 Hunter:
   sprite:
-    atlas: sprites
-    index: 77
+    atlas: units
+    tag: Hunter
   tier: 2
   components:
     cost: 3
@@ -149,8 +149,8 @@ Hunter:
 
 Ranger:
   sprite:
-    atlas: sprites
-    index: 471
+    atlas: units
+    tag: Ranger
   tier: 2
   components:
     cost: 3
@@ -172,8 +172,8 @@ Ranger:
 
 Druid:
   sprite:
-    atlas: sprites
-    index: 122
+    atlas: units
+    tag: Druid
   tier: 4
   components:
     cost: 3
@@ -199,8 +199,8 @@ Druid:
 
 Merchant:
   sprite:
-    atlas: sprites
-    index: 78
+    atlas: units
+    tag: Merchant
   tier: 4
   components:
     cost: 3
@@ -222,8 +222,8 @@ Merchant:
 
 Martyr:
   sprite:
-    atlas: sprites
-    index: 24
+    atlas: units
+    tag: Martyr
   tier: 3
   components:
     cost: 3
@@ -243,8 +243,8 @@ Martyr:
 
 Santo Subito:
   sprite:
-    atlas: sprites
-    index: 220
+    atlas: units
+    tag: Santo Subito
   tier: 5
   components:
     cost: 4
@@ -266,8 +266,8 @@ Santo Subito:
 
 Clay Statue:
   sprite:
-    atlas: sprites
-    index: 469
+    atlas: units
+    tag: Clay Statue
   tier: 4
   components:
     cost: 3
@@ -275,8 +275,33 @@ Clay Statue:
     on_damage: "clay_statue_damage"
     player:
   script: >
-    pub fn clay_statue_damage(world, entity) {
+    pub fn clay_statue_damage(world, entity, _) {
       RuneCommand::Kill(entity)
     }
   description: >
     Breaks when damaged.
+
+Mime:
+  sprite:
+    atlas: units
+    tag: Mime
+  tier: 3
+  components:
+    cost: 3
+    health: [1, 1]
+    on_ally_kill: "mime_ally_kill"
+    player:
+  script: >
+    pub fn mime_ally_kill(world, entity, cmd) {
+      if let RuneCommand::Kill(other) = cmd {
+        if world.is_in_front(entity, other) {
+          let position = world.get("position", entity).unwrap();
+          return [
+            RuneCommand::RemoveUnit(entity),
+            RuneCommand::RespawnPlayer(other, position)
+          ];
+        }
+      }
+    }
+  description: >
+    When an ally in front is killed, respawn it in place of self.

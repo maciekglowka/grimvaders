@@ -3,7 +3,10 @@ use rune::Any;
 use wunderkammer::prelude::*;
 
 use crate::{
-    battle::BattleMode,
+    battle::{
+        player::{remove_player_from_board, reset_player},
+        BattleMode,
+    },
     components::Position,
     scripting::run_command_script,
     utils::get_unit_at,
@@ -15,13 +18,15 @@ use crate::{
 pub struct ChangeFood(pub i32);
 pub struct RedrawHand;
 pub struct Fight;
-pub struct SummonUnit(pub Entity, pub Position);
+pub struct SummonPlayer(pub Entity, pub Position);
 pub struct SpawnUnit(pub Entity, pub Position);
 pub struct MoveUnit(pub Entity, pub Position);
 pub struct Attack(pub Entity, pub Entity);
 pub struct AttackTown(pub Entity);
 pub struct ChangeHealth(pub Entity, pub i32);
 pub struct Kill(pub Entity);
+pub struct RemoveUnit(pub Entity);
+pub struct RespawnPlayer(pub Entity, pub Position);
 
 // Rune
 
@@ -37,16 +42,21 @@ pub enum RuneCommand {
     ChangeHealth(#[rune(get)] Ent, #[rune(get)] i32),
     #[rune(constructor)]
     Kill(#[rune(get)] Ent),
+    #[rune(constructor)]
+    RemoveUnit(#[rune(get)] Ent),
+    #[rune(constructor)]
+    RespawnPlayer(#[rune(get)] Ent, #[rune(get)] Position),
 }
 impl RuneCommand {
     pub fn send(&self, cx: &mut SchedulerContext) {
         match self {
             Self::None => (),
-            // This probably will never be used in the rune script
             Self::SpawnUnit(e, p) => cx.send(SpawnUnit(e.into(), *p)),
             Self::ChangeFood(v) => cx.send(ChangeFood(*v)),
             Self::ChangeHealth(e, v) => cx.send(ChangeHealth(e.into(), *v)),
             Self::Kill(e) => cx.send(Kill(e.into())),
+            Self::RemoveUnit(e) => cx.send(RemoveUnit(e.into())),
+            Self::RespawnPlayer(e, p) => cx.send(RespawnPlayer(e.into(), *p)),
         }
     }
 }
@@ -58,7 +68,7 @@ pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
     scheduler.add_system(redraw_hand);
     scheduler.add_system(fight);
     scheduler.add_system_with_priority(handle_on_fight, 1);
-    scheduler.add_system(summon_unit);
+    scheduler.add_system(summon_player);
     scheduler.add_system(spawn_unit);
     scheduler.add_system_with_priority(handle_on_spawn, 1);
     scheduler.add_system(move_unit);
@@ -68,6 +78,9 @@ pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
     scheduler.add_system_with_priority(handle_on_damage, 1);
     scheduler.add_system(kill);
     scheduler.add_system_with_priority(handle_on_kill, 1);
+    scheduler.add_system_with_priority(handle_on_ally_kill, 2);
+    scheduler.add_system(remove_unit);
+    scheduler.add_system(respawn_player);
 }
 
 // Handlers
@@ -129,8 +142,8 @@ fn handle_on_fight(
     Ok(())
 }
 
-fn summon_unit(
-    cmd: &mut SummonUnit,
+fn summon_player(
+    cmd: &mut SummonPlayer,
     world: &mut World,
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
@@ -345,5 +358,55 @@ fn handle_on_kill(
         }
     }
 
+    Ok(())
+}
+
+fn handle_on_ally_kill(
+    cmd: &mut Kill,
+    world: &mut World,
+    cx: &mut SchedulerContext,
+) -> Result<(), CommandError> {
+    let hosts = query_iter!(world, With(player, position, on_ally_kill))
+        // Do not trigger on self
+        .filter(|(e, _, _, _)| *e != cmd.0)
+        .map(|(e, _, _, s)| (e, s.to_string()))
+        .collect::<Vec<_>>();
+
+    for (entity, script) in hosts {
+        if let Some(commands) = run_command_script(
+            &script,
+            entity.into(),
+            world,
+            RuneCommand::Kill(cmd.0.into()),
+        ) {
+            for c in commands {
+                c.send(cx);
+            }
+        }
+    }
+
+    Ok(())
+}
+
+fn remove_unit(cmd: &mut RemoveUnit, world: &mut World) -> Result<(), CommandError> {
+    if world.components.player.get(cmd.0).is_some() {
+        remove_player_from_board(cmd.0, world);
+    } else {
+        world.despawn(cmd.0);
+    }
+    Ok(())
+}
+
+fn respawn_player(
+    cmd: &mut RespawnPlayer,
+    world: &mut World,
+    cx: &mut SchedulerContext,
+) -> Result<(), CommandError> {
+    // Only respawn killed units
+    if world.components.killed.get(cmd.0).is_none() {
+        return Err(CommandError::Break);
+    }
+    reset_player(cmd.0, world);
+    cx.send(SpawnUnit(cmd.0, cmd.1));
     Ok(())
 }

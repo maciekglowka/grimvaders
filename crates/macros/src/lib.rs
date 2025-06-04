@@ -34,6 +34,7 @@ fn impl_rune_adapter(ast: &syn::DeriveInput) -> TokenStream {
                 module.function_meta(World::get_tile_at)?;
                 module.function_meta(World::get_adjacent_units)?;
                 module.function_meta(World::get_units_with_tag)?;
+                module.function_meta(World::is_in_front)?;
                 module.function_meta(World::query)?;
                 Ok(module)
             }

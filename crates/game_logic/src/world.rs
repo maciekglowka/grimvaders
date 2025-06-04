@@ -49,7 +49,7 @@ impl World {
     }
 
     #[rune::function]
-    fn get_adjacent_units(&self, entity: Ent) -> Vec<Ent> {
+    fn get_adjacent_units(&self, entity: &Ent) -> Vec<Ent> {
         let Some(position) = self.0.components.position.get(entity.into()) else {
             return Vec::new();
         };
@@ -68,6 +68,17 @@ impl World {
             .filter(|(_, _, _, t)| t.contains(tag))
             .map(|(e, _, _, _)| e.into())
             .collect()
+    }
+
+    #[rune::function]
+    fn is_in_front(&self, entity: &Ent, other: &Ent) -> bool {
+        match (
+            self.components.position.get(entity.into()),
+            self.components.position.get(other.into()),
+        ) {
+            (Some(a), Some(b)) => a.x == b.x && b.y - a.y == 1,
+            _ => false,
+        }
     }
 }
 impl std::ops::Deref for World {
@@ -94,6 +105,7 @@ pub struct Components {
     pub on_spawn: ComponentStorage<String>,
     pub on_fight: ComponentStorage<String>,
     pub on_kill: ComponentStorage<String>,
+    pub on_ally_kill: ComponentStorage<String>,
     pub on_damage: ComponentStorage<String>,
     // handlers end
     pub player: ComponentStorage<()>,

@@ -10,7 +10,8 @@ use crate::{
         bubbles::Bubble,
         sprites::{
             animate_unit_sprite, attack_town, attack_unit_sprite, get_unit_sprite,
-            kill_unit_sprite, move_unit_sprite, place_unit_sprite, purge_unit_sprites, UnitSprite,
+            kill_unit_sprite, move_unit_sprite, place_unit_sprite, purge_unit_sprites,
+            remove_unit_sprite, UnitSprite,
         },
     },
     globals::{BASE_TEXT_SIZE, FOOD_COLOR, GAP, RED_COLOR, TILE_SIZE},
@@ -123,6 +124,10 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
     observers.push(Box::new(CommandObserver::new(
         &mut env.scheduler,
         |c: &commands::Kill, _, s| kill_unit_sprite(c.0, &mut s.unit_sprites),
+    )));
+    observers.push(Box::new(CommandObserver::new(
+        &mut env.scheduler,
+        |c: &commands::RemoveUnit, _, s| remove_unit_sprite(c.0, &mut s.unit_sprites),
     )));
 
     state.observers = observers;

@@ -6,7 +6,7 @@ use game_data::SpriteData;
 use game_logic::{components::Position, World};
 
 use crate::{
-    globals::{DISINTEGRATE_SPEED, MOVE_SPEED, SPRITE_OFFSET, SPRITE_SIZE, TILE_Z},
+    globals::{DISINTEGRATE_SPEED, MOVE_SPEED, SPRITE_OFFSET, SPRITE_SIZE, TILE_SIZE, TILE_Z},
     utils::{get_z_offset, tile_to_sprite, world_to_tile},
 };
 
@@ -25,6 +25,7 @@ pub struct UnitSprite {
     pub origin: Vector2f,
     pub atlas: String,
     pub index: usize,
+    frame: usize,
     pub frames: Option<usize>,
     pub animation: Option<EntityAnimation>,
     pub remove: bool,
@@ -76,7 +77,11 @@ impl UnitSprite {
             atlas,
             self.index,
             self.origin,
-            TILE_Z + 1 + get_z_offset(world_to_tile(self.origin - SPRITE_OFFSET)),
+            TILE_Z
+                + 1
+                + get_z_offset(world_to_tile(
+                    self.origin + Vector2f::new(0.5 * TILE_SIZE, 0.),
+                )),
             Vector2f::splat(SPRITE_SIZE),
             SpriteParams {
                 color,

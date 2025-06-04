@@ -42,7 +42,9 @@ fn handle_input_player(
             } else {
                 match state.input_mode {
                     InputMode::HandUnit(entity) => {
-                        state.input_queue.push(InputEvent::SummonUnit(entity, tile));
+                        state
+                            .input_queue
+                            .push(InputEvent::SummonPlayer(entity, tile));
                         state.input_mode = InputMode::None;
                     }
                     InputMode::BoardUnit(entity) => {

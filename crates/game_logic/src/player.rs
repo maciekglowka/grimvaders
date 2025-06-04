@@ -18,7 +18,7 @@ pub(crate) fn player_game_init(world: &mut World) {
     world.0.resources.player_data = PlayerData::default();
     world.0.resources.player_data.health = 5;
 
-    for name in ["Sheep", "Peasant", "Villager", "Villager", "Villager"] {
+    for name in ["Mime", "Peasant", "Villager", "Villager", "Villager"] {
         let entity = crate::utils::spawn_by_name(name, world).unwrap();
         world.0.components.player.insert(entity, ());
         world.0.resources.player_data.draw.push_back(entity);

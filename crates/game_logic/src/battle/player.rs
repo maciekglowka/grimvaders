@@ -21,10 +21,15 @@ pub(super) fn player_next_turn(env: &mut GameEnv) {
     env.world.0.resources.player_data.food += 4;
 }
 
-pub(crate) fn remove_player_from_board(entity: Entity, world: &mut World) {
-    world.components.position.remove(entity);
+pub(crate) fn reset_player(entity: Entity, world: &mut World) {
     if let Some(health) = world.components.health.get_mut(entity) {
         health.restore();
     }
+    world.components.killed.remove(entity);
+}
+
+pub(crate) fn remove_player_from_board(entity: Entity, world: &mut World) {
+    world.components.position.remove(entity);
+    reset_player(entity, world);
     world.resources.player_data.discard.push(entity);
 }

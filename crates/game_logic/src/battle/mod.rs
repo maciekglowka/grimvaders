@@ -42,7 +42,7 @@ pub fn battle_update(env: &mut GameEnv) {
         return;
     };
 
-    systems::handle_killed(&mut env.world);
+    systems::handle_killed(env);
 
     match env.world.resources.battle_state.mode {
         BattleMode::Plan => {
@@ -75,8 +75,8 @@ fn handle_command_queue(env: &mut GameEnv) -> bool {
 fn handle_input_events(env: &mut GameEnv) -> Option<()> {
     while let Some(event) = env.input.as_ref().unwrap().next() {
         match event {
-            InputEvent::SummonUnit(entity, target) => {
-                env.scheduler.send(commands::SummonUnit(entity, target));
+            InputEvent::SummonPlayer(entity, target) => {
+                env.scheduler.send(commands::SummonPlayer(entity, target));
             }
             InputEvent::MoveUnit(entity, target) => {
                 env.scheduler.send(commands::MoveUnit(entity, target));

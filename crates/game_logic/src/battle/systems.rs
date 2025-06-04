@@ -1,17 +1,12 @@
 use wunderkammer::prelude::*;
 
-use crate::{battle::player::remove_player_from_board, World};
+use crate::{battle::player::remove_player_from_board, commands::RemoveUnit, GameEnv};
 
-pub(crate) fn handle_killed(world: &mut World) {
-    let entities = query_iter!(world, With(killed))
+pub(crate) fn handle_killed(env: &mut GameEnv) {
+    let entities = query_iter!(env.world, With(killed))
         .map(|(e, _)| e)
         .collect::<Vec<_>>();
     for entity in entities {
-        world.components.killed.remove(entity);
-        if world.components.player.get(entity).is_some() {
-            remove_player_from_board(entity, world);
-        } else {
-            world.despawn(entity);
-        }
+        env.scheduler.send(RemoveUnit(entity));
     }
 }

@@ -55,9 +55,9 @@ pub(crate) fn draw_deck_unit(
     if let Some(cost) = world.0.components.cost.get(entity) {
         let _ = context.graphics.draw_text(
             "digits",
-            &format!("G: {}", cost),
+            &format!("{}", cost),
             origin + Vector2f::new(0., -DIGITS_TEXT_SIZE),
-            OVERLAY_Z,
+            z + 1,
             DIGITS_TEXT_SIZE,
             SpriteParams::default(),
         );

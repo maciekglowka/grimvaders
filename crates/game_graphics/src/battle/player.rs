@@ -113,20 +113,24 @@ fn handle_hand(
     take_input: bool,
 ) {
     let bounds = get_viewport_bounds(context);
-    let mut origin = Vector2f::new(bounds.1.x - 3. * SPRITE_SIZE, bounds.0.y + GAP);
+    let base = Vector2f::new(
+        bounds.1.x - SPRITE_SIZE - GAP,
+        bounds.0.y + BUTTON_SIZE + 2. * GAP,
+    );
 
-    origin.y += BUTTON_SIZE + GAP;
+    // origin.y += BUTTON_SIZE + GAP;
 
-    for &entity in world.0.resources.player_data.hand.iter() {
+    for (i, &entity) in world.0.resources.player_data.hand.iter().enumerate() {
+        let origin = base + 1.5 * SPRITE_SIZE * Vector2f::new(-((i / 2) as f32), (i % 2) as f32);
         let selected = state.input_mode == InputMode::HandUnit(entity);
-        let mut button = Button::new(origin, Vector2f::splat(2. * SPRITE_SIZE), UI_Z);
+        let mut button = Button::new(origin, Vector2f::splat(SPRITE_SIZE), UI_Z);
         if selected {
             button = button.with_sprite("sprites", 726);
         }
         button.draw(context, input_state);
         draw_deck_unit(
             entity,
-            origin + Vector2f::splat(0.5 * SPRITE_SIZE),
+            origin + Vector2f::new(0., 0.5 * SPRITE_SIZE),
             UI_Z + 1,
             world,
             context,
@@ -143,8 +147,6 @@ fn handle_hand(
                 state.input_mode = InputMode::HandUnit(entity);
             }
         }
-
-        origin.y += 3. * SPRITE_SIZE;
     }
 
     let redraw = Button::new(

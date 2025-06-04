@@ -156,7 +156,13 @@ pub(crate) fn attack_unit_sprite(
             // let tile_in_front = Position::new(target_position.x, target_position.y + 1);
             let dest = tile_to_sprite(*target_position);
             // let next_origin = 0.5 * (sprite.origin + dest);
-            let path = vec![(dest, Ease::In)];
+            let path = vec![
+                (
+                    sprite.origin - Vector2f::new(0., 0.125 * SPRITE_SIZE),
+                    Ease::InOut,
+                ),
+                (dest, Ease::In),
+            ];
             // let path = vec![(dest, Ease::In), (sprite.origin, Ease::Out)];
             sprite.add_translations(&path);
         }

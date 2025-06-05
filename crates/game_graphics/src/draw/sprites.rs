@@ -6,7 +6,7 @@ use game_data::SpriteData;
 use game_logic::{components::Position, World};
 
 use crate::{
-    globals::{DISINTEGRATE_SPEED, MOVE_SPEED, SPRITE_OFFSET, SPRITE_SIZE, TILE_SIZE, TILE_Z},
+    globals::{DISINTEGRATE_SPEED, MOVE_SPEED, OVERLAY_Z, SPRITE_SIZE, TILE_SIZE, TILE_Z},
     utils::{get_z_offset, tile_to_sprite, world_to_tile},
 };
 
@@ -89,7 +89,7 @@ impl UnitSprite {
             },
         );
 
-        super::units::draw_unit_overlay(self.entity, self.origin, world, context);
+        super::units::draw_unit_overlay(self.entity, self.origin, OVERLAY_Z, world, context, false);
     }
     pub fn mouse_over(&self, state: &crate::input::InputState) -> bool {
         crate::utils::is_mouse_over(self.origin, Vector2f::splat(SPRITE_SIZE), state)

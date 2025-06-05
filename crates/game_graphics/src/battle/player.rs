@@ -4,7 +4,10 @@ use game_logic::{get_unit_at, is_on_board, InputEvent, World};
 
 use crate::{
     draw::units::{draw_deck_unit, draw_entity_description},
-    globals::{BASE_TEXT_SIZE, BUTTON_SIZE, GAP, OVERLAY_Z, SPRITE_SIZE, TILE_SIZE, UI_Z},
+    globals::{
+        BASE_TEXT_SIZE, BUTTON_SIZE, BUTTON_TEXT_COLOR, FOOD_COLOR, GAP, ICON_SIZE, OVERLAY_Z,
+        RED_COLOR, SPRITE_SIZE, TILE_SIZE, UI_Z,
+    },
     input::{ButtonState, InputState},
     ui::{Button, Span},
     utils::{get_viewport_bounds, tile_to_world, world_to_tile},
@@ -162,23 +165,45 @@ fn handle_hand(
 }
 
 pub(super) fn draw_status(state: &super::BattleGraphics, world: &World, context: &mut Context) {
-    let text = format!(
-        "Health: {} | Food: {} | Wave: {}/{}",
-        world.0.resources.player_data.health,
-        world.0.resources.player_data.food,
-        world.0.resources.battle_state.wave,
-        game_logic::globals::WAVE_COUNT
+    let mut spans = Vec::new();
+    spans.push(
+        Span::new()
+            .with_sprite("icons_small", 0)
+            .with_spacer(2.)
+            .with_text_owned(format!("{}", world.resources.player_data.health))
+            .with_spacer(4.)
+            .with_sprite_size(ICON_SIZE)
+            .with_text_size(BASE_TEXT_SIZE)
+            .with_text_color(RED_COLOR),
     );
-    let w = context
-        .graphics
-        .text_dimensions("default", &text, BASE_TEXT_SIZE)
-        .x;
-    let _ = context.graphics.draw_text(
-        "default",
-        &text,
-        state.status_origin - Vector2f::new(0.5 * w, 0.),
-        UI_Z,
-        BASE_TEXT_SIZE,
-        SpriteParams::default(),
+    spans.push(
+        Span::new()
+            .with_sprite("icons_small", 1)
+            .with_spacer(2.)
+            .with_text_owned(format!("{}", world.resources.player_data.food))
+            .with_spacer(4.)
+            .with_sprite_size(ICON_SIZE)
+            .with_text_size(BASE_TEXT_SIZE)
+            .with_text_color(FOOD_COLOR),
     );
+    spans.push(
+        Span::new()
+            .with_sprite("icons_small", 2)
+            .with_spacer(2.)
+            .with_text_owned(format!(
+                "{}/{}",
+                world.resources.battle_state.wave,
+                game_logic::globals::WAVE_COUNT
+            ))
+            .with_sprite_size(ICON_SIZE)
+            .with_text_size(BASE_TEXT_SIZE)
+            .with_text_color(BUTTON_TEXT_COLOR),
+    );
+
+    let w: f32 = spans.iter().map(|s| s.width(context)).sum();
+    let mut origin = state.status_origin - Vector2f::new(0.5 * w, 0.);
+    for span in spans {
+        span.draw(origin, UI_Z, context);
+        origin.x += span.width(context);
+    }
 }

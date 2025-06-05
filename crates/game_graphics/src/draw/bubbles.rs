@@ -1,7 +1,11 @@
+use rand::prelude::*;
 use rogalik::prelude::*;
 
 use crate::{
-    globals::{BUBBLE_AGE, BUBBLE_SPEED, BUBBLE_WAIT_AGE, BUBBLE_Z, DIGITS_TEXT_SIZE, ICON_SIZE},
+    globals::{
+        BUBBLE_AGE, BUBBLE_SPEED, BUBBLE_WAIT_AGE, BUBBLE_Z, DIGITS_TEXT_SIZE, ICON_SIZE,
+        SPRITE_SIZE,
+    },
     ui::Span,
 };
 
@@ -14,8 +18,11 @@ pub struct Bubble {
 }
 impl Bubble {
     pub fn new(origin: Vector2f, color: Color, text: Option<String>, icon: Option<usize>) -> Self {
+        let mut rng = thread_rng();
+        let offset =
+            SPRITE_SIZE * Vector2f::new(rng.gen_range(0.25..0.75), rng.gen_range(0.25..0.75));
         Self {
-            origin,
+            origin: origin + offset,
             color,
             text,
             icon,

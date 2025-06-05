@@ -73,10 +73,10 @@ impl<'a> Span<'a> {
                 SpanItem::Text(text) => {
                     width += context
                         .graphics
-                        .text_dimensions(self.font, text, self.text_size as f32)
+                        .text_dimensions(self.font, text, self.text_size)
                         .x
                 }
-                &SpanItem::Sprite(_, _) => width += self.sprite_size as f32,
+                &SpanItem::Sprite(_, _) => width += self.sprite_size,
                 SpanItem::Spacer(w) => width += w,
             }
         }
@@ -92,13 +92,14 @@ impl<'a> Span<'a> {
 
     pub fn draw(&self, origin: Vector2f, z: i32, context: &mut Context) {
         let mut offset = 0.;
-        let middle = Vector2f::new(origin.x, origin.y - 0.5 * self.height());
+        let origin = origin.round();
+        let middle = Vector2f::new(origin.x, origin.y + 0.5 * self.height());
 
         for item in self.items.iter() {
             match item {
                 SpanItem::Text(text) => {
                     let _ = context.graphics.draw_text(
-                        &self.font,
+                        self.font,
                         text,
                         (middle + Vector2f::new(offset, -0.5 * self.text_size)).round(),
                         z,
@@ -110,7 +111,7 @@ impl<'a> Span<'a> {
                     );
                     offset += context
                         .graphics
-                        .text_dimensions(&self.font, text, self.text_size)
+                        .text_dimensions(self.font, text, self.text_size)
                         .x;
                 }
                 &SpanItem::Sprite(atlas, index) => {

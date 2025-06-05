@@ -33,8 +33,7 @@ pub const MOVE_THRESH: f32 = 0.1;
 pub const DISINTEGRATE_SPEED: f32 = 2.;
 
 // PALETTE
-pub const BACKGROUND_COLOR: Color = Color(70, 39, 64, 255);
-pub const BUTTON_TEXT_COLOR: Color = Color(70, 39, 64, 255);
-pub const FOOD_COLOR: Color = Color(163, 162, 154, 255);
-pub const RED_COLOR: Color = Color(197, 105, 129, 255);
-// pub const BLUE_COLOR: Color = Color(84, 92, 126, 255);
+pub const BACKGROUND_COLOR: Color = Color(54, 54, 70, 255);
+pub const BUTTON_TEXT_COLOR: Color = Color(139, 99, 107, 255);
+pub const FOOD_COLOR: Color = Color(229, 189, 126, 255);
+pub const RED_COLOR: Color = Color(193, 115, 109, 255);

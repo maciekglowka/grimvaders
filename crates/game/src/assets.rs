@@ -93,7 +93,7 @@ fn load_graphics(context: &mut Context) {
         "ui",
         MaterialParams {
             atlas: Some(AtlasParams {
-                cols: 5,
+                cols: 4,
                 rows: 1,
                 padding: None,
             }),
@@ -107,8 +107,8 @@ fn load_graphics(context: &mut Context) {
         "icons_small",
         MaterialParams {
             atlas: Some(AtlasParams {
-                cols: 8,
-                rows: 8,
+                cols: 4,
+                rows: 1,
                 padding: None,
             }),
             diffuse_texture: icons_texture,
@@ -117,11 +117,11 @@ fn load_graphics(context: &mut Context) {
     );
     context
         .graphics
-        .load_font("default", "ui/font.png", 16, 16, Some((11., 7.)));
+        .load_font("default", "ui/font.png", 16, 16, Some((11., 7.)), None);
 
     context
         .graphics
-        .load_font("digits", "ui/digits.png", 16, 16, Some((4., 2.)));
+        .load_font("digits", "ui/digits.png", 16, 16, Some((4., 2.)), None);
 
     // let noise_shader = context
     //     .graphics

@@ -42,7 +42,9 @@ pub fn battle_update(env: &mut GameEnv) {
         return;
     };
 
-    systems::handle_killed(env);
+    if systems::handle_killed(env) {
+        return;
+    }
 
     match env.world.resources.battle_state.mode {
         BattleMode::Plan => {

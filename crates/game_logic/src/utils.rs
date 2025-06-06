@@ -3,12 +3,16 @@ use wunderkammer::prelude::*;
 
 use crate::{
     components::Position,
-    globals::{BOARD_H, BOARD_W},
+    globals::{BOARD_H, BOARD_W, MAX_WAVE_H},
     World,
 };
 
 pub fn is_on_board(p: Position) -> bool {
     p.x >= 0 && p.y >= 0 && p.x < BOARD_W as i32 && p.y < BOARD_H as i32
+}
+
+pub fn is_on_extended_board(p: Position) -> bool {
+    p.x >= 0 && p.y >= 0 && p.x < BOARD_W as i32 && p.y < (BOARD_H + MAX_WAVE_H) as i32
 }
 
 pub(crate) fn spawn_by_name(name: &str, world: &mut World) -> Option<Entity> {

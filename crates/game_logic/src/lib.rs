@@ -13,5 +13,5 @@ mod utils;
 mod world;
 
 pub use events::InputEvent;
-pub use utils::{get_tile_at, get_unit_at, is_on_board};
+pub use utils::{get_tile_at, get_unit_at, is_on_board, is_on_extended_board};
 pub use world::{GameEnv, World};

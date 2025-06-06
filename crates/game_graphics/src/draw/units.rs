@@ -55,13 +55,28 @@ pub(crate) fn draw_unit_overlay(
 
     let w: f32 = spans.iter().map(|s| s.width(context)).sum();
 
+    let oh = 4.;
+    let ov = 2.;
     let mut base = origin
         + Vector2f::new(
             (0.5 * (SPRITE_SIZE - w)).round(),
-            SPRITE_SIZE - DIGITS_TEXT_SIZE,
+            SPRITE_SIZE - DIGITS_TEXT_SIZE + 2. * ov,
         );
+
+    let _ = context.graphics.draw_atlas_sprite(
+        "ui",
+        3,
+        base - Vector2f::new(oh, ov),
+        z,
+        Vector2f::new(w + 2. * oh, DIGITS_TEXT_SIZE + 2. * ov),
+        SpriteParams {
+            slice: Some((4, Vector2f::splat(SPRITE_SIZE))),
+            ..Default::default()
+        },
+    );
+
     for span in spans {
-        span.draw(base, z, context);
+        span.draw(base, z + 1, context);
         base.x += span.width(context);
     }
 }

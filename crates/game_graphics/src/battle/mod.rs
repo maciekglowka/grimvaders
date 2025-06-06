@@ -51,7 +51,9 @@ pub fn battle_draw(
     input_state: &InputState,
 ) -> bool {
     let bounds = get_viewport_bounds(context);
-    state.status_origin = Vector2f::new(0.5 * (bounds.0.x + bounds.1.x), bounds.0.y + GAP);
+    // state.status_origin = Vector2f::new(0.5 * (bounds.0.x + bounds.1.x),
+    // bounds.0.y + GAP);
+    state.status_origin = bounds.0 + Vector2f::splat(GAP);
 
     handle_events(state, world);
     let mut is_animating = false;
@@ -110,16 +112,24 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
         &mut env.scheduler,
         |c: &commands::ChangeFood, _, s| {
             s.bubbles.push(Bubble::new(
-                s.status_origin + Vector2f::new(0., 2. * BASE_TEXT_SIZE),
+                s.status_origin + Vector2f::splat(2. * BASE_TEXT_SIZE),
                 FOOD_COLOR,
-                Some(format!("{:+}", c.0)),
-                None,
+                Some((if c.0 < 0 { "-" } else { "+" }).to_string()),
+                Some(1),
             ));
         },
     )));
     observers.push(Box::new(CommandObserver::new(
         &mut env.scheduler,
-        |c: &commands::AttackTown, w, s| attack_town(c.0, w, &mut s.unit_sprites),
+        |c: &commands::AttackTown, w, s| {
+            attack_town(c.0, w, &mut s.unit_sprites);
+            s.bubbles.push(Bubble::new(
+                s.status_origin + Vector2f::splat(2. * BASE_TEXT_SIZE),
+                RED_COLOR,
+                Some("-".to_string()),
+                Some(0),
+            ));
+        },
     )));
     observers.push(Box::new(CommandObserver::new(
         &mut env.scheduler,

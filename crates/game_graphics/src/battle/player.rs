@@ -1,12 +1,12 @@
 use rogalik::prelude::*;
 
-use game_logic::{get_unit_at, is_on_board, InputEvent, World};
+use game_logic::{get_unit_at, is_on_board, is_on_extended_board, InputEvent, World};
 
 use crate::{
     draw::units::{draw_deck_unit, draw_entity_description},
     globals::{
-        BASE_TEXT_SIZE, BUTTON_SIZE, BUTTON_TEXT_COLOR, FOOD_COLOR, GAP, ICON_SIZE, OVERLAY_Z,
-        RED_COLOR, SPRITE_SIZE, TILE_SIZE, UI_Z,
+        BASE_TEXT_SIZE, BUTTON_CLICK_SHIFT, BUTTON_SIZE, BUTTON_TEXT_COLOR, FOOD_COLOR, GAP,
+        ICON_SIZE, OVERLAY_Z, RED_COLOR, SPRITE_SIZE, TILE_SIZE, UI_Z,
     },
     input::{ButtonState, InputState},
     ui::{Button, Span},
@@ -14,6 +14,8 @@ use crate::{
 };
 
 use super::InputMode;
+
+const ACTION_BUTTON_W: f32 = 2.25 * SPRITE_SIZE;
 
 pub(super) fn handle_player_ui(
     world: &World,
@@ -62,11 +64,17 @@ fn handle_input_player(
 
     let bounds = get_viewport_bounds(context);
     let fight = Button::new(
-        bounds.0 + Vector2f::splat(GAP),
-        Vector2f::new(3. * BUTTON_SIZE, BUTTON_SIZE),
+        Vector2f::new(bounds.1.x - ACTION_BUTTON_W - GAP, bounds.0.y + GAP),
+        Vector2f::new(ACTION_BUTTON_W, BUTTON_SIZE),
         UI_Z,
     )
-    .with_span(Span::new().with_text_borrowed("Fight!"));
+    .with_span(
+        Span::new()
+            .with_sprite("icons_small", 2)
+            .with_spacer(2.)
+            .with_text_borrowed("Fight!")
+            .with_sprite_size(ICON_SIZE),
+    );
     fight.draw(context, input_state);
     if fight.clicked(input_state) {
         state.input_queue.push(InputEvent::Done);
@@ -94,7 +102,7 @@ fn draw_cursor(
 
     let tile = world_to_tile(input_state.mouse_world_position);
 
-    if !is_on_board(tile) {
+    if !is_on_extended_board(tile) {
         return;
     }
 
@@ -116,24 +124,34 @@ fn handle_hand(
     take_input: bool,
 ) {
     let bounds = get_viewport_bounds(context);
+    let bottom = bounds.0.y + BUTTON_SIZE + 2. * GAP;
     let base = Vector2f::new(
         bounds.1.x - SPRITE_SIZE - GAP,
-        bounds.0.y + BUTTON_SIZE + 2. * GAP,
+        bottom + 2. * BUTTON_SIZE + GAP,
     );
 
     // origin.y += BUTTON_SIZE + GAP;
 
     for (i, &entity) in world.0.resources.player_data.hand.iter().enumerate() {
-        let origin = base + 1.5 * SPRITE_SIZE * Vector2f::new(-((i / 2) as f32), (i % 2) as f32);
+        let origin =
+            base + SPRITE_SIZE * Vector2f::new(-1.25 * ((i / 2) as f32), 1.75 * (i % 2) as f32);
         let selected = state.input_mode == InputMode::HandUnit(entity);
-        let mut button = Button::new(origin, Vector2f::splat(SPRITE_SIZE), UI_Z);
+
+        let mut button = Button::new(origin, Vector2f::new(SPRITE_SIZE, BUTTON_SIZE), UI_Z);
         if selected {
-            button = button.with_sprite("sprites", 726);
+            button = button.with_sprite("ui", 2);
         }
         button.draw(context, input_state);
+
+        let unit_offset = if button.pressed(input_state) {
+            BUTTON_CLICK_SHIFT
+        } else {
+            0.
+        };
+
         draw_deck_unit(
             entity,
-            origin + Vector2f::new(0., 0.5 * SPRITE_SIZE),
+            origin + Vector2f::new(0., 0.5 * BUTTON_SIZE - unit_offset),
             UI_Z + 1,
             world,
             context,
@@ -142,7 +160,6 @@ fn handle_hand(
         if button.mouse_over(input_state) {
             draw_entity_description(entity, world, context);
         }
-
         if take_input && button.clicked(input_state) {
             if selected {
                 state.input_mode = InputMode::None
@@ -152,14 +169,20 @@ fn handle_hand(
         }
     }
 
-    let redraw = Button::new(
-        Vector2f::new(bounds.1.x - 3. * BUTTON_SIZE - GAP, bounds.0.y + GAP),
-        Vector2f::new(3. * BUTTON_SIZE, BUTTON_SIZE),
+    let reroll = Button::new(
+        Vector2f::new(bounds.1.x - ACTION_BUTTON_W - GAP, bottom),
+        Vector2f::new(ACTION_BUTTON_W, BUTTON_SIZE),
         UI_Z,
     )
-    .with_span(Span::new().with_text_borrowed("Redraw"));
-    redraw.draw(context, input_state);
-    if redraw.clicked(input_state) {
+    .with_span(
+        Span::new()
+            .with_sprite("icons_small", 3)
+            .with_spacer(2.)
+            .with_text_borrowed("Reroll")
+            .with_sprite_size(ICON_SIZE),
+    );
+    reroll.draw(context, input_state);
+    if reroll.clicked(input_state) {
         state.input_queue.push(InputEvent::RedrawHand);
     }
 }
@@ -200,8 +223,23 @@ pub(super) fn draw_status(state: &super::BattleGraphics, world: &World, context:
             .with_text_color(BUTTON_TEXT_COLOR),
     );
 
+    let ov = 4.;
+    let oh = 8.;
     let w: f32 = spans.iter().map(|s| s.width(context)).sum();
-    let mut origin = state.status_origin - Vector2f::new(0.5 * w, 0.);
+
+    let _ = context.graphics.draw_atlas_sprite(
+        "ui",
+        3,
+        state.status_origin,
+        UI_Z,
+        Vector2f::new(w + 2. * oh, BASE_TEXT_SIZE + 2. * ov),
+        SpriteParams {
+            slice: Some((4, Vector2f::splat(SPRITE_SIZE))),
+            ..Default::default()
+        },
+    );
+
+    let mut origin = state.status_origin + Vector2f::new(oh, ov);
     for span in spans {
         span.draw(origin, UI_Z, context);
         origin.x += span.width(context);

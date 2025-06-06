@@ -2,7 +2,7 @@ use rogalik::prelude::*;
 
 use super::Span;
 use crate::{
-    globals::SPRITE_SIZE,
+    globals::{BUTTON_CLICK_SHIFT, SPRITE_SIZE},
     input::{ButtonState, InputState},
 };
 
@@ -46,7 +46,7 @@ impl<'a> Button<'a> {
         let mut text_shift = 0.;
         if self.pressed(state) {
             idx = self.sprite_index + 1;
-            text_shift = -2.;
+            text_shift = -BUTTON_CLICK_SHIFT;
         }
 
         let _ = context.graphics.draw_atlas_sprite(
@@ -73,7 +73,7 @@ impl<'a> Button<'a> {
         state.click == ButtonState::Released && self.mouse_over(state)
     }
 
-    fn pressed(&self, state: &InputState) -> bool {
+    pub fn pressed(&self, state: &InputState) -> bool {
         state.click == ButtonState::Down && self.mouse_over(state)
     }
 

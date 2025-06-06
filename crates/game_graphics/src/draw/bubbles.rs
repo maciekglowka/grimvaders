@@ -67,8 +67,7 @@ fn draw_bubbles(bubbles: &mut Vec<Bubble>, context: &mut Context) {
         if let Some(icon) = bubble.icon {
             span = span
                 .with_sprite("icons_small", icon)
-                .with_sprite_size(ICON_SIZE)
-                .with_sprite_color(bubble.color);
+                .with_sprite_size(ICON_SIZE);
         };
         span.draw(bubble.origin.round(), BUBBLE_Z, context);
     }

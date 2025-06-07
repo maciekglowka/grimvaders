@@ -5,7 +5,7 @@ use game_logic::{shop::ShopState, InputEvent, World};
 
 use crate::{
     draw::units::{draw_deck_unit, draw_entity_description},
-    globals::{BUTTON_SIZE, GAP, SPRITE_SIZE},
+    globals::{BASE_TEXT_SIZE, BUTTON_SIZE, GAP, SPRITE_SIZE},
     input::InputState,
     ui::{Button, Span},
     utils::get_viewport_bounds,
@@ -23,9 +23,12 @@ pub fn shop_draw(
     context: &mut Context,
     input_state: &InputState,
 ) {
+    crate::utils::draw_background(context);
+
     let bounds = get_viewport_bounds(context);
     let center = 0.5 * (bounds.0 + bounds.1);
     let button_w = BUTTON_SIZE * 3.;
+    let unit_offset = Vector2f::new(0.5 * (button_w - SPRITE_SIZE), 0.);
     let w = button_w + GAP;
 
     let mut origin = center - Vector2f::new(0.5 * logic_state.choices.len() as f32 * w, 0.);
@@ -44,9 +47,34 @@ pub fn shop_draw(
                 state.input_queue.push(InputEvent::PickUnit(i));
             }
 
-            draw_deck_unit(*entity, origin, 0, world, context);
+            draw_deck_unit(*entity, origin + unit_offset, 0, world, context);
 
-            if crate::utils::is_mouse_over(origin, Vector2f::splat(SPRITE_SIZE), input_state) {
+            if let Some(name) = world.components.name.get(*entity) {
+                let offset = Vector2f::new(
+                    0.5 * (button_w
+                        - context
+                            .graphics
+                            .text_dimensions("default", name, BASE_TEXT_SIZE)
+                            .x),
+                    SPRITE_SIZE + 3. * GAP,
+                );
+
+                let _ = context.graphics.draw_text(
+                    "default",
+                    name,
+                    origin + offset,
+                    0,
+                    BASE_TEXT_SIZE,
+                    SpriteParams::default(),
+                );
+            }
+
+            if crate::utils::is_mouse_over(
+                origin + unit_offset,
+                Vector2f::splat(SPRITE_SIZE),
+                input_state,
+            ) || button.mouse_over(input_state)
+            {
                 draw_entity_description(*entity, world, context);
             }
         }
@@ -64,18 +92,4 @@ pub fn shop_draw(
     if done.clicked(input_state) {
         state.input_queue.push(InputEvent::Done);
     }
-
-    draw_status(world, context);
-}
-
-fn draw_status(world: &World, context: &mut Context) {
-    let bounds = get_viewport_bounds(context);
-    // let _ = context.graphics.draw_text(
-    //     "default",
-    //     &format!("G: {}", world.0.resources.player_data.gold,),
-    //     Vector2f::new(bounds.0.x + GAP, bounds.1.y - GAP - BASE_TEXT_SIZE),
-    //     0,
-    //     BASE_TEXT_SIZE,
-    //     SpriteParams::default(),
-    // );
 }

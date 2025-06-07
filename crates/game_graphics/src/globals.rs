@@ -35,6 +35,6 @@ pub const DISINTEGRATE_SPEED: f32 = 2.;
 // pub const BACKGROUND_COLOR: Color = Color(54, 54, 70, 255);
 // pub const BACKGROUND_COLOR: Color = Color(56, 112, 127, 255);
 pub const BACKGROUND_COLOR: Color = Color(128, 121, 120, 255);
-pub const BUTTON_TEXT_COLOR: Color = Color(139, 99, 107, 255);
+pub const BUTTON_TEXT_COLOR: Color = Color(66, 53, 83, 255);
 pub const FOOD_COLOR: Color = Color(229, 189, 126, 255);
 pub const RED_COLOR: Color = Color(193, 115, 109, 255);

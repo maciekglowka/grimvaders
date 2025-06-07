@@ -5,7 +5,7 @@ use game_logic::{InputEvent, World};
 
 use crate::{
     draw::units::{draw_deck_unit, draw_entity_description},
-    globals::{BASE_TEXT_SIZE, BUTTON_SIZE, GAP, SPRITE_SIZE, TILE_SIZE},
+    globals::{BASE_TEXT_SIZE, BUTTON_CLICK_SHIFT, BUTTON_SIZE, GAP, SPRITE_SIZE, TILE_SIZE},
     input::InputState,
     ui::{Button, Span},
     utils::get_viewport_bounds,
@@ -23,14 +23,16 @@ pub fn deck_draw(
     context: &mut Context,
     input_state: &InputState,
 ) {
+    crate::utils::draw_background(context);
+
     let bounds = get_viewport_bounds(context);
     let center = 0.5 * (bounds.0 + bounds.1);
-    let w = TILE_SIZE + GAP;
+    let w = SPRITE_SIZE + GAP;
 
     let _ = context.graphics.draw_text(
         "default",
         "Too many cards in the deck. Please discard.",
-        Vector2f::new(bounds.0.x + GAP, bounds.1.y - GAP - BASE_TEXT_SIZE),
+        bounds.0 + Vector2f::splat(GAP),
         0,
         BASE_TEXT_SIZE,
         SpriteParams::default(),
@@ -39,17 +41,26 @@ pub fn deck_draw(
     let mut origin = center + Vector2f::new(-2.5 * w, TILE_SIZE + GAP);
 
     for (i, entity) in world.0.resources.player_data.draw.iter().enumerate() {
-        // let Some(name) = world.0.components.name.get(*entity) else {
-        //     continue;
-        // };
         let selected = state.selected == Some(*entity);
 
-        let mut button = Button::new(origin, Vector2f::splat(2. * SPRITE_SIZE), 0);
+        let mut button = Button::new(origin, Vector2f::new(SPRITE_SIZE, BUTTON_SIZE), 0);
         if selected {
             button = button.with_sprite("sprites", 726);
         }
         button.draw(context, input_state);
-        draw_deck_unit(*entity, origin, 0, world, context);
+
+        let unit_offset = if button.pressed(input_state) {
+            BUTTON_CLICK_SHIFT
+        } else {
+            0.
+        };
+        draw_deck_unit(
+            *entity,
+            origin + Vector2f::new(0., 0.5 * BUTTON_SIZE - unit_offset),
+            0,
+            world,
+            context,
+        );
 
         if button.mouse_over(input_state) {
             draw_entity_description(*entity, world, context);
@@ -65,7 +76,7 @@ pub fn deck_draw(
 
         origin.x += w;
         if i % 5 == 4 {
-            origin.y -= TILE_SIZE + GAP;
+            origin.y -= 1.75 * SPRITE_SIZE;
             origin.x -= 5. * w;
         }
     }

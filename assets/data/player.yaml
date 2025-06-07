@@ -262,6 +262,28 @@ Santo Subito:
   description: >
     On kill: increase health of each player's unit by 1.
 
+Bard:
+  sprite:
+    atlas: units
+    tag: Bard
+  tier: 3
+  components:
+    cost: 3
+    health: [2, 2]
+    on_ally_heal: "bard_ally_heal"
+    player:
+    trigger_limit: [3, 3]
+  script: >
+    pub fn bard_ally_heal(world, entity, cmd) {
+      if let RuneCommand::ChangeHealth(other, val) = cmd {
+        if world.is_adjacent(entity, other) {
+          return RuneCommand::ChangeHealth(entity, val);
+        }
+      }
+    }
+  description: >
+    When adjacent ally gains health, gain the same amount.
+
 # Other
 
 Clay Statue:
@@ -305,3 +327,4 @@ Mime:
     }
   description: >
     When an ally in front is killed, respawn it in place of self.
+

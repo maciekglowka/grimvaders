@@ -151,7 +151,13 @@ pub(crate) fn draw_description(entity: Entity, name: &str, world: &World, contex
     origin.y -= BASE_TEXT_SIZE + 2. * gap;
 
     if let Some(descr) = &data.description {
-        let text = TextBox::borrowed(descr);
+        let mut content = descr.to_string();
+
+        if let Some(limit) = world.components.trigger_limit.get(entity) {
+            content += &format!("Triggers max {}x/turn.", limit.default());
+        }
+
+        let text = TextBox::owned(content);
 
         let h = text.draw(origin, bounds.1.x - bounds.0.x - 2. * GAP, UI_Z, context);
         origin.y -= h - BASE_TEXT_SIZE;

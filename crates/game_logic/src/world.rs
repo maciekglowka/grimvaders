@@ -80,6 +80,17 @@ impl World {
             _ => false,
         }
     }
+
+    #[rune::function]
+    fn is_adjacent(&self, entity: &Ent, other: &Ent) -> bool {
+        match (
+            self.components.position.get(entity.into()),
+            self.components.position.get(other.into()),
+        ) {
+            (Some(a), Some(b)) => a.manhattan(b) == 1,
+            _ => false,
+        }
+    }
 }
 impl std::ops::Deref for World {
     type Target = WorldInner;
@@ -107,11 +118,13 @@ pub struct Components {
     pub on_kill: ComponentStorage<String>,
     pub on_ally_kill: ComponentStorage<String>,
     pub on_damage: ComponentStorage<String>,
+    pub on_ally_heal: ComponentStorage<String>,
     // handlers end
     pub player: ComponentStorage<()>,
     pub position: ComponentStorage<Position>,
     pub tags: ComponentStorage<Vec<Tag>>,
     pub tile: ComponentStorage<Tile>,
+    pub trigger_limit: ComponentStorage<ValueDefault>,
 }
 
 #[derive(Default)]

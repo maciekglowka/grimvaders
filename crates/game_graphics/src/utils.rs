@@ -1,4 +1,4 @@
-use crate::globals::{SPRITE_OFFSET, TILE_SIZE, TILE_Z};
+use crate::globals::{BACKGROUND_Z, SPRITE_OFFSET, TILE_SIZE, TILE_Z};
 use rogalik::prelude::*;
 
 use game_logic::{
@@ -37,4 +37,28 @@ pub(super) fn world_to_tile(v: Vector2f) -> Position {
 pub fn is_mouse_over(origin: Vector2f, size: Vector2f, state: &crate::input::InputState) -> bool {
     let v = state.mouse_world_position;
     v.x >= origin.x && v.y >= origin.y && v.x <= origin.x + size.x && v.y <= origin.y + size.y
+}
+
+pub fn draw_background(context: &mut Context) {
+    let bounds = get_viewport_bounds(context);
+    let u = (bounds.1.x - bounds.0.x) / TILE_SIZE;
+    let v = (bounds.1.y - bounds.0.y) / TILE_SIZE;
+
+    let _ = context.graphics.draw_mesh(
+        "background",
+        &[
+            bounds.0,
+            Vector2f::new(bounds.1.x, bounds.0.y),
+            bounds.1,
+            Vector2f::new(bounds.0.x, bounds.1.y),
+        ],
+        &[
+            Vector2f::ZERO,
+            Vector2f::new(u, 0.),
+            Vector2f::new(u, v),
+            Vector2f::new(0., v),
+        ],
+        &[0, 1, 2, 0, 2, 3],
+        BACKGROUND_Z,
+    );
 }

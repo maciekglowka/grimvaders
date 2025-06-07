@@ -51,9 +51,9 @@ pub fn battle_draw(
     input_state: &InputState,
 ) -> bool {
     let bounds = get_viewport_bounds(context);
-    // state.status_origin = Vector2f::new(0.5 * (bounds.0.x + bounds.1.x),
-    // bounds.0.y + GAP);
     state.status_origin = bounds.0 + Vector2f::splat(GAP);
+
+    crate::utils::draw_background(context);
 
     handle_events(state, world);
     let mut is_animating = false;

@@ -126,6 +126,14 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
     "duration": 100
+   },
+   "units 16.aseprite": {
+    "frame": { "x": 512, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
    }
  },
  "meta": {
@@ -149,9 +157,10 @@
    { "name": "Santo Subito", "from": 10, "to": 10, "direction": "forward", "color": "#000000ff" },
    { "name": "Clay Statue", "from": 11, "to": 11, "direction": "forward", "color": "#000000ff" },
    { "name": "Mime", "from": 12, "to": 12, "direction": "forward", "color": "#000000ff" },
-   { "name": "Gnome", "from": 13, "to": 13, "direction": "forward", "color": "#000000ff" },
-   { "name": "Shadow", "from": 14, "to": 14, "direction": "forward", "color": "#000000ff" },
-   { "name": "Ghost", "from": 15, "to": 15, "direction": "forward", "color": "#000000ff" }
+   { "name": "Bard", "from": 13, "to": 13, "direction": "forward", "color": "#000000ff" },
+   { "name": "Gnome", "from": 14, "to": 14, "direction": "forward", "color": "#000000ff" },
+   { "name": "Shadow", "from": 15, "to": 15, "direction": "forward", "color": "#000000ff" },
+   { "name": "Ghost", "from": 16, "to": 16, "direction": "forward", "color": "#000000ff" }
   ]
  }
 }

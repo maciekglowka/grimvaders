@@ -70,6 +70,16 @@ fn load_graphics(context: &mut Context) {
         },
     );
 
+    let bg_texture = Some(context.graphics.load_texture("sprites/background.png"));
+    context.graphics.load_material(
+        "background",
+        MaterialParams {
+            diffuse_texture: bg_texture,
+            repeat: TextureRepeat::Repeat,
+            ..Default::default()
+        },
+    );
+
     // Tiles
 
     let tiles_texture = Some(context.graphics.load_texture("sprites/tiles.png"));

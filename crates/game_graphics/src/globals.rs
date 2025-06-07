@@ -13,9 +13,8 @@ pub const BUTTON_CLICK_SHIFT: f32 = 2.;
 pub const BUBBLE_Z: i32 = 150;
 pub const OVERLAY_Z: i32 = 100;
 pub const UI_Z: i32 = 200;
-
-// pub const UNIT_Z: i32 = 25;
 pub const TILE_Z: i32 = 0;
+pub const BACKGROUND_Z: i32 = -1000;
 
 pub const BASE_TEXT_SIZE: f32 = 9.0;
 pub const TEXT_LINE_GAP: f32 = 0.1;

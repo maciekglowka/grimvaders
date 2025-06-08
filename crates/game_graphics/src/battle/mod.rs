@@ -111,8 +111,16 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
     observers.push(Box::new(CommandObserver::new(
         &mut env.scheduler,
         |c: &commands::ChangeFood, _, s| {
+            let mut origin = s.status_origin + Vector2f::splat(2. * BASE_TEXT_SIZE);
+
+            // If action has an entity source, spawn bubble from it's position
+            if let Some(entity) = c.1 {
+                if let Some(sprite) = get_unit_sprite(entity, &s.unit_sprites) {
+                    origin = sprite.origin + Vector2f::new(0., TILE_SIZE);
+                }
+            }
             s.bubbles.push(Bubble::new(
-                s.status_origin + Vector2f::splat(2. * BASE_TEXT_SIZE),
+                origin,
                 FOOD_COLOR,
                 Some((if c.0 < 0 { "-" } else { "+" }).to_string()),
                 Some(1),

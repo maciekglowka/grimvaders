@@ -37,6 +37,7 @@ fn impl_rune_adapter(ast: &syn::DeriveInput) -> TokenStream {
                 module.function_meta(World::is_in_front)?;
                 module.function_meta(World::is_adjacent)?;
                 module.function_meta(World::query)?;
+                module.function_meta(World::get_current_food)?;
                 Ok(module)
             }
         }

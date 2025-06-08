@@ -16,6 +16,13 @@ type WorldInner = WorldStorage<Components, Resources>;
 #[derive(Any, Default)]
 pub struct World(pub WorldInner);
 impl World {
+    // Resources
+    #[rune::function]
+    fn get_current_food(&self) -> u32 {
+        self.resources.player_data.food
+    }
+
+    // Components
     #[rune::function]
     fn query(&self, with: Vec<String>, without: Vec<String>) -> Vec<Ent> {
         //
@@ -119,6 +126,7 @@ pub struct Components {
     pub on_ally_kill: ComponentStorage<String>,
     pub on_damage: ComponentStorage<String>,
     pub on_ally_heal: ComponentStorage<String>,
+    pub on_ally_gain_food: ComponentStorage<String>,
     // handlers end
     pub player: ComponentStorage<()>,
     pub position: ComponentStorage<Position>,
@@ -138,6 +146,12 @@ pub struct Resources {
 
 #[derive(Any, Clone, Copy, Debug)]
 pub struct Ent(u16, u16);
+impl Ent {
+    #[rune::function]
+    pub fn clone(&self) -> Self {
+        Self(self.0, self.1)
+    }
+}
 impl From<Entity> for Ent {
     fn from(value: Entity) -> Self {
         Self(value.id, value.version)

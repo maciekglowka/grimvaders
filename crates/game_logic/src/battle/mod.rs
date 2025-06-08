@@ -67,6 +67,7 @@ fn next_turn(env: &mut GameEnv) {
     env.world.resources.battle_state.wave += 1;
     env.world.resources.battle_state.mode = BattleMode::Plan;
     player::player_next_turn(env);
+    systems::reset_trigger_limits(&mut env.world);
     npcs::next_wave(env);
 }
 

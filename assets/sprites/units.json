@@ -134,6 +134,22 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
     "duration": 100
+   },
+   "units 17.aseprite": {
+    "frame": { "x": 544, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "units 18.aseprite": {
+    "frame": { "x": 576, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
    }
  },
  "meta": {
@@ -158,9 +174,11 @@
    { "name": "Clay Statue", "from": 11, "to": 11, "direction": "forward", "color": "#000000ff" },
    { "name": "Mime", "from": 12, "to": 12, "direction": "forward", "color": "#000000ff" },
    { "name": "Bard", "from": 13, "to": 13, "direction": "forward", "color": "#000000ff" },
-   { "name": "Gnome", "from": 14, "to": 14, "direction": "forward", "color": "#000000ff" },
-   { "name": "Shadow", "from": 15, "to": 15, "direction": "forward", "color": "#000000ff" },
-   { "name": "Ghost", "from": 16, "to": 16, "direction": "forward", "color": "#000000ff" }
+   { "name": "Beggar", "from": 14, "to": 14, "direction": "forward", "color": "#000000ff" },
+   { "name": "Thief", "from": 15, "to": 15, "direction": "forward", "color": "#000000ff" },
+   { "name": "Gnome", "from": 16, "to": 16, "direction": "forward", "color": "#000000ff" },
+   { "name": "Shadow", "from": 17, "to": 17, "direction": "forward", "color": "#000000ff" },
+   { "name": "Ghost", "from": 18, "to": 18, "direction": "forward", "color": "#000000ff" }
   ]
  }
 }

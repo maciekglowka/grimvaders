@@ -1,5 +1,5 @@
 use anyhow::Result;
-use rune::{runtime::Protocol, Diagnostics, Module, Value, Vm};
+use rune::{Diagnostics, Module, Value, Vm};
 use std::sync::Arc;
 
 use crate::{
@@ -15,6 +15,8 @@ pub fn init_rune(world: &World) -> Result<Vm> {
     command_module.ty::<RuneCommand>()?;
     command_module.ty::<Tile>()?;
     command_module.function_meta(Tile::partial_eq__meta)?;
+    command_module.ty::<Ent>()?;
+    command_module.function_meta(Ent::clone)?;
     command_module.ty::<Tag>()?;
     command_module.ty::<ValueDefault>()?;
     context.install(command_module)?;

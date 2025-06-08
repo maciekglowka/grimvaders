@@ -40,7 +40,7 @@ Peasant:
       let position = world.get("position", entity).unwrap();
       let tile = world.get_tile_at(position).unwrap();
       match tile {
-        Tile::Field => RuneCommand::ChangeFood(1),
+        Tile::Field => RuneCommand::ChangeFood(1, Some(entity)),
         _ => RuneCommand::None
       }
     }
@@ -140,7 +140,7 @@ Hunter:
       let position = world.get("position", entity).unwrap();
       let tile = world.get_tile_at(position).unwrap();
       match tile {
-        Tile::Forest => RuneCommand::ChangeFood(2),
+        Tile::Forest => RuneCommand::ChangeFood(2, Some(entity)),
         _ => RuneCommand::None
       }
     }
@@ -217,6 +217,53 @@ Merchant:
     }
   description: >
     On spawn: give +1 to all food producers.
+
+Beggar:
+  sprite:
+    atlas: units
+    tag: Beggar
+  tier: 3
+  components:
+    cost: 3
+    health: [1, 1]
+    on_ally_gain_food: "beggar_ally_gain_food"
+    player:
+    trigger_limit: [3, 3]
+  script: >
+    pub fn beggar_ally_gain_food(world, entity, cmd) {
+      if let RuneCommand::ChangeFood(val, Some(other)) = cmd {
+        if world.is_adjacent(entity, other) {
+          return RuneCommand::ChangeHealth(entity, val);
+        }
+      }
+    }
+  description: >
+    When adjacent ally yields food, gain the same amount of health.
+
+Thief:
+  sprite:
+    atlas: units
+    tag: Thief
+  tier: 4
+  components:
+    cost: 3
+    health: [1, 1]
+    on_fight: "thief_fight"
+    player:
+    trigger_limit: [3, 3]
+  script: >
+    pub fn thief_fight(world, entity, _) {
+      let food = world.get_current_food();
+      let val = (0.3 * food as f64) as i64;
+
+      return [
+        RuneCommand::ChangeFood(-val, Some(entity.clone())),
+        RuneCommand::ChangeHealth(entity, val)
+      ];
+
+    }
+  description: >
+    On fight start: take 30% of player's food and gain this much health.
 
 # Health bonus units
 

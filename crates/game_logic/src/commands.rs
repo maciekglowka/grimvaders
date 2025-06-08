@@ -15,7 +15,7 @@ use crate::{
 
 // Commands
 
-pub struct ChangeFood(pub i32);
+pub struct ChangeFood(pub i32, pub Option<Entity>);
 pub struct RedrawHand;
 pub struct Fight;
 pub struct SummonPlayer(pub Entity, pub Position);
@@ -37,7 +37,7 @@ pub enum RuneCommand {
     #[rune(constructor)]
     SpawnUnit(#[rune(get)] Ent, #[rune(get)] Position),
     #[rune(constructor)]
-    ChangeFood(#[rune(get)] i32),
+    ChangeFood(#[rune(get)] i32, #[rune(get)] Option<Ent>),
     #[rune(constructor)]
     ChangeHealth(#[rune(get)] Ent, #[rune(get)] i32),
     #[rune(constructor)]
@@ -52,7 +52,7 @@ impl RuneCommand {
         match self {
             Self::None => (),
             Self::SpawnUnit(e, p) => cx.send(SpawnUnit(e.into(), *p)),
-            Self::ChangeFood(v) => cx.send(ChangeFood(*v)),
+            Self::ChangeFood(v, e) => cx.send(ChangeFood(*v, e.map(|a| a.into()))),
             Self::ChangeHealth(e, v) => cx.send(ChangeHealth(e.into(), *v)),
             Self::Kill(e) => cx.send(Kill(e.into())),
             Self::RemoveUnit(e) => cx.send(RemoveUnit(e.into())),
@@ -65,6 +65,7 @@ impl RuneCommand {
 
 pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
     scheduler.add_system(change_food);
+    scheduler.add_system_with_priority(handle_on_ally_gain_food, 1);
     scheduler.add_system(redraw_hand);
     scheduler.add_system(fight);
     scheduler.add_system_with_priority(handle_on_fight, 1);
@@ -147,6 +148,30 @@ fn change_food(cmd: &mut ChangeFood, world: &mut World) -> Result<(), CommandErr
     Ok(())
 }
 
+fn handle_on_ally_gain_food(
+    cmd: &mut ChangeFood,
+    world: &mut World,
+    cx: &mut SchedulerContext,
+) -> Result<(), CommandError> {
+    // Handle only on gain
+    if cmd.0 <= 0 {
+        return Ok(());
+    };
+    let Some(entity) = cmd.1 else {
+        return Ok(());
+    };
+
+    handle_on_ally!(
+        world,
+        cx,
+        on_ally_gain_food,
+        entity,
+        RuneCommand::ChangeFood(cmd.0, cmd.1.map(|a| a.into()))
+    );
+
+    Ok(())
+}
+
 fn redraw_hand(
     _: &mut RedrawHand,
     world: &mut World,
@@ -159,7 +184,7 @@ fn redraw_hand(
 
     crate::player::draw_hand(world);
 
-    cx.send(ChangeFood(-(cost as i32)));
+    cx.send(ChangeFood(-(cost as i32), None));
     Ok(())
 }
 
@@ -223,7 +248,7 @@ fn summon_player(
     data.hand.retain(|a| *a != cmd.0);
 
     cx.send(SpawnUnit(cmd.0, cmd.1));
-    cx.send(ChangeFood(-(cost as i32)));
+    cx.send(ChangeFood(-(cost as i32), None));
 
     Ok(())
 }

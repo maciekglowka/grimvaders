@@ -92,7 +92,7 @@ pub(crate) fn draw_unit_overlay(
     let t = format!("{}", health.current());
     let w = context
         .graphics
-        .text_dimensions("digits", &t, DIGITS_TEXT_SIZE)
+        .text_dimensions("digits_outline", &t, DIGITS_TEXT_SIZE)
         .x;
     let base = origin
         + Vector2f::new(
@@ -100,19 +100,8 @@ pub(crate) fn draw_unit_overlay(
             0.75 * SPRITE_SIZE - DIGITS_TEXT_SIZE,
         );
 
-    // let _ = context.graphics.draw_text(
-    //     "digits",
-    //     &t,
-    //     base + Vector2f::new(1., 0.),
-    //     z,
-    //     DIGITS_TEXT_SIZE,
-    //     SpriteParams {
-    //         color: Color(255, 255, 255, 255),
-    //         ..Default::default()
-    //     },
-    // );
     let _ = context.graphics.draw_text(
-        "digits",
+        "digits_outline",
         &t,
         base,
         z + 1,

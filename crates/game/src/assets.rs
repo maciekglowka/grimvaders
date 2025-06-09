@@ -103,7 +103,7 @@ fn load_graphics(context: &mut Context) {
         "ui",
         MaterialParams {
             atlas: Some(AtlasParams {
-                cols: 4,
+                cols: 5,
                 rows: 1,
                 padding: None,
             }),
@@ -137,6 +137,7 @@ fn load_graphics(context: &mut Context) {
     context
         .graphics
         .load_font("digits", "ui/digits.png", 16, 16, Some((4., 2.)), None);
+
     context.graphics.load_font(
         "digits_outline",
         "ui/digits.png",

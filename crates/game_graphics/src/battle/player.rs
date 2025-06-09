@@ -1,3 +1,4 @@
+use game_data::SpriteData;
 use rogalik::prelude::*;
 
 use game_logic::{get_unit_at, is_on_board, is_on_extended_board, InputEvent, World};
@@ -16,6 +17,7 @@ use crate::{
 use super::InputMode;
 
 const ACTION_BUTTON_W: f32 = 2.25 * SPRITE_SIZE;
+const PANEL_W: f32 = ACTION_BUTTON_W + 2. * GAP;
 
 pub(super) fn handle_player_ui(
     world: &World,
@@ -24,12 +26,29 @@ pub(super) fn handle_player_ui(
     input_state: &InputState,
     take_input: bool,
 ) {
+    // draw_panel(context);
     draw_status(state, world, context);
     handle_hand(state, world, context, input_state, take_input);
     handle_input_player(state, world, context, input_state, take_input);
     if take_input {
         draw_cursor(state, world, context, input_state);
     }
+}
+
+fn draw_panel(context: &mut Context) {
+    let bounds = get_viewport_bounds(context);
+    let origin = Vector2f::new(bounds.1.x - GAP - PANEL_W, bounds.0.y + GAP);
+    let _ = context.graphics.draw_atlas_sprite(
+        "ui",
+        4,
+        origin,
+        0,
+        Vector2f::new(PANEL_W, bounds.1.y - bounds.0.y - 2. * GAP),
+        SpriteParams {
+            slice: Some((8, Vector2f::splat(SPRITE_SIZE))),
+            ..Default::default()
+        },
+    );
 }
 
 fn handle_input_player(
@@ -133,7 +152,7 @@ fn handle_hand(
     let bottom = bounds.0.y + BUTTON_SIZE + 2. * GAP;
     let base = Vector2f::new(
         bounds.1.x - SPRITE_SIZE - GAP,
-        bottom + 2. * BUTTON_SIZE + GAP,
+        bottom + 1.5 * BUTTON_SIZE + GAP,
     );
 
     // origin.y += BUTTON_SIZE + GAP;

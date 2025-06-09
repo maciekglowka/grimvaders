@@ -14,13 +14,12 @@ use crate::{
 
 use super::sprites::get_sprite_data;
 
-pub(crate) fn draw_unit_overlay(
+pub(crate) fn draw_unit_stats(
     entity: Entity,
     origin: Vector2f,
     z: i32,
     world: &World,
     context: &mut Context,
-    with_cost: bool,
 ) {
     let mut spans = Vec::new();
 
@@ -37,20 +36,18 @@ pub(crate) fn draw_unit_overlay(
         );
     }
 
-    if with_cost {
-        if let Some(cost) = world.0.components.cost.get(entity) {
-            spans.push(Span::new().with_spacer(2.));
-            spans.push(
-                Span::new()
-                    .with_sprite("icons_small", 1)
-                    .with_spacer(1.)
-                    .with_text_owned(format!("{}", cost))
-                    .with_text_color(FOOD_COLOR)
-                    .with_font("digits")
-                    .with_text_size(DIGITS_TEXT_SIZE)
-                    .with_sprite_size(ICON_SIZE),
-            );
-        }
+    if let Some(cost) = world.0.components.cost.get(entity) {
+        spans.push(Span::new().with_spacer(2.));
+        spans.push(
+            Span::new()
+                .with_sprite("icons_small", 1)
+                .with_spacer(1.)
+                .with_text_owned(format!("{}", cost))
+                .with_text_color(FOOD_COLOR)
+                .with_font("digits")
+                .with_text_size(DIGITS_TEXT_SIZE)
+                .with_sprite_size(ICON_SIZE),
+        );
     }
 
     let w: f32 = spans.iter().map(|s| s.width(context)).sum();
@@ -81,6 +78,52 @@ pub(crate) fn draw_unit_overlay(
     }
 }
 
+pub(crate) fn draw_unit_overlay(
+    entity: Entity,
+    origin: Vector2f,
+    z: i32,
+    world: &World,
+    context: &mut Context,
+) {
+    let Some(health) = world.0.components.health.get(entity) else {
+        return;
+    };
+
+    let t = format!("{}", health.current());
+    let w = context
+        .graphics
+        .text_dimensions("digits", &t, DIGITS_TEXT_SIZE)
+        .x;
+    let base = origin
+        + Vector2f::new(
+            0.25 * SPRITE_SIZE - w,
+            0.75 * SPRITE_SIZE - DIGITS_TEXT_SIZE,
+        );
+
+    // let _ = context.graphics.draw_text(
+    //     "digits",
+    //     &t,
+    //     base + Vector2f::new(1., 0.),
+    //     z,
+    //     DIGITS_TEXT_SIZE,
+    //     SpriteParams {
+    //         color: Color(255, 255, 255, 255),
+    //         ..Default::default()
+    //     },
+    // );
+    let _ = context.graphics.draw_text(
+        "digits",
+        &t,
+        base,
+        z + 1,
+        DIGITS_TEXT_SIZE,
+        SpriteParams {
+            color: RED_COLOR,
+            ..Default::default()
+        },
+    );
+}
+
 pub(crate) fn draw_deck_unit(
     entity: Entity,
     origin: Vector2f,
@@ -102,25 +145,7 @@ pub(crate) fn draw_deck_unit(
         Vector2f::splat(SPRITE_SIZE),
         SpriteParams::default(),
     );
-    draw_unit_overlay(entity, origin, z + 1, world, context, true);
-
-    // if let Some(cost) = world.0.components.cost.get(entity) {
-    //     let span = Span::new()
-    //         .with_sprite("icons_small", 1)
-    //         .with_spacer(1.)
-    //         .with_text_owned(format!("{}", cost))
-    //         .with_text_color(FOOD_COLOR)
-    //         .with_font("digits")
-    //         .with_text_size(DIGITS_TEXT_SIZE)
-    //         .with_sprite_size(ICON_SIZE);
-
-    //     let w = span.width(context);
-    //     span.draw(
-    //         origin + Vector2f::new(0.5 * (SPRITE_SIZE - w), SPRITE_SIZE +
-    // 1.),         z + 1,
-    //         context,
-    //     );
-    // }
+    draw_unit_stats(entity, origin, z + 1, world, context);
 }
 
 pub(crate) fn draw_entity_description(entity: Entity, world: &World, context: &mut Context) {

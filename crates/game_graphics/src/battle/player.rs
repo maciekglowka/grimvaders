@@ -26,8 +26,8 @@ pub(super) fn handle_player_ui(
 ) {
     draw_status(state, world, context);
     handle_hand(state, world, context, input_state, take_input);
+    handle_input_player(state, world, context, input_state, take_input);
     if take_input {
-        handle_input_player(state, world, context, input_state);
         draw_cursor(state, world, context, input_state);
     }
 }
@@ -37,7 +37,31 @@ fn handle_input_player(
     world: &World,
     context: &mut Context,
     input_state: &InputState,
+    take_input: bool,
 ) {
+    let bounds = get_viewport_bounds(context);
+    let fight = Button::new(
+        Vector2f::new(bounds.1.x - ACTION_BUTTON_W - GAP, bounds.0.y + GAP),
+        Vector2f::new(ACTION_BUTTON_W, BUTTON_SIZE),
+        UI_Z,
+    )
+    .with_span(
+        Span::new()
+            .with_sprite("icons_small", 2)
+            .with_spacer(2.)
+            .with_text_borrowed("Fight!")
+            .with_sprite_size(ICON_SIZE),
+    );
+    fight.draw(context, input_state);
+
+    if !take_input {
+        return;
+    }
+
+    if fight.clicked(input_state) {
+        state.input_queue.push(InputEvent::Done);
+    }
+
     if input_state.click == ButtonState::Released {
         let tile = world_to_tile(input_state.mouse_world_position);
 
@@ -61,24 +85,6 @@ fn handle_input_player(
             }
         }
     };
-
-    let bounds = get_viewport_bounds(context);
-    let fight = Button::new(
-        Vector2f::new(bounds.1.x - ACTION_BUTTON_W - GAP, bounds.0.y + GAP),
-        Vector2f::new(ACTION_BUTTON_W, BUTTON_SIZE),
-        UI_Z,
-    )
-    .with_span(
-        Span::new()
-            .with_sprite("icons_small", 2)
-            .with_spacer(2.)
-            .with_text_borrowed("Fight!")
-            .with_sprite_size(ICON_SIZE),
-    );
-    fight.draw(context, input_state);
-    if fight.clicked(input_state) {
-        state.input_queue.push(InputEvent::Done);
-    }
 }
 
 fn draw_cursor(

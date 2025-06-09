@@ -1,5 +1,4 @@
 use rand::prelude::*;
-use rune::alloc::HashSet;
 use wunderkammer::prelude::*;
 
 use crate::{
@@ -12,8 +11,14 @@ use crate::{
 
 pub(crate) fn next_wave(env: &mut GameEnv) {
     let tier = env.world.resources.player_data.level;
-    let target_score =
-        (((tier * env.world.resources.battle_state.wave) as f32) / 1.75).ceil() as u32;
+    let wave = env.world.resources.battle_state.wave;
+    // let target_score =
+    //     (((tier * env.world.resources.battle_state.wave) as f32) / 1.75).ceil()
+    // as u32;
+    // let target_score =
+    //     tier + (0.25 * tier as f32).ceil() as u32 *
+    // env.world.resources.battle_state.wave;
+    let target_score = tier + wave;
     let mut score = 0;
 
     let mut rng = thread_rng();

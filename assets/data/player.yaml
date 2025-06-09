@@ -16,7 +16,7 @@ Pikeman:
     atlas: units
     tag: Pikeman
   components:
-    cost: 3
+    cost: 2
     health: [3, 3]
     player:
     tags:
@@ -56,7 +56,7 @@ Herbalist:
     tag: Herbalist
   tier: 2
   components:
-    cost: 3
+    cost: 2
     health: [2, 2]
     on_fight: "healer_fight"
     player:
@@ -96,31 +96,6 @@ Sheep:
   description: >
     On fight start: gain +1 health, when on a meadow tile.
 
-# Shepherd:
-#   sprite:
-#     atlas: sprites
-#     tag: Shepherd
-#   tier: 3
-#   components:
-#     cost: 3
-#     health: [0, 0]
-#     on_spawn: "shepherd_spawn"
-#     player:
-#   script: >
-#     pub fn shepherd_spawn(world, entity, _) {
-#       let sum = 0;
-#       for player in world.query(["player", "position"], []) {
-#         if world.get("name", player) == Some("Sheep") {
-#           if let Some(health) = world.get("health", player) {
-#             sum += health.0;
-#           }
-#         }
-#       }
-#       RuneCommand::ChangeHealth(entity, sum)
-#     }
-#   description: >
-#     On spawn: gain health equal to the sum of all sheep health.
-
 # Forest units
 
 Hunter:
@@ -129,7 +104,7 @@ Hunter:
     tag: Hunter
   tier: 2
   components:
-    cost: 3
+    cost: 2
     health: [1, 1]
     on_fight: "hunter_fight"
     player:
@@ -153,7 +128,7 @@ Ranger:
     tag: Ranger
   tier: 2
   components:
-    cost: 3
+    cost: 2
     health: [2, 2]
     on_fight: "ranger_fight"
     player:
@@ -176,7 +151,7 @@ Druid:
     tag: Druid
   tier: 4
   components:
-    cost: 3
+    cost: 2
     health: [2, 2]
     on_fight: "druid_fight"
     player:
@@ -224,7 +199,7 @@ Beggar:
     tag: Beggar
   tier: 3
   components:
-    cost: 3
+    cost: 2
     health: [1, 1]
     on_ally_gain_food: "beggar_ally_gain_food"
     player:
@@ -246,7 +221,7 @@ Thief:
     tag: Thief
   tier: 4
   components:
-    cost: 3
+    cost: 2
     health: [1, 1]
     on_fight: "thief_fight"
     player:
@@ -273,7 +248,7 @@ Martyr:
     tag: Martyr
   tier: 3
   components:
-    cost: 3
+    cost: 2
     health: [2, 2]
     on_kill: "martyr_kill"
     player:
@@ -294,7 +269,7 @@ Santo Subito:
     tag: Santo Subito
   tier: 5
   components:
-    cost: 4
+    cost: 3
     health: [3, 3]
     on_kill: "santo_subito_kill"
     player:
@@ -315,7 +290,7 @@ Bard:
     tag: Bard
   tier: 3
   components:
-    cost: 3
+    cost: 2
     health: [2, 2]
     on_ally_heal: "bard_ally_heal"
     player:
@@ -339,7 +314,7 @@ Clay Statue:
     tag: Clay Statue
   tier: 4
   components:
-    cost: 3
+    cost: 2
     health: [6, 6]
     on_damage: "clay_statue_damage"
     player:
@@ -356,7 +331,7 @@ Mime:
     tag: Mime
   tier: 3
   components:
-    cost: 3
+    cost: 2
     health: [1, 1]
     on_ally_kill: "mime_ally_kill"
     player:

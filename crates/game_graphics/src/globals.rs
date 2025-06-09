@@ -24,8 +24,8 @@ pub const ICON_SIZE: f32 = 6.0;
 pub const GAP: f32 = 4.;
 
 pub const BUBBLE_SPEED: f32 = 0.5;
-pub const BUBBLE_AGE: u32 = 100;
-pub const BUBBLE_WAIT_AGE: u32 = 0;
+pub const BUBBLE_MAX_AGE: f32 = 3.;
+pub const BUBBLE_WAIT_AGE: f32 = 0.25;
 
 pub const MOVE_SPEED: f32 = 6. * TILE_SIZE;
 pub const MOVE_THRESH: f32 = 0.1;

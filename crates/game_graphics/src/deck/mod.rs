@@ -45,7 +45,7 @@ pub fn deck_draw(
 
         let mut button = Button::new(origin, Vector2f::new(SPRITE_SIZE, BUTTON_SIZE), 0);
         if selected {
-            button = button.with_sprite("sprites", 726);
+            button = button.with_sprite("ui", 2);
         }
         button.draw(context, input_state);
 
@@ -83,7 +83,7 @@ pub fn deck_draw(
 
     if let Some(entity) = state.selected {
         let confirm = Button::new(
-            bounds.0 + Vector2f::splat(GAP),
+            Vector2f::new(bounds.1.x - 3. * BUTTON_SIZE - GAP, bounds.0.y + GAP),
             Vector2f::new(3. * BUTTON_SIZE, BUTTON_SIZE),
             0,
         )

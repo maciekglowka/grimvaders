@@ -102,10 +102,10 @@ Hunter:
   sprite:
     atlas: units
     tag: Hunter
-  tier: 2
+  tier: 3
   components:
     cost: 2
-    health: [1, 1]
+    health: [2, 2]
     on_fight: "hunter_fight"
     player:
     tags:
@@ -200,7 +200,7 @@ Beggar:
   tier: 3
   components:
     cost: 2
-    health: [1, 1]
+    health: [2, 2]
     on_ally_gain_food: "beggar_ally_gain_food"
     player:
     trigger_limit: [3, 3]
@@ -222,14 +222,14 @@ Thief:
   tier: 4
   components:
     cost: 2
-    health: [1, 1]
+    health: [2, 2]
     on_fight: "thief_fight"
     player:
     trigger_limit: [3, 3]
   script: >
     pub fn thief_fight(world, entity, _) {
       let food = world.get_current_food();
-      let val = (0.3 * food as f64) as i64;
+      let val = food;
 
       return [
         RuneCommand::ChangeFood(-val, Some(entity.clone())),
@@ -238,7 +238,7 @@ Thief:
 
     }
   description: >
-    On fight start: take 30% of player's food and gain this much health.
+    On fight start: take all player's food and gain this much health.
 
 # Health bonus units
 
@@ -270,7 +270,7 @@ Santo Subito:
   tier: 5
   components:
     cost: 3
-    health: [3, 3]
+    health: [2, 2]
     on_kill: "santo_subito_kill"
     player:
   script: >

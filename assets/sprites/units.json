@@ -150,6 +150,22 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
     "duration": 100
+   },
+   "units 19.aseprite": {
+    "frame": { "x": 608, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "units 20.aseprite": {
+    "frame": { "x": 640, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
    }
  },
  "meta": {
@@ -176,9 +192,11 @@
    { "name": "Bard", "from": 13, "to": 13, "direction": "forward", "color": "#000000ff" },
    { "name": "Beggar", "from": 14, "to": 14, "direction": "forward", "color": "#000000ff" },
    { "name": "Thief", "from": 15, "to": 15, "direction": "forward", "color": "#000000ff" },
-   { "name": "Gnome", "from": 16, "to": 16, "direction": "forward", "color": "#000000ff" },
-   { "name": "Shadow", "from": 17, "to": 17, "direction": "forward", "color": "#000000ff" },
-   { "name": "Ghost", "from": 18, "to": 18, "direction": "forward", "color": "#000000ff" }
+   { "name": "Shopkeeper", "from": 16, "to": 16, "direction": "forward", "color": "#000000ff" },
+   { "name": "Vampire", "from": 17, "to": 17, "direction": "forward", "color": "#000000ff" },
+   { "name": "Gnome", "from": 18, "to": 18, "direction": "forward", "color": "#000000ff" },
+   { "name": "Shadow", "from": 19, "to": 19, "direction": "forward", "color": "#000000ff" },
+   { "name": "Ghost", "from": 20, "to": 20, "direction": "forward", "color": "#000000ff" }
   ]
  }
 }

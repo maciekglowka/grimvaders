@@ -20,7 +20,7 @@ impl Bubble {
     pub fn new(origin: Vector2f, color: Color, text: Option<String>, icon: Option<usize>) -> Self {
         let mut rng = thread_rng();
         let offset =
-            SPRITE_SIZE * Vector2f::new(rng.gen_range(0.25..0.75), rng.gen_range(0.25..0.75));
+            SPRITE_SIZE * Vector2f::new(rng.gen_range(0.25..0.75), rng.gen_range(-0.25..0.25));
         Self {
             origin: origin + offset,
             color,

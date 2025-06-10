@@ -159,7 +159,7 @@ fn handle_hand(
 
     for (i, &entity) in world.0.resources.player_data.hand.iter().enumerate() {
         let origin =
-            base + SPRITE_SIZE * Vector2f::new(-1.25 * ((i / 2) as f32), 1.75 * (i % 2) as f32);
+            base + SPRITE_SIZE * Vector2f::new(-1.25 * ((i / 3) as f32), 1.6 * (i % 3) as f32);
         let selected = state.input_mode == InputMode::HandUnit(entity);
 
         let mut button = Button::new(origin, Vector2f::new(SPRITE_SIZE, BUTTON_SIZE), UI_Z);

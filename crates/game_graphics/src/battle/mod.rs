@@ -14,7 +14,7 @@ use crate::{
             remove_unit_sprite, UnitSprite,
         },
     },
-    globals::{BASE_TEXT_SIZE, FOOD_COLOR, GAP, RED_COLOR, TILE_SIZE},
+    globals::{BASE_TEXT_SIZE, FOOD_COLOR, GAP, RED_COLOR, SPRITE_SIZE},
     input::InputState,
     utils::get_viewport_bounds,
 };
@@ -100,7 +100,7 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
         |c: &commands::ChangeHealth, _, s| {
             if let Some(sprite) = get_unit_sprite(c.0, &s.unit_sprites) {
                 s.bubbles.push(Bubble::new(
-                    sprite.origin + Vector2f::new(0., TILE_SIZE),
+                    sprite.origin + Vector2f::new(0., SPRITE_SIZE),
                     RED_COLOR,
                     Some(format!("{:+}", c.1)),
                     None,
@@ -116,7 +116,7 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
             // If action has an entity source, spawn bubble from it's position
             if let Some(entity) = c.1 {
                 if let Some(sprite) = get_unit_sprite(entity, &s.unit_sprites) {
-                    origin = sprite.origin + Vector2f::new(0., TILE_SIZE);
+                    origin = sprite.origin + Vector2f::new(0., SPRITE_SIZE);
                 }
             }
             s.bubbles.push(Bubble::new(

@@ -19,7 +19,8 @@ pub(crate) fn next_wave(env: &mut GameEnv) {
     //     tier + (0.25 * tier as f32).ceil() as u32 *
     // env.world.resources.battle_state.wave;
 
-    let target_score = (0.5 * tier as f32).ceil() as u32 + 2 * (wave - 1) + (tier + 1) % 2;
+    let target_score = (0.5 * tier as f32 + (2. * wave as f32)).ceil() as u32;
+    println!("T: {}, W: {}, S:{}", tier, wave, target_score);
     let mut score = 0;
 
     let mut rng = thread_rng();

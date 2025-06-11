@@ -17,7 +17,6 @@ use crate::{
 
 pub struct ChangeFood(pub i32, pub Option<Entity>);
 pub struct RedrawHand;
-pub struct Fight;
 pub struct SummonPlayer(pub Entity, pub Position);
 pub struct SpawnUnit(pub Entity, pub Position);
 pub struct MoveUnit(pub Entity, pub Position);
@@ -47,17 +46,34 @@ pub enum RuneCommand {
     #[rune(constructor)]
     RespawnPlayer(#[rune(get)] Ent, #[rune(get)] Position),
 }
-impl RuneCommand {
-    pub fn send(&self, cx: &mut SchedulerContext) {
-        match self {
-            Self::None => (),
-            Self::SpawnUnit(e, p) => cx.send(SpawnUnit(e.into(), *p)),
-            Self::ChangeFood(v, e) => cx.send(ChangeFood(*v, e.map(|a| a.into()))),
-            Self::ChangeHealth(e, v) => cx.send(ChangeHealth(e.into(), *v)),
-            Self::Kill(e) => cx.send(Kill(e.into())),
-            Self::RemoveUnit(e) => cx.send(RemoveUnit(e.into())),
-            Self::RespawnPlayer(e, p) => cx.send(RespawnPlayer(e.into(), *p)),
+macro_rules! rune_send {
+    { $( ($match_pat:pat => $cmd:expr) ),* } => {
+        pub fn send(&self, cx: &mut SchedulerContext) {
+            match self {
+                Self::None => (),
+                $(
+                    $match_pat => cx.send($cmd),
+                )*
+            }
         }
+        pub fn scheduler_send(&self, scheduler: &mut Scheduler<World>) {
+            match self {
+                Self::None => (),
+                $(
+                    $match_pat => scheduler.send($cmd),
+                )*
+            }
+        }
+    }
+}
+impl RuneCommand {
+    rune_send! {
+            (Self::SpawnUnit(e, p) => SpawnUnit(e.into(), *p)),
+            (Self::ChangeFood(v, e) => ChangeFood(*v, e.map(|a| a.into()))),
+            (Self::ChangeHealth(e, v) => ChangeHealth(e.into(), *v)),
+            (Self::Kill(e) => Kill(e.into())),
+            (Self::RemoveUnit(e) => RemoveUnit(e.into())),
+            (Self::RespawnPlayer(e, p) => RespawnPlayer(e.into(), *p))
     }
 }
 
@@ -67,8 +83,8 @@ pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
     scheduler.add_system(change_food);
     scheduler.add_system_with_priority(handle_on_ally_gain_food, 1);
     scheduler.add_system(redraw_hand);
-    scheduler.add_system(fight);
-    scheduler.add_system_with_priority(handle_on_fight, 1);
+    // scheduler.add_system(fight);
+    // scheduler.add_system_with_priority(handle_on_fight, 1);
     scheduler.add_system(summon_player);
     scheduler.add_system(spawn_unit);
     scheduler.add_system_with_priority(handle_on_spawn, 1);
@@ -188,39 +204,40 @@ fn redraw_hand(
     Ok(())
 }
 
-fn fight(_: &mut Fight, world: &mut World) -> Result<(), CommandError> {
-    world.resources.battle_state.mode = BattleMode::Fight;
-    Ok(())
-}
+// fn fight(_: &mut Fight, world: &mut World) -> Result<(), CommandError> {
+//     world.resources.battle_state.mode = BattleMode::Fight;
+//     Ok(())
+// }
 
-fn handle_on_fight(
-    _: &mut Fight,
-    world: &mut World,
-    cx: &mut SchedulerContext,
-) -> Result<(), CommandError> {
-    let mut on_fight = query_iter!(world, With(position, on_fight))
-        .map(|(e, p, s)| (e, *p, s.to_string()))
-        .collect::<Vec<_>>();
+// fn handle_on_fight(
+//     _: &mut Fight,
+//     world: &mut World,
+//     cx: &mut SchedulerContext,
+// ) -> Result<(), CommandError> {
+//     let mut on_fight = query_iter!(world, With(position, on_fight))
+//         .map(|(e, p, s)| (e, *p, s.to_string()))
+//         .collect::<Vec<_>>();
 
-    // Apply consistent front to back order.
-    on_fight.sort_by(|a, b| b.1.y.cmp(&a.1.y).then_with(|| a.1.x.cmp(&b.1.x)));
+//     // Apply consistent front to back order.
+//     on_fight.sort_by(|a, b| b.1.y.cmp(&a.1.y).then_with(||
+// a.1.x.cmp(&b.1.x)));
 
-    for (entity, _, script) in on_fight {
-        if check_trigger_limit(entity, world).is_err() {
-            continue;
-        }
-        if let Some(commands) = run_command_script(&script, entity.into(), world, RuneCommand::None)
-        {
-            if !commands.is_empty() {
-                use_trigger_limit(entity, world);
-            }
-            for c in commands {
-                c.send(cx);
-            }
-        }
-    }
-    Ok(())
-}
+//     for (entity, _, script) in on_fight {
+//         if check_trigger_limit(entity, world).is_err() {
+//             continue;
+//         }
+//         if let Some(commands) = run_command_script(&script, entity.into(),
+// world, RuneCommand::None)         {
+//             if !commands.is_empty() {
+//                 use_trigger_limit(entity, world);
+//             }
+//             for c in commands {
+//                 c.send(cx);
+//             }
+//         }
+//     }
+//     Ok(())
+// }
 
 fn summon_player(
     cmd: &mut SummonPlayer,
@@ -555,7 +572,7 @@ fn respawn_player(
 
 // Utils
 
-fn check_trigger_limit(entity: Entity, world: &World) -> Result<(), CommandError> {
+pub(crate) fn check_trigger_limit(entity: Entity, world: &World) -> Result<(), CommandError> {
     let Some(limit) = world.components.trigger_limit.get(entity) else {
         return Ok(());
     };
@@ -566,7 +583,7 @@ fn check_trigger_limit(entity: Entity, world: &World) -> Result<(), CommandError
     }
 }
 
-fn use_trigger_limit(entity: Entity, world: &mut World) {
+pub(crate) fn use_trigger_limit(entity: Entity, world: &mut World) {
     if let Some(limit) = world.components.trigger_limit.get_mut(entity) {
         limit.sub(1);
     }

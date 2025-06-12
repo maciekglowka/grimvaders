@@ -111,6 +111,9 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
     observers.push(Box::new(CommandObserver::new(
         &mut env.scheduler,
         |c: &commands::ChangeFood, _, s| {
+            if c.0 == 0 {
+                return;
+            }
             let mut origin = s.status_origin + Vector2f::splat(2. * BASE_TEXT_SIZE);
 
             // If action has an entity source, spawn bubble from it's position

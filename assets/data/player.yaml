@@ -1,5 +1,5 @@
 # Basic
- 
+
 Villager:
   sprite:
     atlas: units
@@ -22,7 +22,16 @@ Pikeman:
     tags:
       - !Basic
 
-# Field units
+Scarecrow:
+  sprite:
+    atlas: units
+    tag: Scarecrow
+  components:
+    cost: 1
+    health: [1, 1]
+    player:
+    tags:
+      - !Basic # Field units
 
 Peasant:
   sprite:
@@ -46,7 +55,6 @@ Peasant:
     }
   description: >
     On fight start: gain +1 food, when on a field tile.
-
 
 # Meadow units
 
@@ -143,7 +151,6 @@ Ranger:
     }
   description: >
     On fight start: gain +1 health, when on a forest tile.
-
 
 Druid:
   sprite:
@@ -259,6 +266,28 @@ Shopkeeper:
     }
   description: >
     When ally yields food, yield the same amount as well.
+
+Taxman:
+  sprite:
+    atlas: units
+    tag: Taxman
+  tier: 3
+  components:
+    cost: 0
+    health: [2, 2]
+    on_fight: "taxman_fight"
+    player:
+  script: >
+    pub fn taxman_fight(world, entity, _) {
+      let food = world.get_current_food();
+      if food > 0 {
+        return RuneCommand::ChangeFood(-1, Some(entity));
+      } else {
+        return RuneCommand::Kill(entity);
+      }
+    }
+  description: >
+    On fight start: takes 1 food.
 
 # Death bonus units
 
@@ -396,4 +425,3 @@ Clay Statue:
     }
   description: >
     Breaks when damaged.
-

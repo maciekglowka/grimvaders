@@ -1,13 +1,13 @@
-use game_data::SpriteData;
 use rogalik::prelude::*;
 
 use game_logic::{get_unit_at, is_on_board, is_on_extended_board, InputEvent, World};
 
 use crate::{
-    draw::units::{draw_deck_unit, draw_entity_description},
+    draw::units::draw_deck_button,
     globals::{
-        BASE_TEXT_SIZE, BUTTON_CLICK_SHIFT, BUTTON_SIZE, BUTTON_TEXT_COLOR, FOOD_COLOR, GAP,
-        ICON_SIZE, OVERLAY_Z, RED_COLOR, SPRITE_SIZE, TILE_SIZE, UI_Z,
+        ACTION_BUTTON_W, BASE_TEXT_SIZE, BUTTON_SIZE, BUTTON_TEXT_COLOR, DECK_BUTTON_H,
+        DECK_BUTTON_W, FOOD_COLOR, GAP, ICON_SIZE, OVERLAY_Z, RED_COLOR, SPRITE_SIZE, TILE_SIZE,
+        UI_Z,
     },
     input::{ButtonState, InputState},
     ui::{Button, Span},
@@ -16,7 +16,6 @@ use crate::{
 
 use super::InputMode;
 
-const ACTION_BUTTON_W: f32 = 2.25 * SPRITE_SIZE;
 const PANEL_W: f32 = ACTION_BUTTON_W + 2. * GAP;
 
 pub(super) fn handle_player_ui(
@@ -158,34 +157,16 @@ fn handle_hand(
     // origin.y += BUTTON_SIZE + GAP;
 
     for (i, &entity) in world.0.resources.player_data.hand.iter().enumerate() {
-        let origin =
-            base + SPRITE_SIZE * Vector2f::new(-1.25 * ((i / 3) as f32), 1.6 * (i % 3) as f32);
+        let origin = base
+            + Vector2f::new(
+                -(GAP + DECK_BUTTON_W) * (i / 3) as f32,
+                (GAP + DECK_BUTTON_H) * (i % 3) as f32,
+            );
         let selected = state.input_mode == InputMode::HandUnit(entity);
 
-        let mut button = Button::new(origin, Vector2f::new(SPRITE_SIZE, BUTTON_SIZE), UI_Z);
-        if selected {
-            button = button.with_sprite("ui", 2);
-        }
-        button.draw(context, input_state);
+        let clicked = draw_deck_button(entity, origin, UI_Z, selected, world, context, input_state);
 
-        let unit_offset = if button.pressed(input_state) {
-            BUTTON_CLICK_SHIFT
-        } else {
-            0.
-        };
-
-        draw_deck_unit(
-            entity,
-            origin + Vector2f::new(0., 0.5 * BUTTON_SIZE - unit_offset),
-            UI_Z + 1,
-            world,
-            context,
-        );
-
-        if button.mouse_over(input_state) {
-            draw_entity_description(entity, world, context);
-        }
-        if take_input && button.clicked(input_state) {
+        if take_input && clicked {
             if selected {
                 state.input_mode = InputMode::None
             } else {

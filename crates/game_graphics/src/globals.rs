@@ -9,6 +9,9 @@ pub const SPRITE_OFFSET: Vector2f = Vector2f {
 
 pub const BUTTON_SIZE: f32 = 0.5 * SPRITE_SIZE + GAP;
 pub const BUTTON_CLICK_SHIFT: f32 = 2.;
+pub const DECK_BUTTON_H: f32 = SPRITE_SIZE + 4. * GAP;
+pub const DECK_BUTTON_W: f32 = SPRITE_SIZE;
+pub const ACTION_BUTTON_W: f32 = 2. * DECK_BUTTON_W + GAP;
 
 pub const BUBBLE_Z: i32 = 150;
 pub const OVERLAY_Z: i32 = 100;

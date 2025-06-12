@@ -4,7 +4,7 @@ use crate::{globals::FOOD_GAIN, GameEnv, World};
 
 pub(super) fn player_battle_init(world: &mut World) {
     crate::player::reset_deck(world);
-    world.resources.player_data.food = 0;
+    // world.resources.player_data.food = 0;
 }
 
 pub(super) fn player_battle_exit(world: &mut World) {

@@ -232,7 +232,6 @@ Thief:
     health: [2, 2]
     on_fight: "thief_fight"
     player:
-    trigger_limit: [3, 3]
   script: >
     pub fn thief_fight(world, entity, _) {
       let food = world.get_current_food();
@@ -246,6 +245,30 @@ Thief:
     }
   description: >
     On fight start: take all player's food and gain this much health.
+
+Alchemist:
+  sprite:
+    atlas: units
+    tag: Alchemist
+  tier: 5
+  components:
+    cost: 2
+    health: [2, 2]
+    on_fight: "alchemist_fight"
+    player:
+  script: >
+    pub fn alchemist_fight(world, entity, _) {
+      let food = world.get_current_food();
+      let val = food;
+
+      return [
+        RuneCommand::ChangeFood(val, Some(entity.clone())),
+        RuneCommand::ChangeHealth(entity, -2)
+      ];
+
+    }
+  description: >
+    On fight start: double player's food. Take two damage.
 
 Shopkeeper:
   sprite:
@@ -427,6 +450,28 @@ Bard:
     }
   description: >
     When adjacent ally gains health, gain the same amount.
+
+Apothecary:
+  sprite:
+    atlas: units
+    tag: Apothecary
+  tier: 3
+  components:
+    cost: 2
+    health: [2, 2]
+    on_damage: "apothecary_damage"
+    player:
+    trigger_limit: [3, 3]
+  script: >
+    pub fn apothecary_damage(world, entity, cmd) {
+      let commands  = [];
+      for player in world.get_adjacent_players(entity) {
+        commands.push(RuneCommand::ChangeHealth(player, 1));
+      }
+      commands
+    }
+  description: >
+    On damage: give +1 health to adjacent allies.
 
 # Other
 

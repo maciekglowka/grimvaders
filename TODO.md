@@ -2,9 +2,6 @@
 
 ## Player Units
 
-- necromancer - any ally killed -> respawn it, 1 trigger / turn
-- 2hp unit; on damage if standing, give hp to adjacent
-- on spawn double food ? 
 
 ## NPCs
 

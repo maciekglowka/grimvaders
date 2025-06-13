@@ -190,6 +190,22 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
     "duration": 100
+   },
+   "units 24.aseprite": {
+    "frame": { "x": 768, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "units 25.aseprite": {
+    "frame": { "x": 800, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
    }
  },
  "meta": {
@@ -221,9 +237,11 @@
    { "name": "Taxman", "from": 18, "to": 18, "direction": "forward", "color": "#000000ff" },
    { "name": "Necromancer", "from": 19, "to": 19, "direction": "forward", "color": "#000000ff" },
    { "name": "Vampire", "from": 20, "to": 20, "direction": "forward", "color": "#000000ff" },
-   { "name": "Gnome", "from": 21, "to": 21, "direction": "forward", "color": "#000000ff" },
-   { "name": "Shadow", "from": 22, "to": 22, "direction": "forward", "color": "#000000ff" },
-   { "name": "Ghost", "from": 23, "to": 23, "direction": "forward", "color": "#000000ff" }
+   { "name": "Alchemist", "from": 21, "to": 21, "direction": "forward", "color": "#000000ff" },
+   { "name": "Apothecary", "from": 22, "to": 22, "direction": "forward", "color": "#000000ff" },
+   { "name": "Gnome", "from": 23, "to": 23, "direction": "forward", "color": "#000000ff" },
+   { "name": "Shadow", "from": 24, "to": 24, "direction": "forward", "color": "#000000ff" },
+   { "name": "Ghost", "from": 25, "to": 25, "direction": "forward", "color": "#000000ff" }
   ]
  }
 }

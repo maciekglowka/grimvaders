@@ -35,9 +35,25 @@ pub const MOVE_THRESH: f32 = 0.1;
 pub const DISINTEGRATE_SPEED: f32 = 2.;
 
 // PALETTE
+
 // pub const BACKGROUND_COLOR: Color = Color(54, 54, 70, 255);
 // pub const BACKGROUND_COLOR: Color = Color(56, 112, 127, 255);
 pub const BACKGROUND_COLOR: Color = Color(128, 121, 120, 255);
 pub const BUTTON_TEXT_COLOR: Color = Color(66, 53, 83, 255);
 pub const FOOD_COLOR: Color = Color(229, 189, 126, 255);
 pub const RED_COLOR: Color = Color(193, 115, 109, 255);
+
+// ICONS
+pub const HEALTH_ICON: usize = 0;
+pub const FOOD_ICON: usize = 1;
+pub const FIGHT_ICON: usize = 2;
+pub const UNIT_ICON: usize = 3;
+
+// UI SPRITES
+pub const BUTTON_SPRITE: usize = 0;
+pub const BUTTON_SPRITE_SELECTED: usize = 2;
+
+pub const DECK_BUTTON_SPRITE: usize = 3;
+pub const DECK_BUTTON_SPRITE_SELECTED: usize = 5;
+
+pub const PANEL_SPRTE: usize = 6;

@@ -5,8 +5,9 @@ use game_logic::World;
 
 use crate::{
     globals::{
-        BASE_TEXT_SIZE, BUTTON_CLICK_SHIFT, DECK_BUTTON_H, DECK_BUTTON_W, DIGITS_TEXT_SIZE,
-        FOOD_COLOR, GAP, ICON_SIZE, RED_COLOR, SPRITE_SIZE, TEXT_LINE_GAP, UI_Z,
+        BASE_TEXT_SIZE, BUTTON_CLICK_SHIFT, DECK_BUTTON_H, DECK_BUTTON_SPRITE,
+        DECK_BUTTON_SPRITE_SELECTED, DECK_BUTTON_W, DIGITS_TEXT_SIZE, FOOD_COLOR, FOOD_ICON, GAP,
+        HEALTH_ICON, ICON_SIZE, RED_COLOR, SPRITE_SIZE, TEXT_LINE_GAP, UI_Z,
     },
     input::InputState,
     ui::{Button, Span, TextBox},
@@ -27,7 +28,7 @@ pub(crate) fn draw_unit_stats(
     if let Some(health) = world.0.components.health.get(entity) {
         spans.push(
             Span::new()
-                .with_sprite("icons_small", 0)
+                .with_sprite("icons_small", HEALTH_ICON)
                 .with_spacer(1.)
                 .with_text_owned(format!("{}", health.current()))
                 .with_text_color(RED_COLOR)
@@ -41,7 +42,7 @@ pub(crate) fn draw_unit_stats(
         spans.push(Span::new().with_spacer(2.));
         spans.push(
             Span::new()
-                .with_sprite("icons_small", 1)
+                .with_sprite("icons_small", FOOD_ICON)
                 .with_spacer(1.)
                 .with_text_owned(format!("{}", cost))
                 .with_text_color(FOOD_COLOR)
@@ -109,9 +110,10 @@ pub(crate) fn draw_deck_button(
     context: &mut Context,
     input_state: &InputState,
 ) -> bool {
-    let mut button = Button::new(origin, Vector2f::new(DECK_BUTTON_W, DECK_BUTTON_H), z);
+    let mut button = Button::new(origin, Vector2f::new(DECK_BUTTON_W, DECK_BUTTON_H), z)
+        .with_sprite("ui", DECK_BUTTON_SPRITE);
     if selected {
-        button = button.with_sprite("ui", 2);
+        button = button.with_sprite("ui", DECK_BUTTON_SPRITE_SELECTED);
     }
     button.draw(context, input_state);
 
@@ -121,49 +123,66 @@ pub(crate) fn draw_deck_button(
         0.
     };
 
-    draw_deck_unit(
-        entity,
-        origin + Vector2f::new(0., 2. * GAP - unit_offset),
-        z + 1,
-        world,
-        context,
-    );
-
     if button.mouse_over(input_state) {
         draw_entity_description(entity, world, context);
     }
-    button.clicked(input_state)
-}
 
-pub(crate) fn draw_deck_unit(
-    entity: Entity,
-    origin: Vector2f,
-    z: i32,
-    world: &World,
-    context: &mut Context,
-) {
-    let Some(name) = world.0.components.name.get(entity) else {
-        return;
+    // Draw unit sprite
+    if let Some(name) = world.0.components.name.get(entity) {
+        if let Some(sprite) = get_sprite_data(name, world) {
+            let _ = context.graphics.draw_atlas_sprite(
+                &sprite.atlas,
+                sprite.index,
+                origin + Vector2f::new(0., 2. * GAP - unit_offset),
+                z + 1,
+                Vector2f::splat(SPRITE_SIZE),
+                SpriteParams::default(),
+            );
+        }
     };
-    let Some(sprite) = get_sprite_data(name, world) else {
-        return;
-    };
-    let _ = context.graphics.draw_atlas_sprite(
-        &sprite.atlas,
-        sprite.index,
-        origin,
-        z,
-        Vector2f::splat(SPRITE_SIZE),
-        SpriteParams::default(),
-    );
+
+    // Draw stats
     draw_unit_stats(
         entity,
-        origin + Vector2f::new(0., SPRITE_SIZE - 2.),
+        origin + Vector2f::new(0., DECK_BUTTON_H - 8. - unit_offset),
         z + 1,
         world,
         context,
     );
+
+    // Return click status
+    button.clicked(input_state)
 }
+
+// pub(crate) fn draw_deck_unit(
+//     entity: Entity,
+//     origin: Vector2f,
+//     z: i32,
+//     world: &World,
+//     context: &mut Context,
+// ) {
+//     let Some(name) = world.0.components.name.get(entity) else {
+//         return;
+//     };
+//     let Some(sprite) = get_sprite_data(name, world) else {
+//         return;
+//     };
+//     let _ = context.graphics.draw_atlas_sprite(
+//         &sprite.atlas,
+//         sprite.index,
+//         origin,
+//         z,
+//         Vector2f::splat(SPRITE_SIZE),
+//         SpriteParams::default(),
+//     );
+//     draw_unit_stats(
+//         entity,
+//         origin + Vector2f::new(0., SPRITE_SIZE - 2.),
+//         z + 1,
+//         world,
+//         context,
+//     );
+// }
 
 pub(crate) fn draw_entity_description(entity: Entity, world: &World, context: &mut Context) {
     let Some(name) = world.components.name.get(entity) else {

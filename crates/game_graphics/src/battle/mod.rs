@@ -14,7 +14,7 @@ use crate::{
             remove_unit_sprite, UnitSprite,
         },
     },
-    globals::{BASE_TEXT_SIZE, FOOD_COLOR, GAP, RED_COLOR, SPRITE_SIZE},
+    globals::{BASE_TEXT_SIZE, FOOD_COLOR, FOOD_ICON, GAP, HEALTH_ICON, RED_COLOR, SPRITE_SIZE},
     input::InputState,
     utils::get_viewport_bounds,
 };
@@ -126,7 +126,7 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
                 origin,
                 FOOD_COLOR,
                 Some((if c.0 < 0 { "-" } else { "+" }).to_string()),
-                Some(1),
+                Some(FOOD_ICON),
             ));
         },
     )));
@@ -138,7 +138,7 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
                 s.status_origin + Vector2f::splat(2. * BASE_TEXT_SIZE),
                 RED_COLOR,
                 Some("-".to_string()),
-                Some(0),
+                Some(HEALTH_ICON),
             ));
         },
     )));

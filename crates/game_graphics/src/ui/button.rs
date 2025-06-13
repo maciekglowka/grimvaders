@@ -2,7 +2,7 @@ use rogalik::prelude::*;
 
 use super::Span;
 use crate::{
-    globals::{BUTTON_CLICK_SHIFT, SPRITE_SIZE},
+    globals::{BUTTON_CLICK_SHIFT, BUTTON_SPRITE, SPRITE_SIZE},
     input::{ButtonState, InputState},
 };
 
@@ -23,7 +23,7 @@ impl<'a> Button<'a> {
             size,
             z,
             sprite_atlas: "ui",
-            sprite_index: 0,
+            sprite_index: BUTTON_SPRITE,
             span: None,
             slice: Some((8, Vector2f::splat(SPRITE_SIZE))),
         }

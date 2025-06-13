@@ -103,7 +103,7 @@ fn load_graphics(context: &mut Context) {
         "ui",
         MaterialParams {
             atlas: Some(AtlasParams {
-                cols: 5,
+                cols: 7,
                 rows: 1,
                 padding: None,
             }),

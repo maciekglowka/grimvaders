@@ -6,8 +6,8 @@ use crate::{
     draw::units::draw_deck_button,
     globals::{
         ACTION_BUTTON_W, BASE_TEXT_SIZE, BUTTON_SIZE, BUTTON_TEXT_COLOR, DECK_BUTTON_H,
-        DECK_BUTTON_W, FOOD_COLOR, GAP, ICON_SIZE, OVERLAY_Z, RED_COLOR, SPRITE_SIZE, TILE_SIZE,
-        UI_Z,
+        DECK_BUTTON_W, FIGHT_ICON, FOOD_COLOR, FOOD_ICON, GAP, HEALTH_ICON, ICON_SIZE, OVERLAY_Z,
+        PANEL_SPRTE, RED_COLOR, SPRITE_SIZE, TILE_SIZE, UI_Z, UNIT_ICON,
     },
     input::{ButtonState, InputState},
     ui::{Button, Span},
@@ -16,8 +16,6 @@ use crate::{
 
 use super::InputMode;
 
-const PANEL_W: f32 = ACTION_BUTTON_W + 2. * GAP;
-
 pub(super) fn handle_player_ui(
     world: &World,
     state: &mut super::BattleGraphics,
@@ -25,29 +23,12 @@ pub(super) fn handle_player_ui(
     input_state: &InputState,
     take_input: bool,
 ) {
-    // draw_panel(context);
     draw_status(state, world, context);
     handle_hand(state, world, context, input_state, take_input);
     handle_input_player(state, world, context, input_state, take_input);
     if take_input {
         draw_cursor(state, world, context, input_state);
     }
-}
-
-fn draw_panel(context: &mut Context) {
-    let bounds = get_viewport_bounds(context);
-    let origin = Vector2f::new(bounds.1.x - GAP - PANEL_W, bounds.0.y + GAP);
-    let _ = context.graphics.draw_atlas_sprite(
-        "ui",
-        4,
-        origin,
-        0,
-        Vector2f::new(PANEL_W, bounds.1.y - bounds.0.y - 2. * GAP),
-        SpriteParams {
-            slice: Some((8, Vector2f::splat(SPRITE_SIZE))),
-            ..Default::default()
-        },
-    );
 }
 
 fn handle_input_player(
@@ -65,7 +46,7 @@ fn handle_input_player(
     )
     .with_span(
         Span::new()
-            .with_sprite("icons_small", 2)
+            .with_sprite("icons_small", FIGHT_ICON)
             .with_spacer(2.)
             .with_text_borrowed("Fight!")
             .with_sprite_size(ICON_SIZE),
@@ -182,7 +163,7 @@ fn handle_hand(
     )
     .with_span(
         Span::new()
-            .with_sprite("icons_small", 3)
+            .with_sprite("icons_small", UNIT_ICON)
             .with_spacer(2.)
             .with_text_borrowed("Reroll")
             .with_sprite_size(ICON_SIZE),
@@ -197,7 +178,7 @@ pub(super) fn draw_status(state: &super::BattleGraphics, world: &World, context:
     let mut spans = Vec::new();
     spans.push(
         Span::new()
-            .with_sprite("icons_small", 0)
+            .with_sprite("icons_small", HEALTH_ICON)
             .with_spacer(2.)
             .with_text_owned(format!("{}", world.resources.player_data.health))
             .with_spacer(4.)
@@ -207,7 +188,7 @@ pub(super) fn draw_status(state: &super::BattleGraphics, world: &World, context:
     );
     spans.push(
         Span::new()
-            .with_sprite("icons_small", 1)
+            .with_sprite("icons_small", FOOD_ICON)
             .with_spacer(2.)
             .with_text_owned(format!("{}", world.resources.player_data.food))
             .with_spacer(4.)
@@ -217,7 +198,7 @@ pub(super) fn draw_status(state: &super::BattleGraphics, world: &World, context:
     );
     spans.push(
         Span::new()
-            .with_sprite("icons_small", 2)
+            .with_sprite("icons_small", FIGHT_ICON)
             .with_spacer(2.)
             .with_text_owned(format!(
                 "{}/{}",
@@ -235,7 +216,7 @@ pub(super) fn draw_status(state: &super::BattleGraphics, world: &World, context:
 
     let _ = context.graphics.draw_atlas_sprite(
         "ui",
-        3,
+        PANEL_SPRTE,
         state.status_origin,
         UI_Z,
         Vector2f::new(w + 2. * oh, BASE_TEXT_SIZE + 2. * ov),

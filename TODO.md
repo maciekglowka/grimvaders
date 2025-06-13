@@ -2,12 +2,9 @@
 
 ## Player Units
 
-- scarecrow - cost 1food, 1hp, if on field give hp to unit behind
+- necromancer - any ally killed -> respawn it, 1 trigger / turn
 - 2hp unit; on damage if standing, give hp to adjacent
-- on spawn +2hp for each basic unit
 - on spawn double food ? 
-- take x food and gain hp, or give hp
-- strong unit, but loses extra hp on damage
 
 ## NPCs
 

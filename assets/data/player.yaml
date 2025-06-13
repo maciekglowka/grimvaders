@@ -81,7 +81,7 @@ Herbalist:
       commands
     }
   description: >
-    On fight start: give +1 to adjacent units, if on a meadow tile.
+    On fight start: give +1 health to adjacent units, if on a meadow tile.
 
 Sheep:
   sprite:
@@ -175,7 +175,7 @@ Druid:
       RuneCommand::ChangeHealth(entity, sum)
     }
   description: >
-    On fight start: gain +1 for each unit on a forest tile.
+    On fight start: gain +1 health for each unit on a forest tile.
 
 # Food bonus units
 
@@ -198,7 +198,7 @@ Merchant:
       commands
     }
   description: >
-    On spawn: give +1 to all food producers.
+    On spawn: give +1 health to all food producers.
 
 Beggar:
   sprite:

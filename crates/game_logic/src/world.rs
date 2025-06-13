@@ -56,7 +56,16 @@ impl World {
     }
 
     #[rune::function]
-    fn get_adjacent_units(&self, entity: &Ent) -> Vec<Ent> {
+    fn get_player_in_front(&self, entity: &Ent) -> Option<Ent> {
+        let mut position = *self.0.components.position.get(entity.into())?;
+        position.y += 1;
+        get_unit_at(self, position)
+            .filter(|a| self.components.player.get(*a).is_some())
+            .map(|a| a.into())
+    }
+
+    #[rune::function]
+    fn get_adjacent_players(&self, entity: &Ent) -> Vec<Ent> {
         let Some(position) = self.0.components.position.get(entity.into()) else {
             return Vec::new();
         };
@@ -70,7 +79,7 @@ impl World {
     }
 
     #[rune::function]
-    fn get_units_with_tag(&self, tag: &Tag) -> Vec<Ent> {
+    fn get_players_with_tag(&self, tag: &Tag) -> Vec<Ent> {
         query_iter!(self.0, With(player, position, tags))
             .filter(|(_, _, _, t)| t.contains(tag))
             .map(|(e, _, _, _)| e.into())

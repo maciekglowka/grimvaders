@@ -14,7 +14,7 @@ use crate::{
             remove_unit_sprite, UnitSprite,
         },
     },
-    globals::{BASE_TEXT_SIZE, FOOD_COLOR, GAP, RED_COLOR, TILE_SIZE},
+    globals::{BASE_TEXT_SIZE, FOOD_COLOR, FOOD_ICON, GAP, HEALTH_ICON, RED_COLOR, SPRITE_SIZE},
     input::InputState,
     utils::get_viewport_bounds,
 };
@@ -100,7 +100,7 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
         |c: &commands::ChangeHealth, _, s| {
             if let Some(sprite) = get_unit_sprite(c.0, &s.unit_sprites) {
                 s.bubbles.push(Bubble::new(
-                    sprite.origin + Vector2f::new(0., TILE_SIZE),
+                    sprite.origin + Vector2f::new(0., SPRITE_SIZE),
                     RED_COLOR,
                     Some(format!("{:+}", c.1)),
                     None,
@@ -111,19 +111,22 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
     observers.push(Box::new(CommandObserver::new(
         &mut env.scheduler,
         |c: &commands::ChangeFood, _, s| {
+            if c.0 == 0 {
+                return;
+            }
             let mut origin = s.status_origin + Vector2f::splat(2. * BASE_TEXT_SIZE);
 
             // If action has an entity source, spawn bubble from it's position
             if let Some(entity) = c.1 {
                 if let Some(sprite) = get_unit_sprite(entity, &s.unit_sprites) {
-                    origin = sprite.origin + Vector2f::new(0., TILE_SIZE);
+                    origin = sprite.origin + Vector2f::new(0., SPRITE_SIZE);
                 }
             }
             s.bubbles.push(Bubble::new(
                 origin,
                 FOOD_COLOR,
                 Some((if c.0 < 0 { "-" } else { "+" }).to_string()),
-                Some(1),
+                Some(FOOD_ICON),
             ));
         },
     )));
@@ -135,7 +138,7 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
                 s.status_origin + Vector2f::splat(2. * BASE_TEXT_SIZE),
                 RED_COLOR,
                 Some("-".to_string()),
-                Some(0),
+                Some(HEALTH_ICON),
             ));
         },
     )));

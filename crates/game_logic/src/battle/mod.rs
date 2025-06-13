@@ -1,3 +1,6 @@
+use std::collections::VecDeque;
+use wunderkammer::prelude::*;
+
 use crate::{commands, events::InputEvent, globals::WAVE_COUNT, GameEnv};
 
 pub(crate) mod board;
@@ -16,6 +19,7 @@ pub enum BattleMode {
 
 #[derive(Default)]
 pub struct BattleState {
+    on_fight_queue: VecDeque<Entity>,
     pub mode: BattleMode,
     pub wave: u32,
 }
@@ -51,6 +55,9 @@ pub fn battle_update(env: &mut GameEnv) {
             handle_input_events(env);
         }
         BattleMode::Fight => {
+            if systems::handle_on_fight(env) {
+                return;
+            }
             if !npcs::next_attack(env) {
                 next_turn(env);
             }
@@ -71,6 +78,20 @@ fn next_turn(env: &mut GameEnv) {
     npcs::next_wave(env);
 }
 
+fn fight_start(env: &mut GameEnv) {
+    // Change battle mode
+    env.world.resources.battle_state.mode = BattleMode::Fight;
+
+    // Collect on fight queue
+    let mut on_fight = query_iter!(env.world, With(position, on_fight))
+        .map(|(e, p, s)| (e, *p, s.to_string()))
+        .collect::<Vec<_>>();
+
+    // Apply consistent front to back order.
+    on_fight.sort_by(|a, b| b.1.y.cmp(&a.1.y).then_with(|| a.1.x.cmp(&b.1.x)));
+    env.world.resources.battle_state.on_fight_queue = on_fight.iter().map(|(e, _, _)| *e).collect();
+}
+
 fn handle_command_queue(env: &mut GameEnv) -> bool {
     env.scheduler.step(&mut env.world)
 }
@@ -85,7 +106,7 @@ fn handle_input_events(env: &mut GameEnv) -> Option<()> {
                 env.scheduler.send(commands::MoveUnit(entity, target));
             }
             InputEvent::Done => {
-                env.scheduler.send(commands::Fight);
+                fight_start(env);
             }
             InputEvent::RedrawHand => env.scheduler.send(commands::RedrawHand),
             _ => (),

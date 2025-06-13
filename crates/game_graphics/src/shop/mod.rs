@@ -4,8 +4,8 @@ use wunderkammer::prelude::*;
 use game_logic::{shop::ShopState, InputEvent, World};
 
 use crate::{
-    draw::units::{draw_deck_unit, draw_entity_description},
-    globals::{BASE_TEXT_SIZE, BUTTON_SIZE, GAP, SPRITE_SIZE},
+    draw::units::draw_deck_button,
+    globals::{ACTION_BUTTON_W, BASE_TEXT_SIZE, BUTTON_SIZE, DECK_BUTTON_W, GAP},
     input::InputState,
     ui::{Button, Span},
     utils::get_viewport_bounds,
@@ -14,6 +14,7 @@ use crate::{
 #[derive(Default)]
 pub struct ShopGraphics {
     pub input_queue: ObservableQueue<InputEvent>,
+    selected: Option<usize>,
 }
 
 pub fn shop_draw(
@@ -27,36 +28,39 @@ pub fn shop_draw(
 
     let bounds = get_viewport_bounds(context);
     let center = 0.5 * (bounds.0 + bounds.1);
-    let button_w = BUTTON_SIZE * 3.;
-    let unit_offset = Vector2f::new(0.5 * (button_w - SPRITE_SIZE), 0.);
-    let w = button_w + GAP;
+    let w = 2. * DECK_BUTTON_W + GAP;
 
     let mut origin = center - Vector2f::new(0.5 * logic_state.choices.len() as f32 * w, 0.);
+    let card_offset = Vector2f::new(0.5 * (w - DECK_BUTTON_W), 0.);
 
     for i in 0..logic_state.choices.len() {
         if let Some(entity) = &logic_state.choices[i] {
-            let button = Button::new(
-                origin - Vector2f::new(0., BUTTON_SIZE + GAP),
-                Vector2f::new(button_w, BUTTON_SIZE),
+            let selected = state.selected == Some(i);
+            let clicked = draw_deck_button(
+                *entity,
+                origin + card_offset,
                 0,
-            )
-            .with_span(Span::new().with_text_borrowed("Pick"));
-            button.draw(context, input_state);
+                selected,
+                world,
+                context,
+                input_state,
+            );
 
-            if button.clicked(input_state) {
-                state.input_queue.push(InputEvent::PickUnit(i));
+            if clicked {
+                if state.selected == Some(i) {
+                    state.selected = None
+                } else {
+                    state.selected = Some(i)
+                }
             }
-
-            draw_deck_unit(*entity, origin + unit_offset, 0, world, context);
 
             if let Some(name) = world.components.name.get(*entity) {
                 let offset = Vector2f::new(
-                    0.5 * (button_w
-                        - context
-                            .graphics
-                            .text_dimensions("default", name, BASE_TEXT_SIZE)
-                            .x),
-                    SPRITE_SIZE + 3. * GAP,
+                    0.5 * (w - context
+                        .graphics
+                        .text_dimensions("default", name, BASE_TEXT_SIZE)
+                        .x),
+                    -(BASE_TEXT_SIZE + GAP),
                 );
 
                 let _ = context.graphics.draw_text(
@@ -68,15 +72,6 @@ pub fn shop_draw(
                     SpriteParams::default(),
                 );
             }
-
-            if crate::utils::is_mouse_over(
-                origin + unit_offset,
-                Vector2f::splat(SPRITE_SIZE),
-                input_state,
-            ) || button.mouse_over(input_state)
-            {
-                draw_entity_description(*entity, world, context);
-            }
         }
 
         origin.x += w;
@@ -84,12 +79,26 @@ pub fn shop_draw(
 
     let done = Button::new(
         bounds.0 + Vector2f::splat(GAP),
-        Vector2f::new(button_w, BUTTON_SIZE),
+        Vector2f::new(ACTION_BUTTON_W, BUTTON_SIZE),
         0,
     )
     .with_span(Span::new().with_text_borrowed("Skip"));
     done.draw(context, input_state);
     if done.clicked(input_state) {
         state.input_queue.push(InputEvent::Done);
+    }
+
+    if let Some(i) = state.selected {
+        let confirm = Button::new(
+            Vector2f::new(bounds.1.x - ACTION_BUTTON_W - GAP, bounds.0.y + GAP),
+            Vector2f::new(ACTION_BUTTON_W, BUTTON_SIZE),
+            0,
+        )
+        .with_span(Span::new().with_text_borrowed("Pick"));
+        confirm.draw(context, input_state);
+
+        if confirm.clicked(input_state) {
+            state.input_queue.push(InputEvent::PickUnit(i));
+        }
     }
 }

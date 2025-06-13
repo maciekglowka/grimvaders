@@ -5,10 +5,12 @@ use game_logic::World;
 
 use crate::{
     globals::{
-        BASE_TEXT_SIZE, DIGITS_TEXT_SIZE, FOOD_COLOR, GAP, ICON_SIZE, OVERLAY_Z, RED_COLOR,
-        SPRITE_SIZE, TEXT_LINE_GAP, UI_Z,
+        BASE_TEXT_SIZE, BUTTON_CLICK_SHIFT, DECK_BUTTON_H, DECK_BUTTON_SPRITE,
+        DECK_BUTTON_SPRITE_SELECTED, DECK_BUTTON_W, DIGITS_TEXT_SIZE, FOOD_COLOR, FOOD_ICON, GAP,
+        HEALTH_ICON, ICON_SIZE, RED_COLOR, SPRITE_SIZE, TEXT_LINE_GAP, UI_Z,
     },
-    ui::{Span, TextBox},
+    input::InputState,
+    ui::{Button, Span, TextBox},
     utils::get_viewport_bounds,
 };
 
@@ -26,7 +28,7 @@ pub(crate) fn draw_unit_stats(
     if let Some(health) = world.0.components.health.get(entity) {
         spans.push(
             Span::new()
-                .with_sprite("icons_small", 0)
+                .with_sprite("icons_small", HEALTH_ICON)
                 .with_spacer(1.)
                 .with_text_owned(format!("{}", health.current()))
                 .with_text_color(RED_COLOR)
@@ -40,7 +42,7 @@ pub(crate) fn draw_unit_stats(
         spans.push(Span::new().with_spacer(2.));
         spans.push(
             Span::new()
-                .with_sprite("icons_small", 1)
+                .with_sprite("icons_small", FOOD_ICON)
                 .with_spacer(1.)
                 .with_text_owned(format!("{}", cost))
                 .with_text_color(FOOD_COLOR)
@@ -52,25 +54,11 @@ pub(crate) fn draw_unit_stats(
 
     let w: f32 = spans.iter().map(|s| s.width(context)).sum();
 
-    let oh = 4.;
-    let ov = 2.;
     let mut base = origin
         + Vector2f::new(
             (0.5 * (SPRITE_SIZE - w)).round(),
-            SPRITE_SIZE - DIGITS_TEXT_SIZE + 2. * ov,
+            0., // SPRITE_SIZE - DIGITS_TEXT_SIZE,
         );
-
-    let _ = context.graphics.draw_atlas_sprite(
-        "ui",
-        3,
-        base - Vector2f::new(oh, ov),
-        z,
-        Vector2f::new(w + 2. * oh, DIGITS_TEXT_SIZE + 2. * ov),
-        SpriteParams {
-            slice: Some((4, Vector2f::splat(SPRITE_SIZE))),
-            ..Default::default()
-        },
-    );
 
     for span in spans {
         span.draw(base, z + 1, context);
@@ -92,7 +80,7 @@ pub(crate) fn draw_unit_overlay(
     let t = format!("{}", health.current());
     let w = context
         .graphics
-        .text_dimensions("digits", &t, DIGITS_TEXT_SIZE)
+        .text_dimensions("digits_outline", &t, DIGITS_TEXT_SIZE)
         .x;
     let base = origin
         + Vector2f::new(
@@ -100,19 +88,8 @@ pub(crate) fn draw_unit_overlay(
             0.75 * SPRITE_SIZE - DIGITS_TEXT_SIZE,
         );
 
-    // let _ = context.graphics.draw_text(
-    //     "digits",
-    //     &t,
-    //     base + Vector2f::new(1., 0.),
-    //     z,
-    //     DIGITS_TEXT_SIZE,
-    //     SpriteParams {
-    //         color: Color(255, 255, 255, 255),
-    //         ..Default::default()
-    //     },
-    // );
     let _ = context.graphics.draw_text(
-        "digits",
+        "digits_outline",
         &t,
         base,
         z + 1,
@@ -124,29 +101,88 @@ pub(crate) fn draw_unit_overlay(
     );
 }
 
-pub(crate) fn draw_deck_unit(
+pub(crate) fn draw_deck_button(
     entity: Entity,
     origin: Vector2f,
     z: i32,
+    selected: bool,
     world: &World,
     context: &mut Context,
-) {
-    let Some(name) = world.0.components.name.get(entity) else {
-        return;
+    input_state: &InputState,
+) -> bool {
+    let mut button = Button::new(origin, Vector2f::new(DECK_BUTTON_W, DECK_BUTTON_H), z)
+        .with_sprite("ui", DECK_BUTTON_SPRITE);
+    if selected {
+        button = button.with_sprite("ui", DECK_BUTTON_SPRITE_SELECTED);
+    }
+    button.draw(context, input_state);
+
+    let unit_offset = if button.pressed(input_state) {
+        BUTTON_CLICK_SHIFT
+    } else {
+        0.
     };
-    let Some(sprite) = get_sprite_data(name, world) else {
-        return;
+
+    if button.mouse_over(input_state) {
+        draw_entity_description(entity, world, context);
+    }
+
+    // Draw unit sprite
+    if let Some(name) = world.0.components.name.get(entity) {
+        if let Some(sprite) = get_sprite_data(name, world) {
+            let _ = context.graphics.draw_atlas_sprite(
+                &sprite.atlas,
+                sprite.index,
+                origin + Vector2f::new(0., 2. * GAP - unit_offset),
+                z + 1,
+                Vector2f::splat(SPRITE_SIZE),
+                SpriteParams::default(),
+            );
+        }
     };
-    let _ = context.graphics.draw_atlas_sprite(
-        &sprite.atlas,
-        sprite.index,
-        origin,
-        z,
-        Vector2f::splat(SPRITE_SIZE),
-        SpriteParams::default(),
+
+    // Draw stats
+    draw_unit_stats(
+        entity,
+        origin + Vector2f::new(0., DECK_BUTTON_H - 8. - unit_offset),
+        z + 1,
+        world,
+        context,
     );
-    draw_unit_stats(entity, origin, z + 1, world, context);
+
+    // Return click status
+    button.clicked(input_state)
 }
+
+// pub(crate) fn draw_deck_unit(
+//     entity: Entity,
+//     origin: Vector2f,
+//     z: i32,
+//     world: &World,
+//     context: &mut Context,
+// ) {
+//     let Some(name) = world.0.components.name.get(entity) else {
+//         return;
+//     };
+//     let Some(sprite) = get_sprite_data(name, world) else {
+//         return;
+//     };
+//     let _ = context.graphics.draw_atlas_sprite(
+//         &sprite.atlas,
+//         sprite.index,
+//         origin,
+//         z,
+//         Vector2f::splat(SPRITE_SIZE),
+//         SpriteParams::default(),
+//     );
+//     draw_unit_stats(
+//         entity,
+//         origin + Vector2f::new(0., SPRITE_SIZE - 2.),
+//         z + 1,
+//         world,
+//         context,
+//     );
+// }
 
 pub(crate) fn draw_entity_description(entity: Entity, world: &World, context: &mut Context) {
     let Some(name) = world.components.name.get(entity) else {

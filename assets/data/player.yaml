@@ -1,5 +1,5 @@
 # Basic
- 
+
 Villager:
   sprite:
     atlas: units
@@ -16,13 +16,22 @@ Pikeman:
     atlas: units
     tag: Pikeman
   components:
-    cost: 3
+    cost: 2
     health: [3, 3]
     player:
     tags:
       - !Basic
 
-# Field units
+Scarecrow:
+  sprite:
+    atlas: units
+    tag: Scarecrow
+  components:
+    cost: 1
+    health: [1, 1]
+    player:
+    tags:
+      - !Basic # Field units
 
 Peasant:
   sprite:
@@ -47,7 +56,6 @@ Peasant:
   description: >
     On fight start: gain +1 food, when on a field tile.
 
-
 # Meadow units
 
 Herbalist:
@@ -56,7 +64,7 @@ Herbalist:
     tag: Herbalist
   tier: 2
   components:
-    cost: 3
+    cost: 2
     health: [2, 2]
     on_fight: "healer_fight"
     player:
@@ -67,7 +75,7 @@ Herbalist:
       if tile != Tile::Meadow { return }
 
       let commands  = [];
-      for player in world.get_adjacent_units(entity) {
+      for player in world.get_adjacent_players(entity) {
         commands.push(RuneCommand::ChangeHealth(player, 1));
       }
       commands
@@ -96,41 +104,16 @@ Sheep:
   description: >
     On fight start: gain +1 health, when on a meadow tile.
 
-# Shepherd:
-#   sprite:
-#     atlas: sprites
-#     tag: Shepherd
-#   tier: 3
-#   components:
-#     cost: 3
-#     health: [0, 0]
-#     on_spawn: "shepherd_spawn"
-#     player:
-#   script: >
-#     pub fn shepherd_spawn(world, entity, _) {
-#       let sum = 0;
-#       for player in world.query(["player", "position"], []) {
-#         if world.get("name", player) == Some("Sheep") {
-#           if let Some(health) = world.get("health", player) {
-#             sum += health.0;
-#           }
-#         }
-#       }
-#       RuneCommand::ChangeHealth(entity, sum)
-#     }
-#   description: >
-#     On spawn: gain health equal to the sum of all sheep health.
-
 # Forest units
 
 Hunter:
   sprite:
     atlas: units
     tag: Hunter
-  tier: 2
+  tier: 3
   components:
-    cost: 3
-    health: [1, 1]
+    cost: 2
+    health: [2, 2]
     on_fight: "hunter_fight"
     player:
     tags:
@@ -153,7 +136,7 @@ Ranger:
     tag: Ranger
   tier: 2
   components:
-    cost: 3
+    cost: 2
     health: [2, 2]
     on_fight: "ranger_fight"
     player:
@@ -169,14 +152,13 @@ Ranger:
   description: >
     On fight start: gain +1 health, when on a forest tile.
 
-
 Druid:
   sprite:
     atlas: units
     tag: Druid
   tier: 4
   components:
-    cost: 3
+    cost: 2
     health: [2, 2]
     on_fight: "druid_fight"
     player:
@@ -210,7 +192,7 @@ Merchant:
   script: >
     pub fn merchant_spawn(world, entity, _) {
       let commands  = [];
-      for player in world.get_units_with_tag(Tag::FoodProducer) {
+      for player in world.get_players_with_tag(Tag::FoodProducer) {
         commands.push(RuneCommand::ChangeHealth(player, 1));
       }
       commands
@@ -224,8 +206,8 @@ Beggar:
     tag: Beggar
   tier: 3
   components:
-    cost: 3
-    health: [1, 1]
+    cost: 2
+    health: [2, 2]
     on_ally_gain_food: "beggar_ally_gain_food"
     player:
     trigger_limit: [3, 3]
@@ -246,15 +228,15 @@ Thief:
     tag: Thief
   tier: 4
   components:
-    cost: 3
-    health: [1, 1]
+    cost: 2
+    health: [2, 2]
     on_fight: "thief_fight"
     player:
     trigger_limit: [3, 3]
   script: >
     pub fn thief_fight(world, entity, _) {
       let food = world.get_current_food();
-      let val = (0.3 * food as f64) as i64;
+      let val = food;
 
       return [
         RuneCommand::ChangeFood(-val, Some(entity.clone())),
@@ -263,9 +245,51 @@ Thief:
 
     }
   description: >
-    On fight start: take 30% of player's food and gain this much health.
+    On fight start: take all player's food and gain this much health.
 
-# Health bonus units
+Shopkeeper:
+  sprite:
+    atlas: units
+    tag: Shopkeeper
+  tier: 5
+  components:
+    cost: 2
+    health: [2, 2]
+    on_ally_gain_food: "shopkeeper_ally_gain_food"
+    player:
+    trigger_limit: [3, 3]
+  script: >
+    pub fn shopkeeper_ally_gain_food(world, entity, cmd) {
+      if let RuneCommand::ChangeFood(val, Some(other)) = cmd {
+        return RuneCommand::ChangeFood(val, Some(entity));
+      }
+    }
+  description: >
+    When ally yields food, yield the same amount as well.
+
+Taxman:
+  sprite:
+    atlas: units
+    tag: Taxman
+  tier: 3
+  components:
+    cost: 0
+    health: [2, 2]
+    on_fight: "taxman_fight"
+    player:
+  script: >
+    pub fn taxman_fight(world, entity, _) {
+      let food = world.get_current_food();
+      if food > 0 {
+        return RuneCommand::ChangeFood(-1, Some(entity));
+      } else {
+        return RuneCommand::Kill(entity);
+      }
+    }
+  description: >
+    On fight start: takes 1 food.
+
+# Death bonus units
 
 Martyr:
   sprite:
@@ -273,14 +297,14 @@ Martyr:
     tag: Martyr
   tier: 3
   components:
-    cost: 3
+    cost: 2
     health: [2, 2]
     on_kill: "martyr_kill"
     player:
   script: >
     pub fn martyr_kill(world, entity, _) {
       let commands  = [];
-      for player in world.get_adjacent_units(entity) {
+      for player in world.get_adjacent_players(entity) {
         commands.push(RuneCommand::ChangeHealth(player, 1));
       }
       commands
@@ -294,8 +318,8 @@ Santo Subito:
     tag: Santo Subito
   tier: 5
   components:
-    cost: 4
-    health: [3, 3]
+    cost: 3
+    health: [2, 2]
     on_kill: "santo_subito_kill"
     player:
   script: >
@@ -309,13 +333,65 @@ Santo Subito:
   description: >
     On kill: increase health of each player's unit by 1.
 
+Mime:
+  sprite:
+    atlas: units
+    tag: Mime
+  tier: 3
+  components:
+    cost: 2
+    health: [1, 1]
+    on_ally_kill: "mime_ally_kill"
+    player:
+  script: >
+    pub fn mime_ally_kill(world, entity, cmd) {
+      if let RuneCommand::Kill(other) = cmd {
+        if world.is_in_front(entity, other) {
+          let position = world.get("position", entity).unwrap();
+          return [
+            RuneCommand::RemoveUnit(entity),
+            RuneCommand::RespawnPlayer(other, position)
+          ];
+        }
+      }
+    }
+  description: >
+    When an ally in front is killed, respawn it in place of self.
+
+Vampire:
+  sprite:
+    atlas: units
+    tag: Vampire
+  tier: 4
+  components:
+    cost: 2
+    health: [2, 2]
+    on_fight: "vampire_fight"
+    player:
+  script: >
+    pub fn vampire_fight(world, entity, _) {
+      if let Some(other) = world.get_player_in_front(entity) {
+        if let Some(health) = world.get("health", other) {
+          let val = health.0;
+          return [
+            RuneCommand::ChangeHealth(other, -val),
+            RuneCommand::ChangeHealth(entity, val),
+          ];
+        }
+      }
+    }
+  description: >
+    On fight start: drain ally's in front health.
+
+# Heal
+
 Bard:
   sprite:
     atlas: units
     tag: Bard
   tier: 3
   components:
-    cost: 3
+    cost: 2
     health: [2, 2]
     on_ally_heal: "bard_ally_heal"
     player:
@@ -339,7 +415,7 @@ Clay Statue:
     tag: Clay Statue
   tier: 4
   components:
-    cost: 3
+    cost: 2
     health: [6, 6]
     on_damage: "clay_statue_damage"
     player:
@@ -349,29 +425,3 @@ Clay Statue:
     }
   description: >
     Breaks when damaged.
-
-Mime:
-  sprite:
-    atlas: units
-    tag: Mime
-  tier: 3
-  components:
-    cost: 3
-    health: [1, 1]
-    on_ally_kill: "mime_ally_kill"
-    player:
-  script: >
-    pub fn mime_ally_kill(world, entity, cmd) {
-      if let RuneCommand::Kill(other) = cmd {
-        if world.is_in_front(entity, other) {
-          let position = world.get("position", entity).unwrap();
-          return [
-            RuneCommand::RemoveUnit(entity),
-            RuneCommand::RespawnPlayer(other, position)
-          ];
-        }
-      }
-    }
-  description: >
-    When an ally in front is killed, respawn it in place of self.
-

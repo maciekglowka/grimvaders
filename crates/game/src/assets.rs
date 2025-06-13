@@ -103,7 +103,7 @@ fn load_graphics(context: &mut Context) {
         "ui",
         MaterialParams {
             atlas: Some(AtlasParams {
-                cols: 4,
+                cols: 7,
                 rows: 1,
                 padding: None,
             }),
@@ -125,6 +125,11 @@ fn load_graphics(context: &mut Context) {
             ..Default::default()
         },
     );
+
+    let outline_text = context
+        .graphics
+        .load_shader(ShaderKind::Sprite, "shaders/outline_text.wgsl");
+
     context
         .graphics
         .load_font("default", "ui/font.png", 16, 16, Some((11., 7.)), None);
@@ -132,6 +137,15 @@ fn load_graphics(context: &mut Context) {
     context
         .graphics
         .load_font("digits", "ui/digits.png", 16, 16, Some((4., 2.)), None);
+
+    context.graphics.load_font(
+        "digits_outline",
+        "ui/digits.png",
+        16,
+        16,
+        Some((4., 2.)),
+        Some(outline_text),
+    );
 
     // let noise_shader = context
     //     .graphics

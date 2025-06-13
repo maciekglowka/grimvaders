@@ -3,10 +3,7 @@ use rune::Any;
 use wunderkammer::prelude::*;
 
 use crate::{
-    battle::{
-        player::{remove_player_from_board, reset_player},
-        BattleMode,
-    },
+    battle::player::{remove_player_from_board, reset_player},
     components::Position,
     scripting::run_command_script,
     utils::get_unit_at,
@@ -105,22 +102,25 @@ pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
 
 macro_rules! handle_on_ally {
     ($world:ident, $cx:ident, $handler:ident, $target_entity:expr, $command:expr) => {{
-        let hosts = query_iter!($world, With(player, position, $handler))
-            // Do not trigger on self
-            .filter(|(e, _, _, _)| *e != $target_entity)
-            .map(|(e, _, _, s)| (e, s.to_string()))
-            .collect::<Vec<_>>();
+        if $world.components.player.get($target_entity).is_some() {
+            let hosts = query_iter!($world, With(player, position, $handler))
+                // Do not trigger on self
+                .filter(|(e, _, _, _)| *e != $target_entity)
+                .map(|(e, _, _, s)| (e, s.to_string()))
+                .collect::<Vec<_>>();
 
-        for (entity, script) in hosts {
-            if check_trigger_limit(entity, $world).is_err() {
-                continue;
-            }
-            if let Some(commands) = run_command_script(&script, entity.into(), $world, $command) {
-                if !commands.is_empty() {
-                    use_trigger_limit(entity, $world);
+            for (entity, script) in hosts {
+                if check_trigger_limit(entity, $world).is_err() {
+                    continue;
                 }
-                for c in commands {
-                    c.send($cx);
+                if let Some(commands) = run_command_script(&script, entity.into(), $world, $command)
+                {
+                    if !commands.is_empty() {
+                        use_trigger_limit(entity, $world);
+                    }
+                    for c in commands {
+                        c.send($cx);
+                    }
                 }
             }
         }
@@ -271,8 +271,10 @@ fn summon_player(
 }
 
 fn spawn_unit(cmd: &mut SpawnUnit, world: &mut World) -> Result<(), CommandError> {
-    if get_unit_at(world, cmd.1).is_some() {
-        return Err(CommandError::Break);
+    if let Some(existing) = get_unit_at(world, cmd.1) {
+        if world.components.killed.get(existing).is_none() && existing != cmd.0 {
+            return Err(CommandError::Break);
+        }
     }
     world.components.position.insert(cmd.0, cmd.1);
     Ok(())
@@ -283,24 +285,6 @@ fn handle_on_spawn(
     world: &mut World,
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
-    // let on_spawn = world
-    //     .components
-    //     .on_spawn
-    //     .get(cmd.0)
-    //     .ok_or(CommandError::Continue)?
-    //     .clone();
-
-    // if let Some(commands) = run_command_script(
-    //     &on_spawn,
-    //     cmd.0.into(),
-    //     world,
-    //     RuneCommand::SpawnUnit(cmd.0.into(), cmd.1),
-    // ) {
-    //     for c in commands {
-    //         c.send(cx);
-    //     }
-    // }
-
     handle_on_self!(
         world,
         cx,
@@ -421,23 +405,6 @@ fn handle_on_damage(
         cmd.0,
         RuneCommand::ChangeHealth(cmd.0.into(), cmd.1)
     );
-    // let on_damage = world
-    //     .components
-    //     .on_damage
-    //     .get(cmd.0)
-    //     .ok_or(CommandError::Continue)?
-    //     .clone();
-
-    // if let Some(commands) = run_command_script(
-    //     &on_damage,
-    //     cmd.0.into(),
-    //     world,
-    //     RuneCommand::ChangeHealth(cmd.0.into(), cmd.1),
-    // ) {
-    //     for c in commands {
-    //         c.send(cx);
-    //     }
-    // }
 
     Ok(())
 }
@@ -459,24 +426,6 @@ fn handle_on_ally_heal(
         cmd.0,
         RuneCommand::ChangeHealth(cmd.0.into(), cmd.1)
     );
-    // let hosts = query_iter!(world, With(player, position, on_ally_heal))
-    //     // Do not trigger on self
-    //     .filter(|(e, _, _, _)| *e != cmd.0)
-    //     .map(|(e, _, _, s)| (e, s.to_string()))
-    //     .collect::<Vec<_>>();
-
-    // for (entity, script) in hosts {
-    //     if let Some(commands) = run_command_script(
-    //         &script,
-    //         entity.into(),
-    //         world,
-    //         RuneCommand::ChangeHealth(cmd.0.into(), cmd.1),
-    //     ) {
-    //         for c in commands {
-    //             c.send(cx);
-    //         }
-    //     }
-    // }
 
     Ok(())
 }
@@ -491,23 +440,6 @@ fn handle_on_kill(
     world: &mut World,
     cx: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
-    // let on_kill = world
-    //     .components
-    //     .on_kill
-    //     .get(cmd.0)
-    //     .ok_or(CommandError::Continue)?
-    //     .clone();
-
-    // if let Some(commands) = run_command_script(
-    //     &on_kill,
-    //     cmd.0.into(),
-    //     world,
-    //     RuneCommand::Kill(cmd.0.into()),
-    // ) {
-    //     for c in commands {
-    //         c.send(cx);
-    //     }
-    // }
     handle_on_self!(world, cx, on_kill, cmd.0, RuneCommand::Kill(cmd.0.into()));
 
     Ok(())
@@ -525,24 +457,6 @@ fn handle_on_ally_kill(
         cmd.0,
         RuneCommand::Kill(cmd.0.into())
     );
-    // let hosts = query_iter!(world, With(player, position, on_ally_kill))
-    //     // Do not trigger on self
-    //     .filter(|(e, _, _, _)| *e != cmd.0)
-    //     .map(|(e, _, _, s)| (e, s.to_string()))
-    //     .collect::<Vec<_>>();
-
-    // for (entity, script) in hosts {
-    //     if let Some(commands) = run_command_script(
-    //         &script,
-    //         entity.into(),
-    //         world,
-    //         RuneCommand::Kill(cmd.0.into()),
-    //     ) {
-    //         for c in commands {
-    //             c.send(cx);
-    //         }
-    //     }
-    // }
 
     Ok(())
 }

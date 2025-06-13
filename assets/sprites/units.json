@@ -182,6 +182,14 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
     "duration": 100
+   },
+   "units 23.aseprite": {
+    "frame": { "x": 736, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
    }
  },
  "meta": {
@@ -211,10 +219,11 @@
    { "name": "Thief", "from": 16, "to": 16, "direction": "forward", "color": "#000000ff" },
    { "name": "Shopkeeper", "from": 17, "to": 17, "direction": "forward", "color": "#000000ff" },
    { "name": "Taxman", "from": 18, "to": 18, "direction": "forward", "color": "#000000ff" },
-   { "name": "Vampire", "from": 19, "to": 19, "direction": "forward", "color": "#000000ff" },
-   { "name": "Gnome", "from": 20, "to": 20, "direction": "forward", "color": "#000000ff" },
-   { "name": "Shadow", "from": 21, "to": 21, "direction": "forward", "color": "#000000ff" },
-   { "name": "Ghost", "from": 22, "to": 22, "direction": "forward", "color": "#000000ff" }
+   { "name": "Necromancer", "from": 19, "to": 19, "direction": "forward", "color": "#000000ff" },
+   { "name": "Vampire", "from": 20, "to": 20, "direction": "forward", "color": "#000000ff" },
+   { "name": "Gnome", "from": 21, "to": 21, "direction": "forward", "color": "#000000ff" },
+   { "name": "Shadow", "from": 22, "to": 22, "direction": "forward", "color": "#000000ff" },
+   { "name": "Ghost", "from": 23, "to": 23, "direction": "forward", "color": "#000000ff" }
   ]
  }
 }

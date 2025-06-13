@@ -383,6 +383,27 @@ Vampire:
   description: >
     On fight start: drain ally's in front health.
 
+Necromancer:
+  sprite:
+    atlas: units
+    tag: Necromancer
+  tier: 5
+  components:
+    cost: 2
+    health: [2, 2]
+    on_ally_kill: "necromancer_ally_kill"
+    player:
+    trigger_limit: [1, 1]
+  script: >
+    pub fn necromancer_ally_kill(world, entity, cmd) {
+      if let RuneCommand::Kill(other) = cmd {
+        let position = world.get("position", other).unwrap();
+        return RuneCommand::RespawnPlayer(other, position);
+      }
+    }
+  description: >
+    When ally is killed, respawn it.
+
 # Heal
 
 Bard:

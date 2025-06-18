@@ -31,12 +31,15 @@ pub enum Tag {
     Basic,
     #[rune(constructor)]
     FoodProducer,
+    #[rune(constructor)]
+    Heavy,
 }
 impl From<Tag> for String {
     fn from(value: Tag) -> Self {
         match value {
             Tag::Basic => "Basic",
             Tag::FoodProducer => "Food Producer",
+            Tag::Heavy => "Heavy",
         }
         .to_string()
     }
@@ -104,6 +107,10 @@ impl Position {
     }
     pub fn manhattan(&self, other: &Position) -> i32 {
         (self.x - other.x).abs() + (self.y - other.y).abs()
+    }
+    #[rune::function(keep, instance, protocol = PARTIAL_EQ)]
+    pub fn partial_eq(&self, rhs: &Self) -> VmResult<bool> {
+        VmResult::Ok(self == rhs)
     }
 }
 

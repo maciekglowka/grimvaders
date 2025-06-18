@@ -130,12 +130,7 @@ fn handle_hand(
 ) {
     let bounds = get_viewport_bounds(context);
     let bottom = bounds.0.y + BUTTON_SIZE + 2. * GAP;
-    let base = Vector2f::new(
-        bounds.1.x - SPRITE_SIZE - GAP,
-        bottom + 1.5 * BUTTON_SIZE + GAP,
-    );
-
-    // origin.y += BUTTON_SIZE + GAP;
+    let base = Vector2f::new(bounds.1.x - SPRITE_SIZE - GAP, bottom + BUTTON_SIZE + GAP);
 
     for (i, &entity) in world.0.resources.player_data.hand.iter().enumerate() {
         let origin = base

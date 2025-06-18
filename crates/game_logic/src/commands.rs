@@ -4,7 +4,7 @@ use wunderkammer::prelude::*;
 
 use crate::{
     battle::player::{remove_player_from_board, reset_player},
-    components::Position,
+    components::{Position, Tag},
     scripting::run_command_script,
     utils::get_unit_at,
     world::{Ent, World},
@@ -37,6 +37,8 @@ pub enum RuneCommand {
     #[rune(constructor)]
     ChangeHealth(#[rune(get)] Ent, #[rune(get)] i32),
     #[rune(constructor)]
+    Attack(#[rune(get)] Ent, #[rune(get)] Ent),
+    #[rune(constructor)]
     Kill(#[rune(get)] Ent),
     #[rune(constructor)]
     RemoveUnit(#[rune(get)] Ent),
@@ -68,6 +70,7 @@ impl RuneCommand {
             (Self::SpawnUnit(e, p) => SpawnUnit(e.into(), *p)),
             (Self::ChangeFood(v, e) => ChangeFood(*v, e.map(|a| a.into()))),
             (Self::ChangeHealth(e, v) => ChangeHealth(e.into(), *v)),
+            (Self::Attack(e, t) => Attack(e.into(), t.into())),
             (Self::Kill(e) => Kill(e.into())),
             (Self::RemoveUnit(e) => RemoveUnit(e.into())),
             (Self::RespawnPlayer(e, p) => RespawnPlayer(e.into(), *p))
@@ -80,13 +83,12 @@ pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
     scheduler.add_system(change_food);
     scheduler.add_system_with_priority(handle_on_ally_gain_food, 1);
     scheduler.add_system(redraw_hand);
-    // scheduler.add_system(fight);
-    // scheduler.add_system_with_priority(handle_on_fight, 1);
     scheduler.add_system(summon_player);
     scheduler.add_system(spawn_unit);
     scheduler.add_system_with_priority(handle_on_spawn, 1);
     scheduler.add_system(move_unit);
     scheduler.add_system(attack);
+    scheduler.add_system_with_priority(handle_on_attack, 1);
     scheduler.add_system(attack_town);
     scheduler.add_system(change_health);
     scheduler.add_system_with_priority(handle_on_damage, 1);
@@ -204,41 +206,6 @@ fn redraw_hand(
     Ok(())
 }
 
-// fn fight(_: &mut Fight, world: &mut World) -> Result<(), CommandError> {
-//     world.resources.battle_state.mode = BattleMode::Fight;
-//     Ok(())
-// }
-
-// fn handle_on_fight(
-//     _: &mut Fight,
-//     world: &mut World,
-//     cx: &mut SchedulerContext,
-// ) -> Result<(), CommandError> {
-//     let mut on_fight = query_iter!(world, With(position, on_fight))
-//         .map(|(e, p, s)| (e, *p, s.to_string()))
-//         .collect::<Vec<_>>();
-
-//     // Apply consistent front to back order.
-//     on_fight.sort_by(|a, b| b.1.y.cmp(&a.1.y).then_with(||
-// a.1.x.cmp(&b.1.x)));
-
-//     for (entity, _, script) in on_fight {
-//         if check_trigger_limit(entity, world).is_err() {
-//             continue;
-//         }
-//         if let Some(commands) = run_command_script(&script, entity.into(),
-// world, RuneCommand::None)         {
-//             if !commands.is_empty() {
-//                 use_trigger_limit(entity, world);
-//             }
-//             for c in commands {
-//                 c.send(cx);
-//             }
-//         }
-//     }
-//     Ok(())
-// }
-
 fn summon_player(
     cmd: &mut SummonPlayer,
     world: &mut World,
@@ -300,15 +267,15 @@ fn move_unit(
     world: &mut World,
     _: &mut SchedulerContext,
 ) -> Result<(), CommandError> {
-    // let cost = 1;
-    // if world.0.resources.player_data.food < cost {
-    //     return Err(CommandError::Break);
-    // }
+    if let Some(tags) = world.components.tags.get(cmd.0) {
+        if tags.contains(&Tag::Heavy) {
+            return Err(CommandError::Break);
+        }
+    }
     if get_unit_at(world, cmd.1).is_some() {
         return Err(CommandError::Break);
     }
     world.components.position.insert(cmd.0, cmd.1);
-    // cx.send(Pay(cost));
     Ok(())
 }
 
@@ -330,6 +297,22 @@ fn attack(
 
     cx.send(ChangeHealth(cmd.1, -(health_0.current() as i32)));
     cx.send(ChangeHealth(cmd.0, -(health_1.current() as i32)));
+    Ok(())
+}
+
+fn handle_on_attack(
+    cmd: &mut Attack,
+    world: &mut World,
+    cx: &mut SchedulerContext,
+) -> Result<(), CommandError> {
+    handle_on_self!(
+        world,
+        cx,
+        on_attack,
+        cmd.0,
+        RuneCommand::Attack(cmd.0.into(), cmd.1.into())
+    );
+
     Ok(())
 }
 

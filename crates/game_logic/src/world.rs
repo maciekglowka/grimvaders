@@ -79,6 +79,14 @@ impl World {
     }
 
     #[rune::function]
+    fn get_players_in_column(&self, x: i32) -> Vec<Ent> {
+        query_iter!(self.0, With(player, position))
+            .filter(|(_, _, p)| p.x == x)
+            .map(|(e, _, _)| e.into())
+            .collect()
+    }
+
+    #[rune::function]
     fn get_players_with_tag(&self, tag: &Tag) -> Vec<Ent> {
         query_iter!(self.0, With(player, position, tags))
             .filter(|(_, _, _, t)| t.contains(tag))
@@ -133,6 +141,7 @@ pub struct Components {
     pub on_fight: ComponentStorage<String>,
     pub on_kill: ComponentStorage<String>,
     pub on_ally_kill: ComponentStorage<String>,
+    pub on_attack: ComponentStorage<String>,
     pub on_damage: ComponentStorage<String>,
     pub on_ally_heal: ComponentStorage<String>,
     pub on_ally_gain_food: ComponentStorage<String>,
@@ -153,12 +162,16 @@ pub struct Resources {
     pub vm: Option<rune::Vm>,
 }
 
-#[derive(Any, Clone, Copy, Debug)]
+#[derive(Any, Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Ent(u16, u16);
 impl Ent {
     #[rune::function]
     pub fn clone(&self) -> Self {
         Self(self.0, self.1)
+    }
+    #[rune::function(keep, instance, protocol = PARTIAL_EQ)]
+    pub fn partial_eq(&self, rhs: &Self) -> rune::runtime::VmResult<bool> {
+        rune::runtime::VmResult::Ok(self == rhs)
     }
 }
 impl From<Entity> for Ent {

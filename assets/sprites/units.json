@@ -206,6 +206,38 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
     "duration": 100
+   },
+   "units 26.aseprite": {
+    "frame": { "x": 832, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "units 27.aseprite": {
+    "frame": { "x": 864, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "units 28.aseprite": {
+    "frame": { "x": 896, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "units 29.aseprite": {
+    "frame": { "x": 928, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
    }
  },
  "meta": {
@@ -229,19 +261,23 @@
    { "name": "Martyr", "from": 10, "to": 10, "direction": "forward", "color": "#000000ff" },
    { "name": "Santo Subito", "from": 11, "to": 11, "direction": "forward", "color": "#000000ff" },
    { "name": "Clay Statue", "from": 12, "to": 12, "direction": "forward", "color": "#000000ff" },
-   { "name": "Mime", "from": 13, "to": 13, "direction": "forward", "color": "#000000ff" },
-   { "name": "Bard", "from": 14, "to": 14, "direction": "forward", "color": "#000000ff" },
-   { "name": "Beggar", "from": 15, "to": 15, "direction": "forward", "color": "#000000ff" },
-   { "name": "Thief", "from": 16, "to": 16, "direction": "forward", "color": "#000000ff" },
-   { "name": "Shopkeeper", "from": 17, "to": 17, "direction": "forward", "color": "#000000ff" },
-   { "name": "Taxman", "from": 18, "to": 18, "direction": "forward", "color": "#000000ff" },
-   { "name": "Necromancer", "from": 19, "to": 19, "direction": "forward", "color": "#000000ff" },
-   { "name": "Vampire", "from": 20, "to": 20, "direction": "forward", "color": "#000000ff" },
-   { "name": "Alchemist", "from": 21, "to": 21, "direction": "forward", "color": "#000000ff" },
-   { "name": "Apothecary", "from": 22, "to": 22, "direction": "forward", "color": "#000000ff" },
-   { "name": "Gnome", "from": 23, "to": 23, "direction": "forward", "color": "#000000ff" },
-   { "name": "Shadow", "from": 24, "to": 24, "direction": "forward", "color": "#000000ff" },
-   { "name": "Ghost", "from": 25, "to": 25, "direction": "forward", "color": "#000000ff" }
+   { "name": "Stone Statue", "from": 13, "to": 13, "direction": "forward", "color": "#000000ff" },
+   { "name": "Mime", "from": 14, "to": 14, "direction": "forward", "color": "#000000ff" },
+   { "name": "Bard", "from": 15, "to": 15, "direction": "forward", "color": "#000000ff" },
+   { "name": "Beggar", "from": 16, "to": 16, "direction": "forward", "color": "#000000ff" },
+   { "name": "Thief", "from": 17, "to": 17, "direction": "forward", "color": "#000000ff" },
+   { "name": "Shopkeeper", "from": 18, "to": 18, "direction": "forward", "color": "#000000ff" },
+   { "name": "Taxman", "from": 19, "to": 19, "direction": "forward", "color": "#000000ff" },
+   { "name": "Necromancer", "from": 20, "to": 20, "direction": "forward", "color": "#000000ff" },
+   { "name": "Vampire", "from": 21, "to": 21, "direction": "forward", "color": "#000000ff" },
+   { "name": "Alchemist", "from": 22, "to": 22, "direction": "forward", "color": "#000000ff" },
+   { "name": "Apothecary", "from": 23, "to": 23, "direction": "forward", "color": "#000000ff" },
+   { "name": "Gnome", "from": 24, "to": 24, "direction": "forward", "color": "#000000ff" },
+   { "name": "Imp", "from": 25, "to": 25, "direction": "forward", "color": "#000000ff" },
+   { "name": "Shadow", "from": 26, "to": 26, "direction": "forward", "color": "#000000ff" },
+   { "name": "Ghost", "from": 27, "to": 27, "direction": "forward", "color": "#000000ff" },
+   { "name": "Wyrm", "from": 28, "to": 28, "direction": "forward", "color": "#000000ff" },
+   { "name": "Zephyr", "from": 29, "to": 29, "direction": "forward", "color": "#000000ff" }
   ]
  }
 }

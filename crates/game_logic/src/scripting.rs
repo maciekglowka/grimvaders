@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use crate::{
     commands::RuneCommand,
-    components::{Tag, Tile, ValueDefault},
+    components::{Position, Tag, Tile, ValueDefault},
     world::{Ent, World},
 };
 
@@ -13,10 +13,13 @@ pub fn init_rune(world: &World) -> Result<Vm> {
 
     let mut command_module = Module::new();
     command_module.ty::<RuneCommand>()?;
+    command_module.ty::<Position>()?;
+    command_module.function_meta(Position::partial_eq__meta)?;
     command_module.ty::<Tile>()?;
     command_module.function_meta(Tile::partial_eq__meta)?;
     command_module.ty::<Ent>()?;
     command_module.function_meta(Ent::clone)?;
+    command_module.function_meta(Ent::partial_eq__meta)?;
     command_module.ty::<Tag>()?;
     command_module.ty::<ValueDefault>()?;
     context.install(command_module)?;

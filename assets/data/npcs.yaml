@@ -22,3 +22,60 @@ Ghost:
   score: 3
   components:
     health: [3, 3]
+
+Imp:
+  sprite:
+    atlas: units
+    tag: Imp
+  tier: 2
+  score: 3
+  components:
+    health: [2, 2]
+    on_attack: "imp_attack"
+  script: >
+    pub fn imp_attack(world, entity, _) {
+      RuneCommand::ChangeFood(-1, Some(entity))
+    }
+  description: >
+    On attack: steal 1 food.
+
+Wyrm:
+  sprite:
+    atlas: units
+    tag: Wyrm
+  tier: 3
+  score: 4
+  components:
+    health: [3, 3]
+    on_damage: "wyrm_damage"
+  script: >
+    pub fn wyrm_damage(world, entity, _) {
+      RuneCommand::ChangeHealth(entity, 1)
+    }
+  description: >
+    On damage: gain +1 health.
+
+Zephyr:
+  sprite:
+    atlas: units
+    tag: Zephyr
+  tier: 4
+  score: 4
+  components:
+    health: [1, 1]
+    on_attack: "zephyr_attack"
+  script: >
+    pub fn zephyr_attack(world, entity, cmd) {
+      let position = world.get("position", entity).unwrap();
+      let commands  = [];
+      for player in world.get_players_in_column(position.x) {
+        // Do not damage the attacked player again.
+        if player != cmd.1 {
+          commands.push(RuneCommand::ChangeHealth(player, -1));
+        }
+      }
+      commands
+    }
+  description: >
+    On attack: damage every other player in the column for 1.
+

@@ -232,7 +232,10 @@ pub(crate) fn draw_description(entity: Entity, name: &str, world: &World, contex
             origin,
             UI_Z,
             BASE_TEXT_SIZE,
-            SpriteParams::default(),
+            SpriteParams {
+                color: RED_COLOR,
+                ..Default::default()
+            },
         );
     }
 }

@@ -463,7 +463,7 @@ Apothecary:
     player:
     trigger_limit: [3, 3]
   script: >
-    pub fn apothecary_damage(world, entity, cmd) {
+    pub fn apothecary_damage(world, entity, _) {
       let commands  = [];
       for player in world.get_adjacent_players(entity) {
         commands.push(RuneCommand::ChangeHealth(player, 1));
@@ -491,3 +491,15 @@ Clay Statue:
     }
   description: >
     Breaks when damaged.
+
+Stone Statue:
+  sprite:
+    atlas: units
+    tag: Stone Statue
+  tier: 4
+  components:
+    cost: 2
+    health: [5, 5]
+    player:
+    tags:
+      - !Heavy

@@ -1,5 +1,5 @@
 use anyhow::Result;
-use rune::{Diagnostics, Module, Value, Vm};
+use rune::{Diagnostics, Module, ToValue, Value, Vm};
 use std::sync::Arc;
 
 use crate::{
@@ -67,10 +67,15 @@ pub(crate) fn run_command_script(
 
     let result = match vm.call([script], (&*world, entity, command)) {
         // Do not early exit here - it will result in a missing Vm
-        Ok(output) => match output {
-            Value::Vec(_) => rune::from_value(output).ok(),
-            _ => rune::from_value(output).map(|v| vec![v]).ok(),
-        },
+        Ok(output) => {
+            if let Ok(value) = rune::from_value(&output) {
+                // If already a vec
+                Some(value)
+            } else {
+                // Otherwise wrap in a vec
+                rune::from_value(&output).map(|v| vec![v]).ok()
+            }
+        }
         Err(e) => {
             log::error!("Script {} failed: {}", script, e);
             None

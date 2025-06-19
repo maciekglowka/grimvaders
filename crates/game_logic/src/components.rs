@@ -1,4 +1,4 @@
-use rune::{runtime::VmResult, Any};
+use rune::{alloc::clone::TryClone, runtime::VmResult, Any};
 use serde::Deserialize;
 use std::ops::{Add, AddAssign, Sub, SubAssign};
 use wunderkammer::prelude::*;
@@ -94,7 +94,7 @@ pub(crate) const ORTHO: [Position; 4] = [
     Position { x: -1, y: 0 },
 ];
 
-#[derive(Any, Clone, Copy, Debug, Hash, PartialEq, Deserialize)]
+#[derive(Any, Clone, Copy, Debug, Hash, PartialEq, Deserialize, TryClone)]
 pub struct Position {
     #[rune(get)]
     pub x: i32,

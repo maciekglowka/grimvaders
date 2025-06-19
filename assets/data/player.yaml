@@ -259,7 +259,7 @@ Alchemist:
   script: >
     pub fn alchemist_fight(world, entity, _) {
       let food = world.get_current_food();
-      let val = food;
+      let val = (0.5 * food as f64).ceil() as i64;
 
       return [
         RuneCommand::ChangeFood(val, Some(entity.clone())),
@@ -268,7 +268,7 @@ Alchemist:
 
     }
   description: >
-    On fight start: double player's food. Take two damage.
+    On fight start: increase food by 50%. Take two damage.
 
 Shopkeeper:
   sprite:
@@ -304,9 +304,9 @@ Taxman:
     pub fn taxman_fight(world, entity, _) {
       let food = world.get_current_food();
       if food > 0 {
-        return RuneCommand::ChangeFood(-1, Some(entity));
+        RuneCommand::ChangeFood(-1, Some(entity))
       } else {
-        return RuneCommand::Kill(entity);
+        RuneCommand::Kill(entity)
       }
     }
   description: >

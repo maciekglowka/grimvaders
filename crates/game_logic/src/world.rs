@@ -1,4 +1,4 @@
-use rune::{Any, Module};
+use rune::{alloc::clone::TryClone, Any, Module};
 use wunderkammer::prelude::*;
 
 use crate::{components::*, get_tile_at, get_unit_at, player::PlayerData};
@@ -162,7 +162,7 @@ pub struct Resources {
     pub vm: Option<rune::Vm>,
 }
 
-#[derive(Any, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Any, Clone, Copy, Debug, PartialEq, Eq, TryClone)]
 pub struct Ent(u16, u16);
 impl Ent {
     #[rune::function]

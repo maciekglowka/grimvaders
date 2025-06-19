@@ -87,7 +87,7 @@ fn load_graphics(context: &mut Context) {
         "tiles",
         MaterialParams {
             atlas: Some(AtlasParams {
-                cols: 8,
+                cols: 12,
                 rows: 1,
                 padding: None,
             }),

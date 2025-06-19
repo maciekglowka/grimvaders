@@ -5,9 +5,9 @@ use game_logic::{get_unit_at, is_on_board, is_on_extended_board, InputEvent, Wor
 use crate::{
     draw::units::draw_deck_button,
     globals::{
-        ACTION_BUTTON_W, BASE_TEXT_SIZE, BUTTON_SIZE, BUTTON_TEXT_COLOR, DECK_BUTTON_H,
-        DECK_BUTTON_W, FIGHT_ICON, FOOD_COLOR, FOOD_ICON, GAP, HEALTH_ICON, ICON_SIZE, OVERLAY_Z,
-        PANEL_SPRTE, RED_COLOR, SPRITE_SIZE, TILE_SIZE, UI_Z, UNIT_ICON,
+        ACTION_BUTTON_W, BASE_TEXT_SIZE, BUTTON_SIZE, BUTTON_TEXT_COLOR, CURSOR_SPIRTE,
+        DECK_BUTTON_H, DECK_BUTTON_W, FIGHT_ICON, FOOD_COLOR, FOOD_ICON, GAP, HEALTH_ICON,
+        ICON_SIZE, OVERLAY_Z, PANEL_SPRTE, RED_COLOR, SPRITE_SIZE, TILE_SIZE, UI_Z, UNIT_ICON,
     },
     input::{ButtonState, InputState},
     ui::{Button, Span},
@@ -96,7 +96,7 @@ fn draw_cursor(
         if let Some(&position) = world.0.components.position.get(entity) {
             let _ = context.graphics.draw_atlas_sprite(
                 "tiles",
-                0,
+                CURSOR_SPIRTE,
                 tile_to_world(position),
                 OVERLAY_Z,
                 Vector2f::splat(TILE_SIZE),
@@ -113,7 +113,7 @@ fn draw_cursor(
 
     let _ = context.graphics.draw_atlas_sprite(
         "tiles",
-        0,
+        CURSOR_SPIRTE,
         tile_to_world(tile),
         OVERLAY_Z,
         Vector2f::splat(TILE_SIZE),
@@ -135,8 +135,8 @@ fn handle_hand(
     for (i, &entity) in world.0.resources.player_data.hand.iter().enumerate() {
         let origin = base
             + Vector2f::new(
-                -(GAP + DECK_BUTTON_W) * (i / 3) as f32,
-                (GAP + DECK_BUTTON_H) * (i % 3) as f32,
+                -(GAP + DECK_BUTTON_W) * (i % 3) as f32,
+                (GAP + DECK_BUTTON_H) * (i / 3) as f32,
             );
         let selected = state.input_mode == InputMode::HandUnit(entity);
 

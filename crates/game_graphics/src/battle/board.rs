@@ -10,7 +10,7 @@ use game_logic::{
 
 use crate::{
     draw::units::draw_entity_description,
-    globals::{TILE_SIZE, TILE_Z},
+    globals::{NPC_TILE_SPRITE, TILE_SIZE, TILE_Z, TOWN_SPRITE},
     input::InputState,
     utils::{get_z_offset, tile_to_world, world_to_tile},
 };
@@ -39,6 +39,14 @@ pub(super) fn draw_board(world: &World, context: &mut Context) {
                 Vector2f::splat(TILE_SIZE),
                 SpriteParams::default(),
             );
+            let _ = context.graphics.draw_atlas_sprite(
+                "tiles",
+                get_tile_sprite(t) + 1,
+                tile_to_world(*p),
+                TILE_Z + get_z_offset(*p) + 2,
+                Vector2f::splat(TILE_SIZE),
+                SpriteParams::default(),
+            );
         }
     );
 
@@ -47,7 +55,7 @@ pub(super) fn draw_board(world: &World, context: &mut Context) {
         let p = Position::new(x as i32, -1);
         let _ = context.graphics.draw_atlas_sprite(
             "tiles",
-            7,
+            TOWN_SPRITE + x % 2,
             tile_to_world(p),
             TILE_Z + get_z_offset(p),
             Vector2f::splat(TILE_SIZE),
@@ -61,7 +69,7 @@ pub(super) fn draw_board(world: &World, context: &mut Context) {
             let p = Position::new(x as i32, (BOARD_H + y) as i32);
             let _ = context.graphics.draw_atlas_sprite(
                 "tiles",
-                1,
+                NPC_TILE_SPRITE,
                 tile_to_world(p),
                 TILE_Z + get_z_offset(p),
                 Vector2f::splat(TILE_SIZE),
@@ -74,8 +82,8 @@ pub(super) fn draw_board(world: &World, context: &mut Context) {
 fn get_tile_sprite(tile: &Tile) -> usize {
     match &tile {
         Tile::Plains => 2,
-        Tile::Meadow => 3,
-        Tile::Field => 4,
-        Tile::Forest => 5,
+        Tile::Meadow => 4,
+        Tile::Field => 6,
+        Tile::Forest => 8,
     }
 }

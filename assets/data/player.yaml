@@ -303,14 +303,14 @@ Taxman:
   script: >
     pub fn taxman_fight(world, entity, _) {
       let food = world.get_current_food();
-      if food > 0 {
-        RuneCommand::ChangeFood(-1, Some(entity))
+      if food >= 2 {
+        RuneCommand::ChangeFood(-2, Some(entity))
       } else {
         RuneCommand::Kill(entity)
       }
     }
   description: >
-    On fight start: takes 1 food.
+    On fight start: takes 2 food to survive.
 
 # Death bonus units
 

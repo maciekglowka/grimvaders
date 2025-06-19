@@ -1,6 +1,9 @@
 use rogalik::prelude::*;
 
-use game_graphics::{globals::TILE_SIZE, utils::tile_to_world};
+use game_graphics::{
+    globals::{SIDE_PANEL_W, TILE_SIZE},
+    utils::tile_to_world,
+};
 use game_logic::{
     components::Position,
     globals::{BOARD_H, BOARD_W, MAX_WAVE_H},
@@ -64,19 +67,13 @@ fn main() {
     engine.run();
 }
 
-fn get_camera_center(vw: u32, vh: u32) -> Vector2f {
-    let bottom_left = tile_to_world(Position::new(0, 0));
-    let bottom_right = tile_to_world(Position::new(BOARD_W as i32, 0));
-    let upper_left = tile_to_world(Position::new(0, TOTAL_BOARD_H as i32));
-    let upper_right = tile_to_world(Position::new(BOARD_W as i32, TOTAL_BOARD_H as i32));
+fn get_camera_center(_: u32, _: u32) -> Vector2f {
+    let board_center = tile_to_world(Position::new(
+        BOARD_W as i32 / 2,
+        ((BOARD_H + MAX_WAVE_H - 1) / 2) as i32,
+    )) + Vector2f::splat(0.5 * TILE_SIZE);
 
-    let board_inner_size =
-        Vector2f::new(bottom_right.x - upper_left.x, upper_right.y - bottom_left.y);
-
-    Vector2f::new(
-        0.5 * (vw as f32 - board_inner_size.x) - TILE_SIZE,
-        0.5 * board_inner_size.y,
-    )
+    Vector2f::new(board_center.x + 0.5 * SIDE_PANEL_W, board_center.y)
 }
 
 fn get_target_resolution(context: &Context) -> (u32, u32) {

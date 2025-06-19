@@ -7,7 +7,7 @@ use crate::{
     globals::{
         BASE_TEXT_SIZE, BUTTON_CLICK_SHIFT, DECK_BUTTON_H, DECK_BUTTON_SPRITE,
         DECK_BUTTON_SPRITE_SELECTED, DECK_BUTTON_W, DIGITS_TEXT_SIZE, FOOD_COLOR, FOOD_ICON, GAP,
-        HEALTH_ICON, ICON_SIZE, RED_COLOR, SPRITE_SIZE, TEXT_LINE_GAP, UI_Z,
+        HEALTH_ICON, ICON_SIZE, RED_COLOR, SIDE_PANEL_W, SPRITE_SIZE, TEXT_LINE_GAP, UI_Z,
     },
     input::InputState,
     ui::{Button, Span, TextBox},
@@ -153,36 +153,6 @@ pub(crate) fn draw_deck_button(
     // Return click status
     button.clicked(input_state)
 }
-
-// pub(crate) fn draw_deck_unit(
-//     entity: Entity,
-//     origin: Vector2f,
-//     z: i32,
-//     world: &World,
-//     context: &mut Context,
-// ) {
-//     let Some(name) = world.0.components.name.get(entity) else {
-//         return;
-//     };
-//     let Some(sprite) = get_sprite_data(name, world) else {
-//         return;
-//     };
-//     let _ = context.graphics.draw_atlas_sprite(
-//         &sprite.atlas,
-//         sprite.index,
-//         origin,
-//         z,
-//         Vector2f::splat(SPRITE_SIZE),
-//         SpriteParams::default(),
-//     );
-//     draw_unit_stats(
-//         entity,
-//         origin + Vector2f::new(0., SPRITE_SIZE - 2.),
-//         z + 1,
-//         world,
-//         context,
-//     );
-// }
 
 pub(crate) fn draw_entity_description(entity: Entity, world: &World, context: &mut Context) {
     let Some(name) = world.components.name.get(entity) else {

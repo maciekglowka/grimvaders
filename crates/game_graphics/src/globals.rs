@@ -11,7 +11,8 @@ pub const BUTTON_SIZE: f32 = 0.5 * SPRITE_SIZE + GAP;
 pub const BUTTON_CLICK_SHIFT: f32 = 2.;
 pub const DECK_BUTTON_H: f32 = SPRITE_SIZE + 4. * GAP;
 pub const DECK_BUTTON_W: f32 = SPRITE_SIZE;
-pub const ACTION_BUTTON_W: f32 = 2. * DECK_BUTTON_W + GAP;
+pub const ACTION_BUTTON_W: f32 = 3. * DECK_BUTTON_W + 2. * GAP;
+pub const SIDE_PANEL_W: f32 = ACTION_BUTTON_W + GAP;
 
 pub const BUBBLE_Z: i32 = 150;
 pub const OVERLAY_Z: i32 = 100;
@@ -36,12 +37,15 @@ pub const DISINTEGRATE_SPEED: f32 = 2.;
 
 // PALETTE
 
-// pub const BACKGROUND_COLOR: Color = Color(54, 54, 70, 255);
-// pub const BACKGROUND_COLOR: Color = Color(56, 112, 127, 255);
 pub const BACKGROUND_COLOR: Color = Color(128, 121, 120, 255);
 pub const BUTTON_TEXT_COLOR: Color = Color(66, 53, 83, 255);
 pub const FOOD_COLOR: Color = Color(207, 131, 103, 255);
 pub const RED_COLOR: Color = Color(194, 97, 108, 255);
+
+// TILES
+pub const CURSOR_SPIRTE: usize = 0;
+pub const NPC_TILE_SPRITE: usize = 1;
+pub const TOWN_SPRITE: usize = 10;
 
 // ICONS
 pub const HEALTH_ICON: usize = 0;

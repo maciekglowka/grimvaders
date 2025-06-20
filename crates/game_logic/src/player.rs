@@ -2,7 +2,7 @@ use rand::prelude::*;
 use std::collections::VecDeque;
 use wunderkammer::prelude::*;
 
-use crate::{globals::HAND_SIZE, World};
+use crate::{globals::HAND_SIZE, utils::take_random, World};
 
 #[derive(Default)]
 pub struct PlayerData {
@@ -18,7 +18,7 @@ pub(crate) fn player_game_init(world: &mut World) {
     world.0.resources.player_data = PlayerData::default();
     world.0.resources.player_data.health = 5;
 
-    for name in ["Peasant", "Sheep", "Scarecrow", "Villager", "Villager"] {
+    for name in get_initial_squad() {
         let entity = crate::utils::spawn_by_name(name, world).unwrap();
         world.0.components.player.insert(entity, ());
         world.0.resources.player_data.draw.push_back(entity);
@@ -52,4 +52,18 @@ pub(crate) fn draw_hand(world: &mut World) {
             world.0.resources.player_data.hand.push(entity);
         }
     }
+}
+
+fn get_initial_squad() -> Vec<&'static str> {
+    let mut output = vec!["Scarecrow"];
+    let mut rng = thread_rng();
+    let special_unit_count = rng.gen_range(1..=2);
+    let mut special_units = vec!["Peasant", "Sheep", "Wanderer"];
+    for _ in 0..special_unit_count {
+        output.push(take_random(&mut special_units, &mut rng));
+    }
+    while output.len() < 5 {
+        output.push("Villager");
+    }
+    output
 }

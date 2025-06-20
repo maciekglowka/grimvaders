@@ -31,7 +31,65 @@ Scarecrow:
     health: [1, 1]
     player:
     tags:
-      - !Basic # Field units
+      - !Basic
+
+Knight:
+  sprite:
+    atlas: units
+    tag: Knight
+  tier: 5
+  components:
+    cost: 3
+    health: [4, 4]
+    player:
+    tags:
+      - !Basic
+
+# Basic bonus
+ 
+Wanderer:
+  sprite:
+    atlas: units
+    tag: Wanderer
+  tier: 1
+  components:
+    cost: 2
+    health: [1, 1]
+    on_spawn: "wanderer_spawn"
+    player:
+  script: >
+    pub fn wanderer_spawn(world, entity, _) {
+      let commands  = [];
+      for player in world.get_players_with_tag(Tag::Basic) {
+        commands.push(RuneCommand::ChangeHealth(player, 1));
+      }
+      commands
+    }
+  description: >
+    On spawn: give +1 health to all basic units.
+
+Chieftain:
+  sprite:
+    atlas: units
+    tag: Chieftain
+  tier: 4
+  components:
+    cost: 2
+    health: [2, 2]
+    on_fight: "chieftain_fight"
+    player:
+  script: >
+    pub fn chieftain_fight(world, entity, _) {
+      let commands  = [];
+      for player in world.get_players_with_tag(Tag::Basic) {
+        commands.push(RuneCommand::ChangeHealth(player, 1));
+      }
+      commands
+    }
+  description: >
+    On fight: give +1 health to all basic units.
+
+# Field units
 
 Peasant:
   sprite:

@@ -292,7 +292,7 @@ Thief:
   script: >
     pub fn thief_fight(world, entity, _) {
       let food = world.get_current_food();
-      let val = food;
+      let val = food as i64;
 
       return [
         RuneCommand::ChangeFood(-val, Some(entity.clone())),
@@ -452,7 +452,7 @@ Vampire:
     pub fn vampire_fight(world, entity, _) {
       if let Some(other) = world.get_player_in_front(entity) {
         if let Some(health) = world.get("health", other) {
-          let val = health.0;
+          let val = health.0 as i64;
           return [
             RuneCommand::ChangeHealth(other, -val),
             RuneCommand::ChangeHealth(entity, val),
@@ -528,7 +528,7 @@ Apothecary:
       commands
     }
   description: >
-    On damage: give +1 health to adjacent allies.
+    On non lethal damage: give +1 health to adjacent allies.
 
 # Other
 

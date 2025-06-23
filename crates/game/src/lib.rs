@@ -61,6 +61,7 @@ fn main() {
     env_logger::init();
     let engine = EngineBuilder::new()
         .with_title("RGLK".to_string())
+        .with_audio(AudioDeviceParams::default())
         .resizable(true)
         .with_logical_size(1280., 720.)
         .build(GameState::default(), Box::new(scenes::MainMenu));

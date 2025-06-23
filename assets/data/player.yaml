@@ -43,10 +43,9 @@ Knight:
     health: [4, 4]
     player:
     tags:
-      - !Basic
+      - !Basic # Basic bonus
 
-# Basic bonus
- 
+
 Wanderer:
   sprite:
     atlas: units
@@ -112,7 +111,7 @@ Peasant:
       }
     }
   description: >
-    On fight start: gain +1 food, when on a field tile.
+    On fight start: gain +1 food, if on a field tile.
 
 # Meadow units
 
@@ -160,7 +159,7 @@ Sheep:
       }
     }
   description: >
-    On fight start: gain +1 health, when on a meadow tile.
+    On fight start: gain +1 health, if on a meadow tile.
 
 # Forest units
 
@@ -186,7 +185,7 @@ Hunter:
       }
     }
   description: >
-    On fight start: gain +2 food, when on a forest tile.
+    On fight start: gain +2 food, if on a forest tile.
 
 Ranger:
   sprite:
@@ -278,7 +277,7 @@ Beggar:
       }
     }
   description: >
-    When adjacent ally yields food, gain the same amount of health.
+    When an adjacent ally yields food, gain the same amount of health.
 
 Thief:
   sprite:
@@ -302,7 +301,7 @@ Thief:
 
     }
   description: >
-    On fight start: take all player's food and gain this much health.
+    On fight start: take all player's food and gain that much health.
 
 Alchemist:
   sprite:
@@ -326,7 +325,7 @@ Alchemist:
 
     }
   description: >
-    On fight start: increase food by 50%. Take two damage.
+    On fight start: increase player's food by 50%. Take two damage.
 
 Shopkeeper:
   sprite:
@@ -346,7 +345,7 @@ Shopkeeper:
       }
     }
   description: >
-    When ally yields food, yield the same amount as well.
+    When an ally yields food, yield the same amount as well.
 
 Taxman:
   sprite:
@@ -412,7 +411,7 @@ Santo Subito:
       commands
     }
   description: >
-    On kill: increase health of each player's unit by 1.
+    On kill: increase the health of each player's unit by 1.
 
 Mime:
   sprite:
@@ -483,7 +482,7 @@ Necromancer:
       }
     }
   description: >
-    When ally is killed, respawn it.
+    When an ally is killed, respawn it.
 
 # Heal
 
@@ -507,7 +506,7 @@ Bard:
       }
     }
   description: >
-    When adjacent ally gains health, gain the same amount.
+    When an adjacent ally gains health, gain the same amount.
 
 Apothecary:
   sprite:

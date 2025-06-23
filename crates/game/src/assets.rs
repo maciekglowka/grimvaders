@@ -12,7 +12,12 @@ pub struct DataAssets {
 }
 
 pub fn load_assets(context: &mut Context) {
+    load_audio(context);
     load_graphics(context);
+}
+
+fn load_audio(context: &mut Context) {
+    context.audio.load_source("pick", "sfx/pick.wav");
 }
 
 fn load_graphics(context: &mut Context) {

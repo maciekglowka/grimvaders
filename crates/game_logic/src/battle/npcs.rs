@@ -20,7 +20,7 @@ pub(crate) fn next_wave(env: &mut GameEnv) {
     let mut rng = thread_rng();
 
     let pool = get_pool(tier, &env.world);
-    // let pool = vec![("Zephyr", 1)];
+    // let pool = vec![("Vortex", 1)];
     let mut layout = [const { Vec::new() }; BOARD_W];
 
     loop {

@@ -1,7 +1,12 @@
 use rune::{alloc::clone::TryClone, Any, Module};
 use wunderkammer::prelude::*;
 
-use crate::{components::*, get_tile_at, get_unit_at, player::PlayerData};
+use crate::{
+    components::*,
+    get_tile_at, get_unit_at,
+    globals::{BOARD_H, BOARD_W},
+    player::PlayerData,
+};
 use macros::{ComponentGen, RuneAdapter};
 
 #[derive(Default)]
@@ -20,6 +25,11 @@ impl World {
     #[rune::function]
     fn get_current_food(&self) -> u32 {
         self.resources.player_data.food
+    }
+
+    #[rune::function]
+    fn board_size(&self) -> (usize, usize) {
+        (BOARD_W, BOARD_H)
     }
 
     // Components

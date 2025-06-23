@@ -270,6 +270,14 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
     "duration": 100
+   },
+   "units 34.aseprite": {
+    "frame": { "x": 64, "y": 32, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
    }
  },
  "meta": {
@@ -313,7 +321,8 @@
    { "name": "Shadow", "from": 30, "to": 30, "direction": "forward", "color": "#000000ff" },
    { "name": "Ghost", "from": 31, "to": 31, "direction": "forward", "color": "#000000ff" },
    { "name": "Wyrm", "from": 32, "to": 32, "direction": "forward", "color": "#000000ff" },
-   { "name": "Zephyr", "from": 33, "to": 33, "direction": "forward", "color": "#000000ff" }
+   { "name": "Zephyr", "from": 33, "to": 33, "direction": "forward", "color": "#000000ff" },
+   { "name": "Vortex", "from": 34, "to": 34, "direction": "forward", "color": "#000000ff" }
   ]
  }
 }

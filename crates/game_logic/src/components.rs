@@ -95,6 +95,7 @@ pub(crate) const ORTHO: [Position; 4] = [
 ];
 
 #[derive(Any, Clone, Copy, Debug, Hash, PartialEq, Deserialize, TryClone)]
+#[rune(constructor)]
 pub struct Position {
     #[rune(get)]
     pub x: i32,

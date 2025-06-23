@@ -53,14 +53,14 @@ Wyrm:
       RuneCommand::ChangeHealth(entity, 1)
     }
   description: >
-    On damage: gain +1 health.
+    On non lethal damage: gain +1 health.
 
 Zephyr:
   sprite:
     atlas: units
     tag: Zephyr
   tier: 4
-  score: 4
+  score: 3
   components:
     health: [1, 1]
     on_attack: "zephyr_attack"
@@ -78,4 +78,25 @@ Zephyr:
     }
   description: >
     On attack: damage every other player in the column for 1.
+
+Vortex:
+  sprite:
+    atlas: units
+    tag: Vortex
+  tier: 4
+  score: 4
+  components:
+    health: [3, 3]
+    on_damage: "vortex_damage"
+  script: >
+    pub fn vortex_damage(world, entity, cmd) {
+      let position = world.get("position", entity).unwrap();
+      if position.x == 0 {
+        return;
+      }
+      let (w, h) = world.board_size();
+      RuneCommand::MoveUnit(entity, Position { x: position.x - 1, y: h })
+    }
+  description: >
+    On non lethal damage: jump to a previous column.
 

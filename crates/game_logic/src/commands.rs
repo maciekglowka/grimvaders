@@ -33,6 +33,8 @@ pub enum RuneCommand {
     #[rune(constructor)]
     SpawnUnit(#[rune(get)] Ent, #[rune(get)] Position),
     #[rune(constructor)]
+    MoveUnit(#[rune(get)] Ent, #[rune(get)] Position),
+    #[rune(constructor)]
     ChangeFood(#[rune(get)] i32, #[rune(get)] Option<Ent>),
     #[rune(constructor)]
     ChangeHealth(#[rune(get)] Ent, #[rune(get)] i32),
@@ -68,6 +70,7 @@ macro_rules! rune_send {
 impl RuneCommand {
     rune_send! {
             (Self::SpawnUnit(e, p) => SpawnUnit(e.into(), *p)),
+            (Self::MoveUnit(e, p) => MoveUnit(e.into(), *p)),
             (Self::ChangeFood(v, e) => ChangeFood(*v, e.map(|a| a.into()))),
             (Self::ChangeHealth(e, v) => ChangeHealth(e.into(), *v)),
             (Self::Attack(e, t) => Attack(e.into(), t.into())),

@@ -1,9 +1,10 @@
 struct GlobalsUniform {
     time: f32,
-    rw: u32,
-    rh: u32,
-    vw: u32,
-    vh: u32,
+    _padding_0: f32,
+    render_size: vec2<u32>,
+    viewport_size: vec2<u32>,
+    _padding_1: f32,
+    _padding_2: f32,
 }
 
 struct Uniform {
@@ -48,6 +49,7 @@ var<uniform> uniform: Uniform;
 var<uniform> globals: GlobalsUniform;
 
 
+const GLOW = 0.5;
 const KERNEL_DIM = 2;
 const THRESH_MIN = 0.05;
 const THRESH_MAX = 0.125;
@@ -56,8 +58,8 @@ const THRESH_MAX = 0.125;
 fn fs_main(vs: VertexOutput) -> @location(0) vec4<f32> {
     let col = textureSample(input_image, input_sampler, vs.uv);
 
-    let dx = 1.0 / f32(globals.vw);
-    let dy = 1.0 / f32(globals.vh);
+    let dx = 1.0 / f32(globals.viewport_size.x);
+    let dy = 1.0 / f32(globals.viewport_size.y);
 
     var n = vec4(0.);
 
@@ -71,6 +73,5 @@ fn fs_main(vs: VertexOutput) -> @location(0) vec4<f32> {
     n /= f32((2 * KERNEL_DIM + 1) * (2 * KERNEL_DIM + 1));
 
     let glow = smoothstep(vec4(THRESH_MIN), vec4(THRESH_MAX), n) * n;
-    // return glow;
-    return col + 0.2 * glow;
+    return col + GLOW * glow;
 }

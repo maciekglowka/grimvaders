@@ -1,11 +1,3 @@
-struct GlobalsUniform {
-    time: f32,
-    rw: u32,
-    rh: u32,
-    vw: u32,
-    vh: u32,
-}
-
 // Vertex shader
 struct CameraUniform {
     view_proj: mat4x4<f32>
@@ -41,9 +33,6 @@ fn vs_main(
 var t_diffuse: texture_2d<f32>;
 @group(0) @binding(1)
 var s_diffuse: sampler;
-
-@group(2) @binding(0)
-var<uniform> globals: GlobalsUniform;
 
 const NOISE = array(
     .1, .3, .124, .51, .78, .2, .51, .13,

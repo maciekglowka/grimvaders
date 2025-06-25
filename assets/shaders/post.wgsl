@@ -1,9 +1,10 @@
 struct GlobalsUniform {
     time: f32,
-    rw: u32,
-    rh: u32,
-    vw: u32,
-    vh: u32,
+    _padding_0: f32,
+    render_size: vec2<u32>,
+    viewport_size: vec2<u32>,
+    _padding_1: f32,
+    _padding_2: f32,
 }
 
 struct Uniform {
@@ -47,10 +48,17 @@ var<uniform> uniform: Uniform;
 @group(1) @binding(0)
 var<uniform> globals: GlobalsUniform;
 
+const STRIPE_MIN = 0.9;
+
 @fragment
 fn fs_main(vs: VertexOutput) -> @location(0) vec4<f32> {
     let col = textureSample(input_image, input_sampler, vs.uv);
+    let scale_x = f32(globals.viewport_size.x / globals.render_size.x);
+    let scale_y = f32(globals.viewport_size.y / globals.render_size.y);
 
-    let y = vs.uv.y * f32(globals.vh);
-    return 1.25 * col * max(0.75, f32(ceil(y) % 2));
+    let y = vs.uv.y * f32(globals.viewport_size.y);
+    let stripe_y = min(1., STRIPE_MIN + floor(y / scale_y) % 2);
+    let x = vs.uv.x * f32(globals.viewport_size.x);
+    let stripe_x = min(1., STRIPE_MIN + floor(x / scale_x) % 2);
+    return vec4(col.r * stripe_x, col.g * stripe_y, col.b, col.a);
 }

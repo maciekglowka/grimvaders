@@ -152,6 +152,8 @@ fn load_graphics(context: &mut Context) {
         Some(outline_text),
     );
 
+    // Shaders
+
     // let noise_shader = context
     //     .graphics
     //     .load_shader(ShaderKind::PostProcess, "shaders/noise.wgsl");
@@ -166,17 +168,17 @@ fn load_graphics(context: &mut Context) {
     //     },
     // );
 
-    let scanline_shader = context
+    let post_shader = context
         .graphics
-        .load_shader(ShaderKind::PostProcess, "shaders/scanline.wgsl");
+        .load_shader(ShaderKind::PostProcess, "shaders/post.wgsl");
 
-    // context.graphics.add_post_process(
-    //     "scanline",
-    //     PostProcessParams {
-    //         shader: scanline_shader,
-    //         ..Default::default()
-    //     },
-    // );
+    context.graphics.add_post_process(
+        "post",
+        PostProcessParams {
+            shader: post_shader,
+            ..Default::default()
+        },
+    );
 
     let glow_shader = context
         .graphics

@@ -2,8 +2,11 @@
 
 ## Player Units
 
+- Health units
+- Food units
+- Death units?
+
 
 ## NPCs
 
-- change column after hit (if survived)
 - deal extra damage after damaged? (if survived)

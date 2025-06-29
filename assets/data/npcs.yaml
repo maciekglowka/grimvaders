@@ -107,13 +107,13 @@ Lump:
   tier: 4
   score: 4
   components:
-    health: 5
+    health: 6
     on_damage: "lump_damage"
     trigger_limit: [1, 1]
   script: >
     pub fn lump_damage(world, entity, cmd) {
-      RuneCommand::ChangeHealth(entity, -2)
+      RuneCommand::ChangeHealth(entity, -3)
     }
   description: >
-    On non lethal damage: loose 2 health.
+    On non lethal damage: loose 3 health.
 

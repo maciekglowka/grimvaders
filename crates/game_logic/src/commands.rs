@@ -3,18 +3,17 @@ use rune::Any;
 use wunderkammer::prelude::*;
 
 use crate::{
-    battle::player::{remove_player_from_board, reset_player},
+    battle::player::{remove_player_from_board, spawn_player_by_name},
     components::{Position, Tag},
     scripting::run_command_script,
-    utils::get_unit_at,
+    utils::{get_data_by_name, get_unit_at},
     world::{Ent, World},
 };
 
 // Commands
 
 pub struct ChangeFood(pub i32, pub Option<Entity>);
-pub struct RedrawHand;
-pub struct SummonPlayer(pub Entity, pub Position);
+pub struct SummonPlayer(pub String, pub Position);
 pub struct SpawnUnit(pub Entity, pub Position);
 pub struct MoveUnit(pub Entity, pub Position);
 pub struct Attack(pub Entity, pub Entity);
@@ -85,7 +84,6 @@ impl RuneCommand {
 pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
     scheduler.add_system(change_food);
     scheduler.add_system_with_priority(handle_on_ally_gain_food, 1);
-    scheduler.add_system(redraw_hand);
     scheduler.add_system(summon_player);
     scheduler.add_system(spawn_unit);
     scheduler.add_system_with_priority(handle_on_spawn, 1);
@@ -193,22 +191,6 @@ fn handle_on_ally_gain_food(
     Ok(())
 }
 
-fn redraw_hand(
-    _: &mut RedrawHand,
-    world: &mut World,
-    cx: &mut SchedulerContext,
-) -> Result<(), CommandError> {
-    let cost = 1;
-    if world.resources.player_data.food < cost {
-        return Err(CommandError::Break);
-    }
-
-    crate::player::draw_hand(world);
-
-    cx.send(ChangeFood(-(cost as i32), None));
-    Ok(())
-}
-
 fn summon_player(
     cmd: &mut SummonPlayer,
     world: &mut World,
@@ -217,25 +199,24 @@ fn summon_player(
     if get_unit_at(world, cmd.1).is_some() {
         return Err(CommandError::Break);
     }
-    let &cost = world
-        .components
+    let cost = get_data_by_name(&cmd.0, world)
+        .ok_or(CommandError::Break)?
         .cost
-        .get(cmd.0)
-        .ok_or(CommandError::Break)?;
+        .unwrap_or_default();
 
     let data = &mut world.resources.player_data;
 
-    if !data.hand.contains(&cmd.0) {
+    if !data.deck.contains(&cmd.0) {
         return Err(CommandError::Break);
     }
     if cost > data.food {
         return Err(CommandError::Break);
     }
 
-    data.hand.retain(|a| *a != cmd.0);
+    let entity = spawn_player_by_name(&cmd.0, world).ok_or(CommandError::Break)?;
 
-    cx.send(SpawnUnit(cmd.0, cmd.1));
     cx.send(ChangeFood(-(cost as i32), None));
+    cx.send(SpawnUnit(entity, cmd.1));
 
     Ok(())
 }
@@ -298,8 +279,8 @@ fn attack(
         .get(cmd.1)
         .ok_or(CommandError::Break)?;
 
-    cx.send(ChangeHealth(cmd.1, -(health_0.current() as i32)));
-    cx.send(ChangeHealth(cmd.0, -(health_1.current() as i32)));
+    cx.send(ChangeHealth(cmd.1, -(*health_0 as i32)));
+    cx.send(ChangeHealth(cmd.0, -(*health_1 as i32)));
     Ok(())
 }
 
@@ -329,11 +310,7 @@ fn attack_town(
         .health
         .get(cmd.0)
         .ok_or(CommandError::Break)?;
-    world.resources.player_data.health = world
-        .resources
-        .player_data
-        .health
-        .saturating_sub(health.current());
+    world.resources.player_data.health = world.resources.player_data.health.saturating_sub(*health);
 
     // npc is removed
     cx.send(Kill(cmd.0));
@@ -352,12 +329,12 @@ fn change_health(
         .ok_or(CommandError::Break)?;
 
     if cmd.1 < 0 {
-        health.sub((-cmd.1) as u32);
-        if health.current() == 0 {
+        *health = health.saturating_sub((-cmd.1) as u32);
+        if *health == 0 {
             cx.send(Kill(cmd.0));
         }
     } else {
-        health.add(cmd.1 as u32);
+        *health += cmd.1 as u32;
     }
     Ok(())
 }
@@ -373,12 +350,11 @@ fn handle_on_damage(
     }
 
     // Only trigger when the unit is still alive
-    if world
+    if *world
         .components
         .health
         .get(cmd.0)
         .ok_or(CommandError::Break)?
-        .current()
         == 0
     {
         return Ok(());
@@ -465,8 +441,14 @@ fn respawn_player(
     if world.components.killed.get(cmd.0).is_none() {
         return Err(CommandError::Break);
     }
-    reset_player(cmd.0, world);
-    cx.send(SpawnUnit(cmd.0, cmd.1));
+    let name = world
+        .components
+        .name
+        .get(cmd.0)
+        .ok_or(CommandError::Break)?
+        .to_string();
+    let entity = spawn_player_by_name(&name, world).ok_or(CommandError::Break)?;
+    cx.send(SpawnUnit(entity, cmd.1));
     Ok(())
 }
 

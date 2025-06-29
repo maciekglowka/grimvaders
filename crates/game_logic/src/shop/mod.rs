@@ -5,7 +5,7 @@ use crate::{events::InputEvent, globals::SHOP_SIZE, utils::spawn_by_name, GameEn
 
 #[derive(Default)]
 pub struct ShopState {
-    pub choices: [Option<Entity>; SHOP_SIZE],
+    pub choices: [Option<String>; SHOP_SIZE],
     pub done: bool,
 }
 
@@ -13,19 +13,16 @@ pub fn shop_init(state: &mut ShopState, env: &mut GameEnv) {
     let level = env.world.resources.player_data.level;
     println!("Tier: {}", level);
     for (i, name) in get_choices(level, &env.world).iter().enumerate() {
-        let Some(name) = name else {
-            continue;
-        };
-        state.choices[i] = spawn_by_name(name, &mut env.world);
+        state.choices[i] = name.as_ref().map(|a| a.to_string());
     }
 }
 
 pub fn shop_exit(state: &mut ShopState, env: &mut GameEnv) {
-    for entity in state.choices {
-        if let Some(entity) = entity {
-            env.world.despawn(entity);
-        }
-    }
+    // for entity in state.choices {
+    //     if let Some(entity) = entity {
+    //         env.world.despawn(entity);
+    //     }
+    // }
 }
 
 pub fn shop_update(state: &mut ShopState, env: &mut GameEnv) {
@@ -39,11 +36,11 @@ pub fn shop_update(state: &mut ShopState, env: &mut GameEnv) {
 }
 
 fn pick_unit(i: usize, state: &mut ShopState, env: &mut GameEnv) {
-    let Some(entity) = state.choices[i] else {
+    let Some(name) = &state.choices[i] else {
         return;
     };
 
-    env.world.resources.player_data.draw.push_back(entity);
+    env.world.resources.player_data.deck.push(name.to_string());
     state.choices[i] = None;
     state.done = true;
 }
@@ -51,7 +48,8 @@ fn pick_unit(i: usize, state: &mut ShopState, env: &mut GameEnv) {
 fn get_choices(tier: u32, world: &World) -> [Option<String>; SHOP_SIZE] {
     let filtered = world.resources.data.categories["player"]
         .iter()
-        .filter_map(|n| world.0.resources.data.entities.get(n).map(|e| (n, e)))
+        .filter_map(|n| world.resources.data.entities.get(n).map(|e| (n, e)))
+        .filter(|(n, _)| !world.resources.player_data.deck.contains(n))
         .filter(|(_, e)| e.tier.unwrap_or(0) <= tier)
         .map(|(n, e)| {
             let tier_dist = 0.8 / tier as f32 * e.tier.unwrap_or(1) as f32 + 0.2;

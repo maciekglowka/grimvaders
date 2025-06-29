@@ -140,8 +140,7 @@ impl std::ops::DerefMut for World {
 
 #[derive(Any, Default, ComponentSet, RuneAdapter, ComponentGen)]
 pub struct Components {
-    pub cost: ComponentStorage<u32>,
-    pub health: ComponentStorage<ValueDefault>,
+    pub health: ComponentStorage<u32>,
     // temp marker
     pub killed: ComponentStorage<()>,
     pub name: ComponentStorage<String>,

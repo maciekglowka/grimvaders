@@ -99,8 +99,9 @@ fn handle_command_queue(env: &mut GameEnv) -> bool {
 fn handle_input_events(env: &mut GameEnv) -> Option<()> {
     while let Some(event) = env.input.as_ref().unwrap().next() {
         match event {
-            InputEvent::SummonPlayer(entity, target) => {
-                env.scheduler.send(commands::SummonPlayer(entity, target));
+            InputEvent::SummonPlayer(idx, target) => {
+                let name = env.world.resources.player_data.deck[idx].to_string();
+                env.scheduler.send(commands::SummonPlayer(name, target));
             }
             InputEvent::MoveUnit(entity, target) => {
                 env.scheduler.send(commands::MoveUnit(entity, target));
@@ -108,7 +109,6 @@ fn handle_input_events(env: &mut GameEnv) -> Option<()> {
             InputEvent::Done => {
                 fight_start(env);
             }
-            InputEvent::RedrawHand => env.scheduler.send(commands::RedrawHand),
             _ => (),
         }
     }

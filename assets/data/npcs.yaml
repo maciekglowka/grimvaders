@@ -4,7 +4,7 @@ Gnome:
     tag: Gnome
   score: 1
   components:
-    health: [1, 1]
+    health: 1
 
 Shadow:
   sprite:
@@ -12,7 +12,7 @@ Shadow:
     tag: Shadow
   score: 2
   components:
-    health: [2, 2]
+    health: 2
 
 Ghost:
   sprite:
@@ -21,7 +21,7 @@ Ghost:
   tier: 2
   score: 3
   components:
-    health: [3, 3]
+    health: 3
 
 Imp:
   sprite:
@@ -30,7 +30,7 @@ Imp:
   tier: 2
   score: 3
   components:
-    health: [2, 2]
+    health: 2
     on_attack: "imp_attack"
   script: >
     pub fn imp_attack(world, entity, _) {
@@ -46,7 +46,7 @@ Wyrm:
   tier: 3
   score: 4
   components:
-    health: [3, 3]
+    health: 3
     on_damage: "wyrm_damage"
   script: >
     pub fn wyrm_damage(world, entity, _) {
@@ -62,7 +62,7 @@ Zephyr:
   tier: 4
   score: 3
   components:
-    health: [1, 1]
+    health: 1
     on_attack: "zephyr_attack"
   script: >
     pub fn zephyr_attack(world, entity, cmd) {
@@ -86,7 +86,7 @@ Vortex:
   tier: 4
   score: 4
   components:
-    health: [3, 3]
+    health: 3
     on_damage: "vortex_damage"
   script: >
     pub fn vortex_damage(world, entity, cmd) {
@@ -107,7 +107,7 @@ Lump:
   tier: 4
   score: 4
   components:
-    health: [5, 5]
+    health: 5
     on_damage: "lump_damage"
     trigger_limit: [1, 1]
   script: >

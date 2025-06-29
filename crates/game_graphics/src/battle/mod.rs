@@ -24,7 +24,7 @@ use game_logic::{commands, GameEnv, InputEvent, World};
 enum InputMode {
     #[default]
     None,
-    HandUnit(Entity),
+    DeckUnit(usize),
     BoardUnit(Entity),
 }
 

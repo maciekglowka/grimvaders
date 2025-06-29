@@ -740,6 +740,8 @@ dependencies = [
  "log",
  "rand",
  "rogalik",
+ "serde",
+ "serde_yaml",
  "wunderkammer",
 ]
 

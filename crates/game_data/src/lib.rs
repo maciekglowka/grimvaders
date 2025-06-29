@@ -23,6 +23,7 @@ pub struct EntityData {
     pub components: HashMap<String, serde_yaml::Value>,
     pub sprite: SpriteData,
     pub chance: Option<f32>,
+    pub cost: Option<u32>,
     pub tier: Option<u32>,
     pub score: Option<u32>,
     #[serde(default)]

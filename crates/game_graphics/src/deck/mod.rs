@@ -16,7 +16,7 @@ use crate::{
 #[derive(Default)]
 pub struct DeckGraphics {
     pub input_queue: ObservableQueue<InputEvent>,
-    selected: Option<Entity>,
+    selected: Option<usize>,
 }
 
 pub fn deck_draw(
@@ -42,16 +42,16 @@ pub fn deck_draw(
 
     let mut origin = center + Vector2f::new(-2.5 * w, TILE_SIZE + GAP);
 
-    for (i, entity) in world.0.resources.player_data.draw.iter().enumerate() {
-        let selected = state.selected == Some(*entity);
+    for (i, name) in world.0.resources.player_data.deck.iter().enumerate() {
+        let selected = state.selected == Some(i);
 
-        let clicked = draw_deck_button(*entity, origin, 0, selected, world, context, input_state);
+        let clicked = draw_deck_button(name, origin, 0, selected, world, context, input_state);
 
         if clicked {
-            if state.selected == Some(*entity) {
+            if state.selected == Some(i) {
                 state.selected = None
             } else {
-                state.selected = Some(*entity)
+                state.selected = Some(i)
             }
         }
 

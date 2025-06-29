@@ -65,16 +65,17 @@ var<uniform> globals: GlobalsUniform;
 fn fs_main(vs: VertexOutput) -> @location(0) vec4<f32> {
      
     // CHROMATIC
-    var col = vec4(1.);
-    let pixel_size = 1. / f32(globals.viewport_size.x);
-    let offset = vec2(pixel_size);
-    col.r = textureSample(input_image, input_sampler, vs.uv - offset).r;
-    col.g = textureSample(input_image, input_sampler, vs.uv).g;
-    col.b = textureSample(input_image, input_sampler, vs.uv + offset).b;
+     
+    // var col = vec4(1.);
+    // let pixel_size = 1. / f32(globals.viewport_size.x);
+    // let offset = vec2(pixel_size);
+    // col.r = textureSample(input_image, input_sampler, vs.uv - offset).r;
+    // col.g = textureSample(input_image, input_sampler, vs.uv).g;
+    // col.b = textureSample(input_image, input_sampler, vs.uv + offset).b;
 
     // DOTS
 
-    // let col = textureSample(input_image, input_sampler, vs.uv);
+    let col = textureSample(input_image, input_sampler, vs.uv);
     let scale_x = f32(globals.viewport_size.x / globals.render_size.x);
     let scale_y = f32(globals.viewport_size.y / globals.render_size.y);
 

@@ -1,69 +1,37 @@
 use rand::prelude::*;
-use std::collections::VecDeque;
-use wunderkammer::prelude::*;
 
-use crate::{globals::HAND_SIZE, utils::take_random, World};
+use crate::{utils::take_random, World};
 
 #[derive(Default)]
 pub struct PlayerData {
-    pub draw: VecDeque<Entity>,
-    pub discard: Vec<Entity>,
-    pub hand: Vec<Entity>,
+    pub deck: Vec<String>,
     pub level: u32,
     pub health: u32,
     pub food: u32,
 }
 
 pub(crate) fn player_game_init(world: &mut World) {
-    world.0.resources.player_data = PlayerData::default();
-    world.0.resources.player_data.health = 5;
-
-    for name in get_initial_squad() {
-        let entity = crate::utils::spawn_by_name(name, world).unwrap();
-        world.0.components.player.insert(entity, ());
-        world.0.resources.player_data.draw.push_back(entity);
-    }
-}
-
-pub(crate) fn reset_deck(world: &mut World) {
-    let mut rng = thread_rng();
-
-    let mut deck: Vec<_> = world.0.resources.player_data.draw.drain(..).collect();
-    deck.append(&mut world.resources.player_data.hand);
-    deck.append(&mut world.resources.player_data.discard);
-    deck.shuffle(&mut rng);
-    world.0.resources.player_data.draw = deck.into();
-}
-
-pub(crate) fn draw_hand(world: &mut World) {
-    world
-        .0
-        .resources
-        .player_data
-        .discard
-        .append(&mut world.0.resources.player_data.hand);
-
-    if world.0.resources.player_data.draw.len() < HAND_SIZE {
-        reset_deck(world);
-    }
-
-    for _ in 0..HAND_SIZE {
-        if let Some(entity) = world.0.resources.player_data.draw.pop_front() {
-            world.0.resources.player_data.hand.push(entity);
-        }
-    }
+    world.resources.player_data = PlayerData::default();
+    world.resources.player_data.health = 5;
+    world.resources.player_data.deck = get_initial_squad().iter().map(|a| a.to_string()).collect();
 }
 
 fn get_initial_squad() -> Vec<&'static str> {
-    let mut output = vec!["Scarecrow"];
     let mut rng = thread_rng();
-    let special_unit_count = rng.gen_range(1..=2);
-    let mut special_units = vec!["Peasant", "Sheep", "Wanderer"];
-    for _ in 0..special_unit_count {
-        output.push(take_random(&mut special_units, &mut rng));
-    }
-    while output.len() < 5 {
-        output.push("Villager");
-    }
-    output
+    let extra_unit = ["Peasant", "Sheep", "Wanderer"].choose(&mut rng).unwrap();
+    vec!["Scarecrow", "Villager", extra_unit]
 }
+
+// fn get_initial_squad() -> Vec<&'static str> {
+//     let mut output = vec!["Scarecrow"];
+//     let mut rng = thread_rng();
+//     let special_unit_count = rng.gen_range(1..=2);
+//     let mut special_units = vec!["Peasant", "Sheep", "Wanderer"];
+//     for _ in 0..special_unit_count {
+//         output.push(take_random(&mut special_units, &mut rng));
+//     }
+//     while output.len() < 5 {
+//         output.push("Villager");
+//     }
+//     output
+// }

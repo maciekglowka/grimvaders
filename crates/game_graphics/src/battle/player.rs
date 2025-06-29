@@ -69,10 +69,8 @@ fn handle_input_player(
                 state.input_mode = InputMode::BoardUnit(entity);
             } else {
                 match state.input_mode {
-                    InputMode::HandUnit(entity) => {
-                        state
-                            .input_queue
-                            .push(InputEvent::SummonPlayer(entity, tile));
+                    InputMode::DeckUnit(idx) => {
+                        state.input_queue.push(InputEvent::SummonPlayer(idx, tile));
                         state.input_mode = InputMode::None;
                     }
                     InputMode::BoardUnit(entity) => {
@@ -132,41 +130,41 @@ fn handle_hand(
     let bottom = bounds.0.y + BUTTON_SIZE + 2. * GAP;
     let base = Vector2f::new(bounds.1.x - SPRITE_SIZE - GAP, bottom + BUTTON_SIZE + GAP);
 
-    for (i, &entity) in world.0.resources.player_data.hand.iter().enumerate() {
+    for (i, name) in world.0.resources.player_data.deck.iter().enumerate() {
         let origin = base
             + Vector2f::new(
                 -(GAP + DECK_BUTTON_W) * (i % 3) as f32,
                 (GAP + DECK_BUTTON_H) * (i / 3) as f32,
             );
-        let selected = state.input_mode == InputMode::HandUnit(entity);
+        let selected = state.input_mode == InputMode::DeckUnit(i);
 
-        let clicked = draw_deck_button(entity, origin, UI_Z, selected, world, context, input_state);
+        let clicked = draw_deck_button(name, origin, UI_Z, selected, world, context, input_state);
 
         if take_input && clicked {
             if selected {
                 state.input_mode = InputMode::None
             } else {
-                state.input_mode = InputMode::HandUnit(entity);
+                state.input_mode = InputMode::DeckUnit(i);
             }
         }
     }
 
-    let reroll = Button::new(
-        Vector2f::new(bounds.1.x - ACTION_BUTTON_W - GAP, bottom),
-        Vector2f::new(ACTION_BUTTON_W, BUTTON_SIZE),
-        UI_Z,
-    )
-    .with_span(
-        Span::new()
-            .with_sprite("icons_small", UNIT_ICON)
-            .with_spacer(2.)
-            .with_text_borrowed("Reroll")
-            .with_sprite_size(ICON_SIZE),
-    );
-    reroll.draw(context, input_state);
-    if reroll.clicked(input_state) {
-        state.input_queue.push(InputEvent::RedrawHand);
-    }
+    // let reroll = Button::new(
+    //     Vector2f::new(bounds.1.x - ACTION_BUTTON_W - GAP, bottom),
+    //     Vector2f::new(ACTION_BUTTON_W, BUTTON_SIZE),
+    //     UI_Z,
+    // )
+    // .with_span(
+    //     Span::new()
+    //         .with_sprite("icons_small", UNIT_ICON)
+    //         .with_spacer(2.)
+    //         .with_text_borrowed("Reroll")
+    //         .with_sprite_size(ICON_SIZE),
+    // );
+    // reroll.draw(context, input_state);
+    // if reroll.clicked(input_state) {
+    //     state.input_queue.push(InputEvent::RedrawHand);
+    // }
 }
 
 pub(super) fn draw_status(state: &super::BattleGraphics, world: &World, context: &mut Context) {

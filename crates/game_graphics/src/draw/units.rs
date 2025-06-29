@@ -1,13 +1,13 @@
 use rogalik::prelude::*;
 use wunderkammer::prelude::*;
 
-use game_logic::World;
+use game_logic::{components::ValueDefault, get_data_by_name, World};
 
 use crate::{
     globals::{
         BASE_TEXT_SIZE, BUTTON_CLICK_SHIFT, DECK_BUTTON_H, DECK_BUTTON_SPRITE,
         DECK_BUTTON_SPRITE_SELECTED, DECK_BUTTON_W, DIGITS_TEXT_SIZE, FOOD_COLOR, FOOD_ICON, GAP,
-        HEALTH_ICON, ICON_SIZE, RED_COLOR, SIDE_PANEL_W, SPRITE_SIZE, TEXT_LINE_GAP, UI_Z,
+        HEALTH_ICON, ICON_SIZE, RED_COLOR, SPRITE_SIZE, TEXT_LINE_GAP, UI_Z,
     },
     input::InputState,
     ui::{Button, Span, TextBox},
@@ -16,8 +16,8 @@ use crate::{
 
 use super::sprites::get_sprite_data;
 
-pub(crate) fn draw_unit_stats(
-    entity: Entity,
+pub(crate) fn draw_deck_unit_stats(
+    data: &game_data::EntityData,
     origin: Vector2f,
     z: i32,
     world: &World,
@@ -25,12 +25,12 @@ pub(crate) fn draw_unit_stats(
 ) {
     let mut spans = Vec::new();
 
-    if let Some(health) = world.0.components.health.get(entity) {
+    if let Some(health) = component_from_data::<u32>(data, "health") {
         spans.push(
             Span::new()
                 .with_sprite("icons_small", HEALTH_ICON)
                 .with_spacer(1.)
-                .with_text_owned(format!("{}", health.current()))
+                .with_text_owned(format!("{}", health))
                 .with_text_color(RED_COLOR)
                 .with_font("digits")
                 .with_text_size(DIGITS_TEXT_SIZE)
@@ -38,7 +38,7 @@ pub(crate) fn draw_unit_stats(
         );
     }
 
-    if let Some(cost) = world.0.components.cost.get(entity) {
+    if let Some(cost) = data.cost {
         spans.push(Span::new().with_spacer(2.));
         spans.push(
             Span::new()
@@ -73,11 +73,11 @@ pub(crate) fn draw_unit_overlay(
     world: &World,
     context: &mut Context,
 ) {
-    let Some(health) = world.0.components.health.get(entity) else {
+    let Some(health) = world.components.health.get(entity) else {
         return;
     };
 
-    let t = format!("{}", health.current());
+    let t = format!("{}", health);
     let w = context
         .graphics
         .text_dimensions("digits_outline", &t, DIGITS_TEXT_SIZE)
@@ -102,7 +102,7 @@ pub(crate) fn draw_unit_overlay(
 }
 
 pub(crate) fn draw_deck_button(
-    entity: Entity,
+    name: &str,
     origin: Vector2f,
     z: i32,
     selected: bool,
@@ -124,26 +124,26 @@ pub(crate) fn draw_deck_button(
     };
 
     if button.mouse_over(input_state) {
-        draw_entity_description(entity, world, context);
+        draw_description(name, world, context);
     }
 
-    // Draw unit sprite
-    if let Some(name) = world.0.components.name.get(entity) {
-        if let Some(sprite) = get_sprite_data(name, world) {
-            let _ = context.graphics.draw_atlas_sprite(
-                &sprite.atlas,
-                sprite.index,
-                origin + Vector2f::new(0., 2. * GAP - unit_offset),
-                z + 1,
-                Vector2f::splat(SPRITE_SIZE),
-                SpriteParams::default(),
-            );
-        }
+    let Some(data) = get_data_by_name(name, world) else {
+        return false;
     };
 
+    // Draw unit sprite
+    let _ = context.graphics.draw_atlas_sprite(
+        &data.sprite.atlas,
+        data.sprite.index,
+        origin + Vector2f::new(0., 2. * GAP - unit_offset),
+        z + 1,
+        Vector2f::splat(SPRITE_SIZE),
+        SpriteParams::default(),
+    );
+
     // Draw stats
-    draw_unit_stats(
-        entity,
+    draw_deck_unit_stats(
+        data,
         origin + Vector2f::new(0., DECK_BUTTON_H - 8. - unit_offset),
         z + 1,
         world,
@@ -158,11 +158,11 @@ pub(crate) fn draw_entity_description(entity: Entity, world: &World, context: &m
     let Some(name) = world.components.name.get(entity) else {
         return;
     };
-    draw_description(entity, name, world, context);
+    draw_description(name, world, context);
 }
 
-pub(crate) fn draw_description(entity: Entity, name: &str, world: &World, context: &mut Context) {
-    let Some(data) = world.resources.data.entities.get(name) else {
+pub(crate) fn draw_description(name: &str, world: &World, context: &mut Context) {
+    let Some(data) = get_data_by_name(name, world) else {
         return;
     };
 
@@ -184,7 +184,7 @@ pub(crate) fn draw_description(entity: Entity, name: &str, world: &World, contex
     if let Some(descr) = &data.description {
         let mut content = descr.to_string();
 
-        if let Some(limit) = world.components.trigger_limit.get(entity) {
+        if let Some(limit) = component_from_data::<ValueDefault>(data, "trigger_limit") {
             content += &format!("Triggers max {}x/turn.", limit.default());
         }
 
@@ -194,7 +194,7 @@ pub(crate) fn draw_description(entity: Entity, name: &str, world: &World, contex
         origin.y -= h - BASE_TEXT_SIZE;
     };
 
-    if let Some(tags) = world.components.tags.get(entity) {
+    if let Some(tags) = component_from_data::<Vec<game_logic::components::Tag>>(data, "tags") {
         let names: Vec<String> = tags.iter().map(|a| a.into()).collect();
         let _ = context.graphics.draw_text(
             "default",
@@ -208,4 +208,11 @@ pub(crate) fn draw_description(entity: Entity, name: &str, world: &World, contex
             },
         );
     }
+}
+
+fn component_from_data<T: serde::de::DeserializeOwned>(
+    data: &game_data::EntityData,
+    component: &str,
+) -> Option<T> {
+    serde_yaml::from_value(data.components.get(component)?.clone()).ok()
 }

@@ -34,10 +34,10 @@ pub fn shop_draw(
     let card_offset = Vector2f::new(0.5 * (w - DECK_BUTTON_W), 0.);
 
     for i in 0..logic_state.choices.len() {
-        if let Some(entity) = &logic_state.choices[i] {
+        if let Some(name) = &logic_state.choices[i] {
             let selected = state.selected == Some(i);
             let clicked = draw_deck_button(
-                *entity,
+                name,
                 origin + card_offset,
                 0,
                 selected,
@@ -54,24 +54,22 @@ pub fn shop_draw(
                 }
             }
 
-            if let Some(name) = world.components.name.get(*entity) {
-                let offset = Vector2f::new(
-                    0.5 * (w - context
-                        .graphics
-                        .text_dimensions("default", name, BASE_TEXT_SIZE)
-                        .x),
-                    -(BASE_TEXT_SIZE + GAP),
-                );
+            let offset = Vector2f::new(
+                0.5 * (w - context
+                    .graphics
+                    .text_dimensions("default", name, BASE_TEXT_SIZE)
+                    .x),
+                -(BASE_TEXT_SIZE + GAP),
+            );
 
-                let _ = context.graphics.draw_text(
-                    "default",
-                    name,
-                    origin + offset,
-                    0,
-                    BASE_TEXT_SIZE,
-                    SpriteParams::default(),
-                );
-            }
+            let _ = context.graphics.draw_text(
+                "default",
+                name,
+                origin + offset,
+                0,
+                BASE_TEXT_SIZE,
+                SpriteParams::default(),
+            );
         }
 
         origin.x += w;

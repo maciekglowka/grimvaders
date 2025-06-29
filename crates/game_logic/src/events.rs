@@ -5,9 +5,8 @@ use crate::components::Position;
 #[derive(Clone, Copy, Debug)]
 pub enum InputEvent {
     MoveUnit(Entity, Position),
-    SummonPlayer(Entity, Position),
-    RedrawHand,
+    SummonPlayer(usize, Position),
     Done,
     PickUnit(usize),
-    DiscardUnit(Entity),
+    DiscardUnit(usize),
 }

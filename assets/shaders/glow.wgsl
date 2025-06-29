@@ -49,10 +49,37 @@ var<uniform> uniform: Uniform;
 var<uniform> globals: GlobalsUniform;
 
 
-const GLOW = 0.5;
-const KERNEL_DIM = 2;
-const THRESH_MIN = 0.05;
-const THRESH_MAX = 0.125;
+// const GLOW = 0.5;
+// const KERNEL_DIM = 2;
+// const THRESH_MIN = 0.05;
+// const THRESH_MAX = 0.125;
+
+// @fragment
+// fn fs_main(vs: VertexOutput) -> @location(0) vec4<f32> {
+//     let col = textureSample(input_image, input_sampler, vs.uv);
+
+//     let dx = 1.0 / f32(globals.viewport_size.x);
+//     let dy = 1.0 / f32(globals.viewport_size.y);
+
+//     var n = vec4(0.);
+
+//     for (var x=-KERNEL_DIM; x<=KERNEL_DIM; x++) {
+//         for (var y=-KERNEL_DIM; y<=KERNEL_DIM; y++) {
+//             let g = textureSample(input_image, input_sampler, vs.uv + vec2(f32(x) * dx, f32(y) * dy));
+//             n += max(vec4(0.), g - col);
+//         }
+//     }
+
+//     n /= f32((2 * KERNEL_DIM + 1) * (2 * KERNEL_DIM + 1));
+
+//     let glow = smoothstep(vec4(THRESH_MIN), vec4(THRESH_MAX), n) * n;
+//     return col + GLOW * glow;
+// }
+ 
+const KERNEL_DIM = 1;
+const STEPS = 2;
+const THRESH_MIN = 0.01;
+const THRESH_MAX = 0.35;
 
 @fragment
 fn fs_main(vs: VertexOutput) -> @location(0) vec4<f32> {
@@ -63,15 +90,18 @@ fn fs_main(vs: VertexOutput) -> @location(0) vec4<f32> {
 
     var n = vec4(0.);
 
-    for (var x=-KERNEL_DIM; x<=KERNEL_DIM; x++) {
-        for (var y=-KERNEL_DIM; y<=KERNEL_DIM; y++) {
-            let g = textureSample(input_image, input_sampler, vs.uv + vec2(f32(x) * dx, f32(y) * dy));
-            n += max(vec4(0.), g - col);
+    for (var step=1.; step<=f32(STEPS); step+=1.) {
+        for (var x=-KERNEL_DIM; x<=KERNEL_DIM; x++) {
+            for (var y=-KERNEL_DIM; y<=KERNEL_DIM; y++) {
+                n += textureSample(input_image, input_sampler, vs.uv + vec2(f32(x) * dx * step, f32(y) * dy * step));
+            }
         }
     }
 
-    n /= f32((2 * KERNEL_DIM + 1) * (2 * KERNEL_DIM + 1));
+    n /= f32(STEPS) * f32((2 * KERNEL_DIM + 1) * (2 * KERNEL_DIM + 1));
 
-    let glow = smoothstep(vec4(THRESH_MIN), vec4(THRESH_MAX), n) * n;
-    return col + GLOW * glow;
+    let luma_n = dot(n, vec4(.299, .587, .114, .0));
+    let luma_col = dot(col, vec4(.299, .587, .114, .0));
+    let glow = n * smoothstep(THRESH_MIN, THRESH_MAX, max(0., luma_n - luma_col));
+    return col + glow;
 }

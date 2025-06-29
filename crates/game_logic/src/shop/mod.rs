@@ -43,7 +43,7 @@ fn pick_unit(i: usize, state: &mut ShopState, env: &mut GameEnv) {
         return;
     };
 
-    env.world.resources.player_data.draw.push_back(entity);
+    env.world.resources.player_data.deck.push(entity);
     state.choices[i] = None;
     state.done = true;
 }

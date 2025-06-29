@@ -13,7 +13,6 @@ use crate::{
 // Commands
 
 pub struct ChangeFood(pub i32, pub Option<Entity>);
-pub struct RedrawHand;
 pub struct SummonPlayer(pub Entity, pub Position);
 pub struct SpawnUnit(pub Entity, pub Position);
 pub struct MoveUnit(pub Entity, pub Position);
@@ -85,7 +84,6 @@ impl RuneCommand {
 pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
     scheduler.add_system(change_food);
     scheduler.add_system_with_priority(handle_on_ally_gain_food, 1);
-    scheduler.add_system(redraw_hand);
     scheduler.add_system(summon_player);
     scheduler.add_system(spawn_unit);
     scheduler.add_system_with_priority(handle_on_spawn, 1);
@@ -193,22 +191,6 @@ fn handle_on_ally_gain_food(
     Ok(())
 }
 
-fn redraw_hand(
-    _: &mut RedrawHand,
-    world: &mut World,
-    cx: &mut SchedulerContext,
-) -> Result<(), CommandError> {
-    let cost = 1;
-    if world.resources.player_data.food < cost {
-        return Err(CommandError::Break);
-    }
-
-    crate::player::draw_hand(world);
-
-    cx.send(ChangeFood(-(cost as i32), None));
-    Ok(())
-}
-
 fn summon_player(
     cmd: &mut SummonPlayer,
     world: &mut World,
@@ -225,14 +207,14 @@ fn summon_player(
 
     let data = &mut world.resources.player_data;
 
-    if !data.hand.contains(&cmd.0) {
+    if !data.deck.contains(&cmd.0) {
         return Err(CommandError::Break);
     }
     if cost > data.food {
         return Err(CommandError::Break);
     }
 
-    data.hand.retain(|a| *a != cmd.0);
+    data.deck.retain(|a| *a != cmd.0);
 
     cx.send(SpawnUnit(cmd.0, cmd.1));
     cx.send(ChangeFood(-(cost as i32), None));

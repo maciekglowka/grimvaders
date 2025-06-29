@@ -108,7 +108,6 @@ fn handle_input_events(env: &mut GameEnv) -> Option<()> {
             InputEvent::Done => {
                 fight_start(env);
             }
-            InputEvent::RedrawHand => env.scheduler.send(commands::RedrawHand),
             _ => (),
         }
     }

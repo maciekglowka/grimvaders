@@ -42,7 +42,7 @@ pub fn deck_draw(
 
     let mut origin = center + Vector2f::new(-2.5 * w, TILE_SIZE + GAP);
 
-    for (i, entity) in world.0.resources.player_data.draw.iter().enumerate() {
+    for (i, entity) in world.0.resources.player_data.deck.iter().enumerate() {
         let selected = state.selected == Some(*entity);
 
         let clicked = draw_deck_button(*entity, origin, 0, selected, world, context, input_state);

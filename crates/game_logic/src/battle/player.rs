@@ -18,7 +18,7 @@ pub(super) fn player_battle_exit(world: &mut World) {
 }
 
 pub(super) fn player_next_turn(env: &mut GameEnv) {
-    crate::player::draw_hand(&mut env.world);
+    crate::player::reset_deck(&mut env.world);
     env.world.0.resources.player_data.food += FOOD_GAIN;
 }
 

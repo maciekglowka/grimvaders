@@ -12,7 +12,7 @@ pub const BUTTON_CLICK_SHIFT: f32 = 2.;
 pub const DECK_BUTTON_H: f32 = SPRITE_SIZE + 4. * GAP;
 pub const DECK_BUTTON_W: f32 = SPRITE_SIZE;
 pub const ACTION_BUTTON_W: f32 = (game_logic::globals::DECK_SIZE / 2) as f32 * DECK_BUTTON_W
-    + (game_logic::globals::DECK_SIZE - 1) as f32 * GAP;
+    + (game_logic::globals::DECK_SIZE / 2 - 1) as f32 * GAP;
 pub const SIDE_PANEL_W: f32 = ACTION_BUTTON_W + GAP;
 
 pub const BUBBLE_Z: i32 = 150;

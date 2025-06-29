@@ -43,8 +43,21 @@ Knight:
     health: [4, 4]
     player:
     tags:
-      - !Basic # Basic bonus
+      - !Basic
 
+Stone Statue:
+  sprite:
+    atlas: units
+    tag: Stone Statue
+  tier: 4
+  components:
+    cost: 2
+    health: [5, 5]
+    player:
+    tags:
+      - !Heavy
+
+# Basic bonus
 
 Wanderer:
   sprite:
@@ -88,7 +101,7 @@ Chieftain:
   description: >
     On fight: give +1 health to all basic units.
 
-# Field units
+# Food units
 
 Peasant:
   sprite:
@@ -112,56 +125,6 @@ Peasant:
     }
   description: >
     On fight start: gain +1 food, if on a field tile.
-
-# Meadow units
-
-Herbalist:
-  sprite:
-    atlas: units
-    tag: Herbalist
-  tier: 2
-  components:
-    cost: 2
-    health: [2, 2]
-    on_fight: "healer_fight"
-    player:
-  script: >
-    pub fn healer_fight(world, entity, _) {
-      let position = world.get("position", entity).unwrap();
-      let tile = world.get_tile_at(position).unwrap();
-      if tile != Tile::Meadow { return }
-
-      let commands  = [];
-      for player in world.get_adjacent_players(entity) {
-        commands.push(RuneCommand::ChangeHealth(player, 1));
-      }
-      commands
-    }
-  description: >
-    On fight start: give +1 health to adjacent units, if on a meadow tile.
-
-Sheep:
-  sprite:
-    atlas: units
-    tag: Sheep
-  components:
-    cost: 2
-    health: [1, 1]
-    on_fight: "sheep_fight"
-    player:
-  script: >
-    pub fn sheep_fight(world, entity, _) {
-      let position = world.get("position", entity).unwrap();
-      let tile = world.get_tile_at(position).unwrap();
-      match tile {
-        Tile::Meadow => RuneCommand::ChangeHealth(entity, 1),
-        _ => RuneCommand::None
-      }
-    }
-  description: >
-    On fight start: gain +1 health, if on a meadow tile.
-
-# Forest units
 
 Hunter:
   sprite:
@@ -187,6 +150,122 @@ Hunter:
   description: >
     On fight start: gain +2 food, if on a forest tile.
 
+Alchemist:
+  sprite:
+    atlas: units
+    tag: Alchemist
+  tier: 5
+  components:
+    cost: 2
+    health: [2, 2]
+    on_fight: "alchemist_fight"
+    player:
+  script: >
+    pub fn alchemist_fight(world, entity, _) {
+      let food = world.get_current_food();
+      let val = (0.5 * food as f64).ceil() as i64;
+
+      return [
+        RuneCommand::ChangeFood(val, Some(entity.clone())),
+        RuneCommand::ChangeHealth(entity, -2)
+      ];
+
+    }
+  description: >
+    On fight start: increase player's food by 50%. Take two damage.
+
+Shopkeeper:
+  sprite:
+    atlas: units
+    tag: Shopkeeper
+  tier: 5
+  components:
+    cost: 2
+    health: [1, 1]
+    on_ally_gain_food: "shopkeeper_ally_gain_food"
+    player:
+    trigger_limit: [3, 3]
+  script: >
+    pub fn shopkeeper_ally_gain_food(world, entity, cmd) {
+      if let RuneCommand::ChangeFood(val, Some(other)) = cmd {
+        return RuneCommand::ChangeFood(val, Some(entity));
+      }
+    }
+  description: >
+    When an ally yields food, yield the same amount as well.
+
+# Health units
+
+Sheep:
+  sprite:
+    atlas: units
+    tag: Sheep
+  components:
+    cost: 2
+    health: [1, 1]
+    on_fight: "sheep_fight"
+    player:
+  script: >
+    pub fn sheep_fight(world, entity, _) {
+      let position = world.get("position", entity).unwrap();
+      let tile = world.get_tile_at(position).unwrap();
+      match tile {
+        Tile::Meadow => RuneCommand::ChangeHealth(entity, 1),
+        _ => RuneCommand::None
+      }
+    }
+  description: >
+    On fight start: gain +1 health, if on a meadow tile.
+
+Herbalist:
+  sprite:
+    atlas: units
+    tag: Herbalist
+  tier: 2
+  components:
+    cost: 2
+    health: [2, 2]
+    on_fight: "herbalist_fight"
+    player:
+  script: >
+    pub fn herbalist_fight(world, entity, _) {
+      let position = world.get("position", entity).unwrap();
+      let tile = world.get_tile_at(position).unwrap();
+      if tile != Tile::Meadow { return }
+
+      let commands  = [];
+      for player in world.get_adjacent_players(entity) {
+        commands.push(RuneCommand::ChangeHealth(player, 1));
+      }
+      commands
+    }
+  description: >
+    On fight start: give +1 health to adjacent units, if on a meadow tile.
+
+Medic:
+  sprite:
+    atlas: units
+    tag: Medic
+  tier: 4
+  components:
+    cost: 2
+    health: [2, 2]
+    on_fight: "medic_fight"
+    player:
+  script: >
+    pub fn medic_fight(world, entity, _) {
+      let position = world.get("position", entity).unwrap();
+      let tile = world.get_tile_at(position).unwrap();
+
+      let commands  = [];
+      for player in world.get_adjacent_players(entity) {
+        commands.push(RuneCommand::ChangeHealth(player, 1));
+      }
+      commands
+    }
+  description: >
+    On fight start: give +1 health to adjacent units.
+
 Ranger:
   sprite:
     atlas: units
@@ -194,7 +273,7 @@ Ranger:
   tier: 2
   components:
     cost: 2
-    health: [2, 2]
+    health: [1, 1]
     on_fight: "ranger_fight"
     player:
   script: >
@@ -202,12 +281,12 @@ Ranger:
       let position = world.get("position", entity).unwrap();
       let tile = world.get_tile_at(position).unwrap();
       match tile {
-        Tile::Forest => RuneCommand::ChangeHealth(entity, 1),
+        Tile::Forest => RuneCommand::ChangeHealth(entity, 2),
         _ => RuneCommand::None
       }
     }
   description: >
-    On fight start: gain +1 health, when on a forest tile.
+    On fight start: gain +2 health, when on a forest tile.
 
 Druid:
   sprite:
@@ -234,7 +313,51 @@ Druid:
   description: >
     On fight start: gain +1 health for each unit on a forest tile.
 
-# Food bonus units
+Bard:
+  sprite:
+    atlas: units
+    tag: Bard
+  tier: 3
+  components:
+    cost: 2
+    health: [2, 2]
+    on_ally_heal: "bard_ally_heal"
+    player:
+    trigger_limit: [3, 3]
+  script: >
+    pub fn bard_ally_heal(world, entity, cmd) {
+      if let RuneCommand::ChangeHealth(other, val) = cmd {
+        if world.is_adjacent(entity, other) {
+          return RuneCommand::ChangeHealth(entity, val);
+        }
+      }
+    }
+  description: >
+    When an adjacent ally gains health, gain the same amount.
+
+Apothecary:
+  sprite:
+    atlas: units
+    tag: Apothecary
+  tier: 3
+  components:
+    cost: 2
+    health: [2, 2]
+    on_damage: "apothecary_damage"
+    player:
+    trigger_limit: [3, 3]
+  script: >
+    pub fn apothecary_damage(world, entity, _) {
+      let commands  = [];
+      for player in world.get_adjacent_players(entity) {
+        commands.push(RuneCommand::ChangeHealth(player, 1));
+      }
+      commands
+    }
+  description: >
+    On non lethal damage: give +1 health to adjacent allies.
+
+# Food + health units
 
 Merchant:
   sprite:
@@ -303,73 +426,27 @@ Thief:
   description: >
     On fight start: take all player's food and gain that much health.
 
-Alchemist:
-  sprite:
-    atlas: units
-    tag: Alchemist
-  tier: 5
-  components:
-    cost: 2
-    health: [2, 2]
-    on_fight: "alchemist_fight"
-    player:
-  script: >
-    pub fn alchemist_fight(world, entity, _) {
-      let food = world.get_current_food();
-      let val = (0.5 * food as f64).ceil() as i64;
-
-      return [
-        RuneCommand::ChangeFood(val, Some(entity.clone())),
-        RuneCommand::ChangeHealth(entity, -2)
-      ];
-
-    }
-  description: >
-    On fight start: increase player's food by 50%. Take two damage.
-
-Shopkeeper:
-  sprite:
-    atlas: units
-    tag: Shopkeeper
-  tier: 5
-  components:
-    cost: 2
-    health: [2, 2]
-    on_ally_gain_food: "shopkeeper_ally_gain_food"
-    player:
-    trigger_limit: [3, 3]
-  script: >
-    pub fn shopkeeper_ally_gain_food(world, entity, cmd) {
-      if let RuneCommand::ChangeFood(val, Some(other)) = cmd {
-        return RuneCommand::ChangeFood(val, Some(entity));
-      }
-    }
-  description: >
-    When an ally yields food, yield the same amount as well.
-
 Taxman:
   sprite:
     atlas: units
     tag: Taxman
   tier: 3
   components:
-    cost: 0
+    cost: 2
     health: [2, 2]
-    on_fight: "taxman_fight"
+    on_ally_heal: "taxman_ally_heal"
     player:
+    trigger_limit: [3, 3]
   script: >
-    pub fn taxman_fight(world, entity, _) {
-      let food = world.get_current_food();
-      if food >= 2 {
-        RuneCommand::ChangeFood(-2, Some(entity))
-      } else {
-        RuneCommand::Kill(entity)
+    pub fn taxman_ally_heal(world, entity, cmd) {
+      if let RuneCommand::ChangeHealth(other, val) = cmd {
+        return RuneCommand::ChangeFood(val, Some(entity));
       }
     }
   description: >
-    On fight start: takes 2 food to survive.
+    When an ally gains health, yield the same amount of food.
 
-# Death bonus units
+# Death units
 
 Martyr:
   sprite:
@@ -484,54 +561,6 @@ Necromancer:
   description: >
     When an ally is killed, respawn it.
 
-# Heal
-
-Bard:
-  sprite:
-    atlas: units
-    tag: Bard
-  tier: 3
-  components:
-    cost: 2
-    health: [2, 2]
-    on_ally_heal: "bard_ally_heal"
-    player:
-    trigger_limit: [3, 3]
-  script: >
-    pub fn bard_ally_heal(world, entity, cmd) {
-      if let RuneCommand::ChangeHealth(other, val) = cmd {
-        if world.is_adjacent(entity, other) {
-          return RuneCommand::ChangeHealth(entity, val);
-        }
-      }
-    }
-  description: >
-    When an adjacent ally gains health, gain the same amount.
-
-Apothecary:
-  sprite:
-    atlas: units
-    tag: Apothecary
-  tier: 3
-  components:
-    cost: 2
-    health: [2, 2]
-    on_damage: "apothecary_damage"
-    player:
-    trigger_limit: [3, 3]
-  script: >
-    pub fn apothecary_damage(world, entity, _) {
-      let commands  = [];
-      for player in world.get_adjacent_players(entity) {
-        commands.push(RuneCommand::ChangeHealth(player, 1));
-      }
-      commands
-    }
-  description: >
-    On non lethal damage: give +1 health to adjacent allies.
-
-# Other
-
 Clay Statue:
   sprite:
     atlas: units
@@ -549,14 +578,3 @@ Clay Statue:
   description: >
     Breaks when damaged.
 
-Stone Statue:
-  sprite:
-    atlas: units
-    tag: Stone Statue
-  tier: 4
-  components:
-    cost: 2
-    health: [5, 5]
-    player:
-    tags:
-      - !Heavy

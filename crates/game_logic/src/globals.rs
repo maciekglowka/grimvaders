@@ -5,4 +5,4 @@ pub const WAVE_COUNT: u32 = 3;
 
 pub const DECK_SIZE: usize = 8;
 pub const SHOP_SIZE: usize = 5;
-pub const FOOD_GAIN: u32 = 3;
+// pub const FOOD_GAIN: u32 = 3;

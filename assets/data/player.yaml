@@ -160,7 +160,7 @@ Hunter:
       }
     }
   description: >
-    On fight start: gain +2 food, if on a forest tile.
+    On fight start: gain +1 food, if on a forest tile.
 
 Alchemist:
   sprite:
@@ -192,7 +192,7 @@ Shopkeeper:
     tag: Shopkeeper
   tier: 5
   components:
-    cost: 2
+    cost: 3
     health: [1, 1]
     on_ally_gain_food: "shopkeeper_ally_gain_food"
     player:
@@ -478,11 +478,12 @@ Taxman:
   script: >
     pub fn taxman_ally_heal(world, entity, cmd) {
       if let RuneCommand::ChangeHealth(other, val) = cmd {
-        return RuneCommand::ChangeFood(val, Some(entity));
+        let food = (0.5 * val as f64).ceil() as i64;
+        return RuneCommand::ChangeFood(food, Some(entity));
       }
     }
   description: >
-    When an ally gains health, yield the same amount of food.
+    When an ally gains health, yield half of the amount of food.
 
 # Death units
 

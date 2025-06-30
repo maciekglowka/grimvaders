@@ -1,6 +1,6 @@
 use wunderkammer::prelude::*;
 
-use crate::{globals::FOOD_GAIN, GameEnv, World};
+use crate::{GameEnv, World};
 
 pub(super) fn player_battle_init(world: &mut World) {
     crate::player::reset_deck(world);
@@ -19,7 +19,11 @@ pub(super) fn player_battle_exit(world: &mut World) {
 
 pub(super) fn player_next_turn(env: &mut GameEnv) {
     crate::player::reset_deck(&mut env.world);
-    env.world.0.resources.player_data.food += FOOD_GAIN;
+    let food_gain = match env.world.resources.battle_state.wave {
+        1 | 2 => 3,
+        _ => 4,
+    };
+    env.world.0.resources.player_data.food += food_gain;
 }
 
 pub(crate) fn reset_player(entity: Entity, world: &mut World) {

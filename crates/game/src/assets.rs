@@ -122,7 +122,7 @@ fn load_graphics(context: &mut Context) {
         "icons_small",
         MaterialParams {
             atlas: Some(AtlasParams {
-                cols: 4,
+                cols: 5,
                 rows: 1,
                 padding: None,
             }),

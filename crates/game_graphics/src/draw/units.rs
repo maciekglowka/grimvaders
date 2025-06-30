@@ -178,6 +178,26 @@ pub(crate) fn draw_description(entity: Entity, name: &str, world: &World, contex
         SpriteParams::default(),
     );
 
+    if let Some(tags) = world.components.tags.get(entity) {
+        let name_w = context
+            .graphics
+            .text_dimensions("default", name, BASE_TEXT_SIZE)
+            .x;
+        let names: Vec<String> = tags.iter().map(|a| a.into()).collect();
+
+        let _ = context.graphics.draw_text(
+            "default",
+            &names.join(", "),
+            origin + Vector2f::new(name_w + GAP, 0.),
+            UI_Z,
+            BASE_TEXT_SIZE,
+            SpriteParams {
+                color: RED_COLOR,
+                ..Default::default()
+            },
+        );
+    }
+
     let gap = TEXT_LINE_GAP * BASE_TEXT_SIZE;
     origin.y -= BASE_TEXT_SIZE + 2. * gap;
 
@@ -193,19 +213,4 @@ pub(crate) fn draw_description(entity: Entity, name: &str, world: &World, contex
         let h = text.draw(origin, bounds.1.x - bounds.0.x - 2. * GAP, UI_Z, context);
         origin.y -= h - BASE_TEXT_SIZE;
     };
-
-    if let Some(tags) = world.components.tags.get(entity) {
-        let names: Vec<String> = tags.iter().map(|a| a.into()).collect();
-        let _ = context.graphics.draw_text(
-            "default",
-            &names.join(", "),
-            origin,
-            UI_Z,
-            BASE_TEXT_SIZE,
-            SpriteParams {
-                color: RED_COLOR,
-                ..Default::default()
-            },
-        );
-    }
 }

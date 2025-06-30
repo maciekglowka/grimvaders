@@ -7,7 +7,7 @@ use crate::{
     globals::{
         ACTION_BUTTON_W, BASE_TEXT_SIZE, BUTTON_SIZE, BUTTON_TEXT_COLOR, CURSOR_SPIRTE,
         DECK_BUTTON_H, DECK_BUTTON_W, FIGHT_ICON, FOOD_COLOR, FOOD_ICON, GAP, HEALTH_ICON,
-        ICON_SIZE, OVERLAY_Z, PANEL_SPRTE, RED_COLOR, SPRITE_SIZE, TILE_SIZE, UI_Z, UNIT_ICON,
+        ICON_SIZE, OVERLAY_Z, PANEL_SPRTE, RED_COLOR, SPRITE_SIZE, TILE_SIZE, TOWN_ICON, UI_Z,
     },
     input::{ButtonState, InputState},
     ui::{Button, Span},
@@ -202,6 +202,16 @@ pub(super) fn draw_status(state: &super::BattleGraphics, world: &World, context:
                 world.resources.battle_state.wave,
                 game_logic::globals::WAVE_COUNT
             ))
+            .with_spacer(4.)
+            .with_sprite_size(ICON_SIZE)
+            .with_text_size(BASE_TEXT_SIZE)
+            .with_text_color(BUTTON_TEXT_COLOR),
+    );
+    spans.push(
+        Span::new()
+            .with_sprite("icons_small", TOWN_ICON)
+            .with_spacer(2.)
+            .with_text_owned(format!("{}", world.resources.player_data.level))
             .with_sprite_size(ICON_SIZE)
             .with_text_size(BASE_TEXT_SIZE)
             .with_text_color(BUTTON_TEXT_COLOR),

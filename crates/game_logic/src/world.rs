@@ -154,6 +154,7 @@ pub struct Components {
     pub on_attack: ComponentStorage<String>,
     pub on_damage: ComponentStorage<String>,
     pub on_ally_heal: ComponentStorage<String>,
+    pub on_ally_damage: ComponentStorage<String>,
     pub on_ally_gain_food: ComponentStorage<String>,
     // handlers end
     pub player: ComponentStorage<()>,

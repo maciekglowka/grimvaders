@@ -94,6 +94,7 @@ pub(crate) fn register_handlers(scheduler: &mut Scheduler<World>) {
     scheduler.add_system(change_health);
     scheduler.add_system_with_priority(handle_on_damage, 1);
     scheduler.add_system_with_priority(handle_on_ally_heal, 2);
+    scheduler.add_system_with_priority(handle_on_ally_damage, 2);
     scheduler.add_system(kill);
     scheduler.add_system_with_priority(handle_on_kill, 1);
     scheduler.add_system_with_priority(handle_on_ally_kill, 2);
@@ -391,6 +392,39 @@ fn handle_on_ally_heal(
         world,
         cx,
         on_ally_heal,
+        cmd.0,
+        RuneCommand::ChangeHealth(cmd.0.into(), cmd.1)
+    );
+
+    Ok(())
+}
+
+fn handle_on_ally_damage(
+    cmd: &mut ChangeHealth,
+    world: &mut World,
+    cx: &mut SchedulerContext,
+) -> Result<(), CommandError> {
+    // Handle only damage
+    if cmd.1 >= 0 {
+        return Ok(());
+    }
+
+    // Only trigger when the unit is still alive
+    if world
+        .components
+        .health
+        .get(cmd.0)
+        .ok_or(CommandError::Break)?
+        .current()
+        == 0
+    {
+        return Ok(());
+    }
+
+    handle_on_ally!(
+        world,
+        cx,
+        on_ally_damage,
         cmd.0,
         RuneCommand::ChangeHealth(cmd.0.into(), cmd.1)
     );

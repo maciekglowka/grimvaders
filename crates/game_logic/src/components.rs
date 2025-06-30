@@ -32,6 +32,8 @@ pub enum Tag {
     #[rune(constructor)]
     FoodProducer,
     #[rune(constructor)]
+    Healer,
+    #[rune(constructor)]
     Heavy,
 }
 impl From<Tag> for String {
@@ -39,6 +41,7 @@ impl From<Tag> for String {
         match value {
             Tag::Basic => "Basic",
             Tag::FoodProducer => "Food Producer",
+            Tag::Healer => "Healer",
             Tag::Heavy => "Heavy",
         }
         .to_string()

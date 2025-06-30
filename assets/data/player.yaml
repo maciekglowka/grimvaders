@@ -33,6 +33,18 @@ Scarecrow:
     tags:
       - !Basic
 
+Guard:
+  sprite:
+    atlas: units
+    tag: Guard
+  tier: 6
+  components:
+    cost: 2
+    health: [4, 4]
+    player:
+    tags:
+      - !Basic
+
 Knight:
   sprite:
     atlas: units
@@ -40,7 +52,7 @@ Knight:
   tier: 5
   components:
     cost: 3
-    health: [4, 4]
+    health: [5, 5]
     player:
     tags:
       - !Basic
@@ -227,6 +239,8 @@ Herbalist:
     health: [2, 2]
     on_fight: "herbalist_fight"
     player:
+    tags:
+      - !Healer
   script: >
     pub fn herbalist_fight(world, entity, _) {
       let position = world.get("position", entity).unwrap();
@@ -252,6 +266,8 @@ Medic:
     health: [2, 2]
     on_fight: "medic_fight"
     player:
+    tags:
+      - !Healer
   script: >
     pub fn medic_fight(world, entity, _) {
       let position = world.get("position", entity).unwrap();
@@ -343,19 +359,41 @@ Apothecary:
   components:
     cost: 2
     health: [2, 2]
-    on_damage: "apothecary_damage"
+    on_ally_damage: "apothecary_ally_damage"
     player:
-    trigger_limit: [3, 3]
+    tags:
+      - !Healer
   script: >
-    pub fn apothecary_damage(world, entity, _) {
+    pub fn apothecary_ally_damage(world, entity, cmd) {
+      if world.is_adjacent(entity, cmd.0) {
+        return RuneCommand::ChangeHealth(cmd.0, 2);
+      }
+    }
+  description: >
+    When adjacent unit receives non lethal damage, heal it for 2.
+
+Pilgrim:
+  sprite:
+    atlas: units
+    tag: Pilgrim
+  tier: 4
+  components:
+    cost: 2
+    health: [0, 0]
+    on_spawn: "pilgrim_spawn"
+    player:
+    tags:
+      - !Healer
+  script: >
+    pub fn pilgrim_spawn(world, entity, _) {
       let commands  = [];
-      for player in world.get_adjacent_players(entity) {
-        commands.push(RuneCommand::ChangeHealth(player, 1));
+      for player in world.get_players_with_tag(Tag::Healer) {
+        commands.push(RuneCommand::ChangeHealth(player, 2));
       }
       commands
     }
   description: >
-    On non lethal damage: give +1 health to adjacent allies.
+    On spawn: give +2 health to each healer.
 
 # Food + health units
 
@@ -452,7 +490,7 @@ Martyr:
   sprite:
     atlas: units
     tag: Martyr
-  tier: 3
+  tier: 5
   components:
     cost: 2
     health: [2, 2]
@@ -460,27 +498,6 @@ Martyr:
     player:
   script: >
     pub fn martyr_kill(world, entity, _) {
-      let commands  = [];
-      for player in world.get_adjacent_players(entity) {
-        commands.push(RuneCommand::ChangeHealth(player, 1));
-      }
-      commands
-    }
-  description: >
-    On kill: increase adjacent units' health by 1.
-
-Santo Subito:
-  sprite:
-    atlas: units
-    tag: Santo Subito
-  tier: 5
-  components:
-    cost: 3
-    health: [2, 2]
-    on_kill: "santo_subito_kill"
-    player:
-  script: >
-    pub fn santo_subito_kill(world, entity, _) {
       let commands  = [];
       for player in world.query(["player", "position"], []) {
         commands.push(RuneCommand::ChangeHealth(player, 1));

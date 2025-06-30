@@ -53,6 +53,7 @@ pub const HEALTH_ICON: usize = 0;
 pub const FOOD_ICON: usize = 1;
 pub const FIGHT_ICON: usize = 2;
 pub const UNIT_ICON: usize = 3;
+pub const TOWN_ICON: usize = 4;
 
 // UI SPRITES
 pub const BUTTON_SPRITE: usize = 0;

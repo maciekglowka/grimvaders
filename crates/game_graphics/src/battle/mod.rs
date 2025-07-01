@@ -1,4 +1,5 @@
 use rogalik::prelude::*;
+use std::collections::VecDeque;
 use wunderkammer::prelude::*;
 
 mod board;
@@ -36,6 +37,7 @@ pub struct BattleGraphics {
     unit_sprites: Vec<UnitSprite>,
     bubbles: Vec<Bubble>,
     status_origin: Vector2f,
+    sounds: VecDeque<&'static str>,
 }
 
 pub fn battle_init(state: &mut BattleGraphics, env: &mut GameEnv) {
@@ -69,6 +71,12 @@ pub fn battle_draw(
 
     is_animating |= crate::draw::bubbles::update_bubbles(&mut state.bubbles, context);
     player::handle_player_ui(world, state, context, input_state, !is_animating);
+
+    // TEMP?
+    while let Some(sound) = state.sounds.pop_front() {
+        let _ = context.audio.play(sound, false);
+    }
+
     is_animating
 }
 
@@ -85,19 +93,33 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
 
     observers.push(Box::new(CommandObserver::new(
         &mut env.scheduler,
-        |c: &commands::SpawnUnit, w, s| place_unit_sprite(c.0, c.1, w, &mut s.unit_sprites),
+        |c: &commands::SpawnUnit, w, s| {
+            s.sounds.push_back("spawn");
+            place_unit_sprite(c.0, c.1, w, &mut s.unit_sprites)
+        },
     )));
     observers.push(Box::new(CommandObserver::new(
         &mut env.scheduler,
-        |c: &commands::MoveUnit, w, s| move_unit_sprite(c.0, w, &mut s.unit_sprites),
+        |c: &commands::MoveUnit, w, s| {
+            s.sounds.push_back("jump");
+            move_unit_sprite(c.0, w, &mut s.unit_sprites)
+        },
     )));
     observers.push(Box::new(CommandObserver::new(
         &mut env.scheduler,
-        |c: &commands::Attack, w, s| attack_unit_sprite(c.0, c.1, w, &mut s.unit_sprites),
+        |c: &commands::Attack, w, s| {
+            s.sounds.push_back("jump");
+            attack_unit_sprite(c.0, c.1, w, &mut s.unit_sprites)
+        },
     )));
     observers.push(Box::new(CommandObserver::new(
         &mut env.scheduler,
         |c: &commands::ChangeHealth, _, s| {
+            match c.1 {
+                a if a < 0 => s.sounds.push_back("hit"),
+                a if a > 0 => s.sounds.push_back("heal"),
+                _ => (),
+            }
             if let Some(sprite) = get_unit_sprite(c.0, &s.unit_sprites) {
                 s.bubbles.push(Bubble::new(
                     sprite.origin + Vector2f::new(0., SPRITE_SIZE),
@@ -114,6 +136,10 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
             if c.0 == 0 {
                 return;
             }
+            if c.0 >= 0 {
+                s.sounds.push_back("yield");
+            }
+
             let mut origin = s.status_origin + Vector2f::splat(2. * BASE_TEXT_SIZE);
 
             // If action has an entity source, spawn bubble from it's position
@@ -134,6 +160,7 @@ fn subscribe_events(env: &mut GameEnv, state: &mut BattleGraphics) {
         &mut env.scheduler,
         |c: &commands::AttackTown, w, s| {
             attack_town(c.0, w, &mut s.unit_sprites);
+            s.sounds.push_back("jump");
             s.bubbles.push(Bubble::new(
                 s.status_origin + Vector2f::splat(2. * BASE_TEXT_SIZE),
                 RED_COLOR,

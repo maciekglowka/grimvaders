@@ -48,6 +48,9 @@ impl<'a> Button<'a> {
             idx = self.sprite_index + 1;
             text_shift = -BUTTON_CLICK_SHIFT;
         }
+        if self.clicked(state) {
+            let _ = context.audio.play("click", false);
+        }
 
         let _ = context.graphics.draw_atlas_sprite(
             self.sprite_atlas,

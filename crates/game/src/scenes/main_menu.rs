@@ -24,7 +24,6 @@ impl Scene for MainMenu {
 
         let input = crate::input::get_input_state(game.main_camera, context);
         if input.click == ButtonState::Released {
-            let _ = context.audio.play("pick", false);
             return Some(SceneChange::Push(Box::new(super::game::GameScene)));
         }
 

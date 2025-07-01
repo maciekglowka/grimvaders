@@ -17,7 +17,12 @@ pub fn load_assets(context: &mut Context) {
 }
 
 fn load_audio(context: &mut Context) {
-    context.audio.load_source("pick", "sfx/pick.wav");
+    let _ = context.audio.load_source("click", "sfx/click.wav");
+    let _ = context.audio.load_source("heal", "sfx/heal.wav");
+    let _ = context.audio.load_source("hit", "sfx/hit.wav");
+    let _ = context.audio.load_source("jump", "sfx/jump.wav");
+    let _ = context.audio.load_source("yield", "sfx/yield.wav");
+    let _ = context.audio.load_source("spawn", "sfx/spawn.wav");
 }
 
 fn load_graphics(context: &mut Context) {

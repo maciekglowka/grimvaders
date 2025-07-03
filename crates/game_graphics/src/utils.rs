@@ -6,7 +6,7 @@ use game_logic::{
     globals::{BOARD_H, BOARD_W},
 };
 
-pub(crate) fn get_viewport_bounds(context: &Context) -> (Vector2f, Vector2f) {
+pub fn get_viewport_bounds(context: &Context) -> (Vector2f, Vector2f) {
     let camera = context.graphics.get_current_camera();
     camera.get_bounds()
 }

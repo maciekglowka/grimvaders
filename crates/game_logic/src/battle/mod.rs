@@ -50,6 +50,11 @@ pub fn battle_update(env: &mut GameEnv) {
         return;
     }
 
+    if systems::check_loose(env) {
+        env.world.resources.game_mode = crate::GameMode::GameOver;
+        return;
+    }
+
     match env.world.resources.battle_state.mode {
         BattleMode::Plan => {
             handle_input_events(env);
@@ -68,6 +73,9 @@ pub fn battle_update(env: &mut GameEnv) {
 
 fn next_turn(env: &mut GameEnv) {
     if env.world.resources.battle_state.wave >= WAVE_COUNT {
+        if systems::check_win(env) {
+            env.world.resources.game_mode = crate::GameMode::Win;
+        }
         env.world.resources.battle_state.mode = BattleMode::Done;
         return;
     }

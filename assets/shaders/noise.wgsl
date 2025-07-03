@@ -61,7 +61,7 @@ const LUT_SIZE: f32 = 32.0;
 @fragment
 fn fs_main(vs: VertexOutput) -> @location(0) vec4<f32> {
     let noise = textureSample(noise_image, noise_sampler, vs.uv + 0.1 * sin(globals.time));
-    let offset = vec2(uniform.strength * noise.b / 50., 0.);
+    let offset = vec2(uniform.strength * noise.b / 100., 0.);
     let col = textureSample(input_image, input_sampler, vs.uv + offset);
     return col;
 

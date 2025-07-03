@@ -3,6 +3,7 @@ use wunderkammer::prelude::*;
 use crate::{
     commands::{check_trigger_limit, use_trigger_limit, RemoveUnit, RuneCommand},
     components::ValueDefault,
+    globals,
     scripting::run_command_script,
     GameEnv, World,
 };
@@ -51,4 +52,12 @@ pub(crate) fn handle_on_fight(env: &mut GameEnv) -> bool {
     }
 
     true
+}
+
+pub(crate) fn check_win(env: &GameEnv) -> bool {
+    env.world.resources.player_data.level >= globals::MAX_BATTLES
+}
+
+pub(crate) fn check_loose(env: &GameEnv) -> bool {
+    env.world.resources.player_data.health == 0
 }

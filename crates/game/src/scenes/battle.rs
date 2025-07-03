@@ -34,6 +34,13 @@ impl Scene for Battle {
             game_logic::battle::battle_update(&mut game.env);
         }
 
+        match game.env.world.resources.game_mode {
+            game_logic::GameMode::GameOver | game_logic::GameMode::Win => {
+                return Some(SceneChange::Pop);
+            }
+            _ => (),
+        }
+
         match game.env.world.resources.battle_state.mode {
             game_logic::battle::BattleMode::Done => {
                 Some(SceneChange::Switch(Box::new(super::shop::Shop::default())))

@@ -168,6 +168,7 @@ pub struct Components {
 pub struct Resources {
     pub battle_state: crate::battle::BattleState,
     pub data: game_data::GameData,
+    pub game_mode: crate::GameMode,
     pub player_data: PlayerData,
     // serialize as none
     pub vm: Option<rune::Vm>,

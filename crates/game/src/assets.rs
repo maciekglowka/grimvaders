@@ -159,19 +159,19 @@ fn load_graphics(context: &mut Context) {
 
     // Shaders
 
-    // let noise_shader = context
-    //     .graphics
-    //     .load_shader(ShaderKind::PostProcess, "shaders/noise.wgsl");
-    // let noise_texture =
-    // Some(context.graphics.load_texture("shaders/perlin.png"));
-    // context.graphics.add_post_process(
-    //     "noise",
-    //     PostProcessParams {
-    //         shader: noise_shader,
-    //         texture: noise_texture,
-    //         ..Default::default()
-    //     },
-    // );
+    let noise_shader = context
+        .graphics
+        .load_shader(ShaderKind::PostProcess, "shaders/noise.wgsl");
+    let noise_texture = Some(context.graphics.load_texture("shaders/perlin.png"));
+
+    context.graphics.add_post_process(
+        "noise",
+        PostProcessParams {
+            shader: noise_shader,
+            texture: noise_texture,
+            ..Default::default()
+        },
+    );
 
     let post_shader = context
         .graphics

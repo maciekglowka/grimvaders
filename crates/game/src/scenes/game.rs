@@ -1,4 +1,6 @@
-use rogalik::engine::{Context, Scene, SceneChange};
+use rogalik::prelude::*;
+
+use game_logic::GameMode;
 
 use crate::{assets::load_data, GameState};
 
@@ -21,17 +23,26 @@ impl Scene for GameScene {
 
     fn update(
         &mut self,
-        _game: &mut Self::Game,
+        game: &mut Self::Game,
         _context: &mut Context,
     ) -> Option<SceneChange<Self::Game>> {
+        match game.env.world.resources.game_mode {
+            GameMode::GameOver => {
+                return Some(SceneChange::Switch(Box::new(super::game_over::GameOver)))
+            }
+            GameMode::Win => return Some(SceneChange::Switch(Box::new(super::win::GameWin))),
+            _ => (),
+        }
         Some(SceneChange::Push(
             Box::new(super::battle::Battle::default()),
         ))
     }
     fn enter(&mut self, game: &mut Self::Game, context: &mut rogalik::engine::Context) {
+        game.env.world.resources.game_mode = GameMode::Init;
+        let _ = context.graphics.set_postprocess_strength("noise", 0.);
         self.init_game(game, context);
     }
-    fn restore(&mut self, game: &mut Self::Game, context: &mut rogalik::engine::Context) {
-        self.init_game(game, context);
+    fn exit(&mut self, _game: &mut Self::Game, context: &mut rogalik::engine::Context) {
+        let _ = context.graphics.set_postprocess_strength("noise", 1.);
     }
 }

@@ -4,8 +4,10 @@ use game_graphics::input::ButtonState;
 
 use crate::GameState;
 
-pub(crate) struct MainMenu;
-impl Scene for MainMenu {
+#[derive(Default)]
+pub(crate) struct GameWin;
+
+impl Scene for GameWin {
     type Game = GameState;
 
     fn update(
@@ -14,14 +16,12 @@ impl Scene for MainMenu {
         context: &mut Context,
     ) -> Option<SceneChange<Self::Game>> {
         game_graphics::utils::draw_background(context);
-
-        super::draw_centered_text("Grimvaders", context);
+        super::draw_centered_text("We are safe, for now...", context);
 
         let input = crate::input::get_input_state(game.main_camera, context);
         if input.click == ButtonState::Released {
-            return Some(SceneChange::Push(Box::new(super::game::GameScene)));
+            return Some(SceneChange::Pop);
         }
-
         None
     }
 }

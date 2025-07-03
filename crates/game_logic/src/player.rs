@@ -51,12 +51,9 @@ pub(crate) fn reset_deck(world: &mut World) {
 fn get_initial_squad() -> Vec<&'static str> {
     let mut output = vec!["Scarecrow"];
     let mut rng = thread_rng();
-    let special_unit_count = rng.gen_range(1..=2);
-    let mut special_units = vec!["Peasant", "Sheep", "Wanderer"];
-    for _ in 0..special_unit_count {
-        output.push(take_random(&mut special_units, &mut rng));
-    }
-    while output.len() < 5 {
+    let mut special_units = vec!["Peasant", "Sheep"];
+    output.push(take_random(&mut special_units, &mut rng));
+    while output.len() < 4 {
         output.push("Villager");
     }
     output

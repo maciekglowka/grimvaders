@@ -11,7 +11,7 @@ pub struct ShopState {
 
 pub fn shop_init(state: &mut ShopState, env: &mut GameEnv) {
     let level = env.world.resources.player_data.level;
-    println!("Tier: {}", level);
+    // println!("Tier: {}", level);
     for (i, name) in get_choices(level, &env.world).iter().enumerate() {
         let Some(name) = name else {
             continue;
@@ -55,7 +55,7 @@ fn get_choices(tier: u32, world: &World) -> [Option<String>; SHOP_SIZE] {
         .filter(|(_, e)| e.tier.unwrap_or(0) <= tier)
         .map(|(n, e)| {
             let tier_dist = 0.8 / tier as f32 * e.tier.unwrap_or(1) as f32 + 0.2;
-            println!("T: {}, Et: {:?}, Dt: {}", tier, e.tier, tier_dist);
+            // println!("T: {}, Et: {:?}, Dt: {}", tier, e.tier, tier_dist);
             (tier_dist * e.chance.unwrap_or(1.), n.to_string())
         })
         .collect::<Vec<_>>();

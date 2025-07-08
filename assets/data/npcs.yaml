@@ -6,18 +6,18 @@ Gnome:
   components:
     health: [1, 1]
 
-Shadow:
+Phantom:
   sprite:
     atlas: units
-    tag: Shadow
+    tag: Phantom
   score: 2
   components:
     health: [2, 2]
 
-Ghost:
+Banshee:
   sprite:
     atlas: units
-    tag: Ghost
+    tag: Banshee
   tier: 2
   score: 3
   components:
@@ -39,33 +39,33 @@ Imp:
   description: >
     On attack: steal 1 food.
 
-Wyrm:
+Ghoul:
   sprite:
     atlas: units
-    tag: Wyrm
+    tag: Ghoul
   tier: 3
   score: 3
   components:
     health: [3, 3]
-    on_damage: "wyrm_damage"
+    on_damage: "ghoul_damage"
   script: >
-    pub fn wyrm_damage(world, entity, _) {
+    pub fn ghoul_damage(world, entity, _) {
       RuneCommand::ChangeHealth(entity, 1)
     }
   description: >
     On non lethal damage: gain +1 health.
 
-Zephyr:
+Poltergeist:
   sprite:
     atlas: units
-    tag: Zephyr
+    tag: Poltergeist
   tier: 4
   score: 2
   components:
     health: [1, 1]
-    on_attack: "zephyr_attack"
+    on_attack: "poltergeist_attack"
   script: >
-    pub fn zephyr_attack(world, entity, cmd) {
+    pub fn poltergeist_attack(world, entity, cmd) {
       let position = world.get("position", entity).unwrap();
       let commands  = [];
       for player in world.get_players_in_column(position.x) {
@@ -100,18 +100,18 @@ Vortex:
   description: >
     On non lethal damage: jump to a previous column.
 
-Lump:
+Chaos:
   sprite:
     atlas: units
-    tag: Lump
+    tag: Chaos
   tier: 4
   score: 3
   components:
     health: [6, 6]
-    on_damage: "lump_damage"
+    on_damage: "chaos_damage"
     trigger_limit: [1, 1]
   script: >
-    pub fn lump_damage(world, entity, cmd) {
+    pub fn chaos_damage(world, entity, cmd) {
       RuneCommand::ChangeHealth(entity, -3)
     }
   description: >

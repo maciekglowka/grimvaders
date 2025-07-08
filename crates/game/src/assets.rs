@@ -90,6 +90,15 @@ fn load_graphics(context: &mut Context) {
         },
     );
 
+    let main_title = Some(context.graphics.load_texture("sprites/main.png"));
+    context.graphics.load_material(
+        "main_title",
+        MaterialParams {
+            diffuse_texture: main_title,
+            ..Default::default()
+        },
+    );
+
     // Tiles
 
     let tiles_texture = Some(context.graphics.load_texture("sprites/tiles.png"));

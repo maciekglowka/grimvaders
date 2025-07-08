@@ -335,12 +335,12 @@
    { "name": "Apothecary", "from": 28, "to": 28, "direction": "forward", "color": "#000000ff" },
    { "name": "Gnome", "from": 29, "to": 29, "direction": "forward", "color": "#000000ff" },
    { "name": "Imp", "from": 30, "to": 30, "direction": "forward", "color": "#000000ff" },
-   { "name": "Shadow", "from": 31, "to": 31, "direction": "forward", "color": "#000000ff" },
-   { "name": "Ghost", "from": 32, "to": 32, "direction": "forward", "color": "#000000ff" },
-   { "name": "Wyrm", "from": 33, "to": 33, "direction": "forward", "color": "#000000ff" },
-   { "name": "Zephyr", "from": 34, "to": 34, "direction": "forward", "color": "#000000ff" },
+   { "name": "Phantom", "from": 31, "to": 31, "direction": "forward", "color": "#000000ff" },
+   { "name": "Banshee", "from": 32, "to": 32, "direction": "forward", "color": "#000000ff" },
+   { "name": "Ghoul", "from": 33, "to": 33, "direction": "forward", "color": "#000000ff" },
+   { "name": "Poltergeist", "from": 34, "to": 34, "direction": "forward", "color": "#000000ff" },
    { "name": "Vortex", "from": 35, "to": 35, "direction": "forward", "color": "#000000ff" },
-   { "name": "Lump", "from": 36, "to": 36, "direction": "forward", "color": "#000000ff" }
+   { "name": "Chaos", "from": 36, "to": 36, "direction": "forward", "color": "#000000ff" }
   ]
  }
 }

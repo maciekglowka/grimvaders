@@ -1,5 +1,8 @@
 use rogalik::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::*;
+
 use game_graphics::{
     globals::{SIDE_PANEL_W, TILE_SIZE},
     utils::tile_to_world,
@@ -56,11 +59,25 @@ impl Game for GameState {
     }
 }
 
+#[cfg(target_arch = "wasm32")]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
+pub fn wasm_main() {
+    console_log::init_with_level(rogalik::engine::log::Level::Info)
+        .expect("Can't init the logger!");
+    let engine = EngineBuilder::new()
+        .with_audio(AudioDeviceParams {
+            buffer_secs: 0.01,
+            ..Default::default()
+        })
+        .build_wasm(GameState::default(), Box::new(scenes::MainMenu));
+    engine.run();
+}
+
 #[allow(dead_code)]
 fn main() {
     env_logger::init();
     let engine = EngineBuilder::new()
-        .with_title("RGLK".to_string())
+        .with_title("Grimvaders".to_string())
         .with_audio(AudioDeviceParams {
             buffer_secs: 0.01,
             ..Default::default()

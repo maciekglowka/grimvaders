@@ -21,3 +21,7 @@ game_data = { path = "../game_data" }
 game_logic = { path = "../game_logic" }
 game_graphics = { path = "../game_graphics" }
 
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+console_log = "1.0"
+getrandom = { version = "0.2", features = ["js"] }
+wasm-bindgen = "0.2"

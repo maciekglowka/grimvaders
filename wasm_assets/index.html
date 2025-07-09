@@ -14,8 +14,6 @@
       }
       #rogalik-canvas {
         display: block;
-        width: 960px;
-        height: 540px;
         transform: scale(var(--scale-factor));
         transform-origin: center;
         image-rendering: crisp-edges;
@@ -23,17 +21,34 @@
     </style>
     <script type="module">
       import init from './game.js'
-      init()
 
       function updateScaleFactor() {
-        // let scaleFactor = Math.min(1.0, Math.floor(window.innerWidth / 960.0));
-        let scaleFactor = window.innerWidth / 960.0;
-        console.log(window.innerWidth, scaleFactor);
+        let targetW = window.innerWidth;
+        let targetH = window.innerHeight;
+        let ratio = targetW / targetH;
+
+        let canvasW = targetW;
+        let canvasH = targetH; 
+
+        // Render at max 1920px
+        if (canvasW > 1920) {
+          canvasW = 1920;
+          canvasH = canvasW / ratio;
+        }
+
+        const canvas = document.getElementById("rogalik-canvas");
+        canvas.width = canvasW;
+        canvas.height = canvasH;
+
+        let scaleFactor = targetW / canvasW;
+        console.log("Target width:", window.innerWidth, "Scale factor:", scaleFactor);
         document.documentElement.style.setProperty("--scale-factor", scaleFactor);
       }
 
       window.addEventListener("resize", updateScaleFactor);
       updateScaleFactor();
+
+      init()
     </script>
   </head>
   <body>

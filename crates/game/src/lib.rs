@@ -66,7 +66,7 @@ pub fn wasm_main() {
         .expect("Can't init the logger!");
     let engine = EngineBuilder::new()
         .with_audio(AudioDeviceParams {
-            buffer_secs: 0.01,
+            buffer_secs: 0.05,
             ..Default::default()
         })
         .build_wasm(GameState::default(), Box::new(scenes::MainMenu));

@@ -186,6 +186,7 @@ fn load_graphics(context: &mut Context) {
         .graphics
         .load_shader(ShaderKind::PostProcess, "shaders/post.wgsl");
 
+    #[cfg(not(target_arch = "wasm32"))]
     context.graphics.add_post_process(
         "post",
         PostProcessParams {

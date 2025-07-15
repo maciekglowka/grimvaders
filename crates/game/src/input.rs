@@ -1,4 +1,4 @@
-use rogalik::{engine::input::MouseButton, prelude::*};
+use rogalik::{input::MouseButton, prelude::*};
 
 use game_graphics::input::{ButtonState, InputState};
 

@@ -1,4 +1,4 @@
-use rogalik::{math::vectors::vector2::Vector2, prelude::*};
+use rogalik::prelude::*;
 
 use game_graphics::input::ButtonState;
 
@@ -14,7 +14,8 @@ impl Scene for MainMenu {
         &mut self,
         game: &mut Self::Game,
         context: &mut Context,
-    ) -> Option<SceneChange<Self::Game>> {
+        scenes: &mut SceneController<Self::Game>,
+    ) {
         game_graphics::utils::draw_background(context);
 
         let bounds = game_graphics::utils::get_viewport_bounds(context);
@@ -30,9 +31,7 @@ impl Scene for MainMenu {
 
         let input = crate::input::get_input_state(game.main_camera, context);
         if input.click == ButtonState::Released {
-            return Some(SceneChange::Push(Box::new(super::game::GameScene)));
+            scenes.push(Box::new(super::game::GameScene));
         }
-
-        None
     }
 }

@@ -14,14 +14,14 @@ impl Scene for GameWin {
         &mut self,
         game: &mut Self::Game,
         context: &mut Context,
-    ) -> Option<SceneChange<Self::Game>> {
+        scenes: &mut SceneController<Self::Game>,
+    ) {
         game_graphics::utils::draw_background(context);
         super::draw_centered_text("We are safe, for now...", context);
 
         let input = crate::input::get_input_state(game.main_camera, context);
         if input.click == ButtonState::Released {
-            return Some(SceneChange::Pop);
+            scenes.pop();
         }
-        None
     }
 }

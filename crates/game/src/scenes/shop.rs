@@ -10,11 +10,21 @@ pub(crate) struct Shop {
 impl Scene for Shop {
     type Game = GameState;
 
-    fn enter(&mut self, game: &mut Self::Game, _context: &mut rogalik::engine::Context) {
+    fn enter(
+        &mut self,
+        game: &mut Self::Game,
+        _context: &mut Context,
+        _scenes: &mut SceneController<Self::Game>,
+    ) {
         game.env.input = Some(self.graphics_state.input_queue.subscribe());
         game_logic::shop::shop_init(&mut self.logic_state, &mut game.env);
     }
-    fn exit(&mut self, game: &mut Self::Game, _context: &mut rogalik::engine::Context) {
+    fn exit(
+        &mut self,
+        game: &mut Self::Game,
+        _context: &mut Context,
+        _scenes: &mut SceneController<Self::Game>,
+    ) {
         game_logic::shop::shop_exit(&mut self.logic_state, &mut game.env);
     }
 
@@ -22,7 +32,8 @@ impl Scene for Shop {
         &mut self,
         game: &mut Self::Game,
         context: &mut Context,
-    ) -> Option<SceneChange<Self::Game>> {
+        scenes: &mut SceneController<Self::Game>,
+    ) {
         let input = crate::input::get_input_state(game.main_camera, context);
         game_graphics::shop::shop_draw(
             &self.logic_state,
@@ -34,8 +45,7 @@ impl Scene for Shop {
         game_logic::shop::shop_update(&mut self.logic_state, &mut game.env);
 
         if self.logic_state.done {
-            return Some(SceneChange::Switch(Box::new(super::deck::Deck::default())));
+            scenes.switch(Box::new(super::deck::Deck::default()));
         }
-        None
     }
 }

@@ -1917,47 +1917,6 @@ checksum = "19b30a45b0cd0bcca8037f3d0dc3421eaf95327a17cad11964fb8179b4fc4832"
 name = "rogalik"
 version = "0.3.0"
 dependencies = [
- "rogalik_assets",
- "rogalik_common",
- "rogalik_engine",
- "rogalik_events",
- "rogalik_math",
- "rogalik_persist",
- "rogalik_storage",
- "rogalik_wgpu",
-]
-
-[[package]]
-name = "rogalik_assets"
-version = "0.1.0"
-dependencies = [
- "log",
- "rogalik_common",
-]
-
-[[package]]
-name = "rogalik_audio"
-version = "0.1.0"
-dependencies = [
- "log",
- "rogalik_assets",
- "rogalik_common",
- "symphonia",
- "tinyaudio",
-]
-
-[[package]]
-name = "rogalik_common"
-version = "0.1.0"
-dependencies = [
- "rogalik_math",
- "winit",
-]
-
-[[package]]
-name = "rogalik_engine"
-version = "0.1.0"
-dependencies = [
  "android_logger",
  "cfg-if",
  "console_error_panic_hook",
@@ -1968,6 +1927,7 @@ dependencies = [
  "rogalik_audio",
  "rogalik_common",
  "rogalik_math",
+ "rogalik_persist",
  "rogalik_wgpu",
  "serde",
  "wasm-bindgen",
@@ -1976,12 +1936,35 @@ dependencies = [
 ]
 
 [[package]]
-name = "rogalik_events"
-version = "0.1.0"
+name = "rogalik_assets"
+version = "0.3.0"
+dependencies = [
+ "log",
+ "rogalik_common",
+]
+
+[[package]]
+name = "rogalik_audio"
+version = "0.3.0"
+dependencies = [
+ "log",
+ "rogalik_assets",
+ "rogalik_common",
+ "symphonia",
+ "tinyaudio",
+]
+
+[[package]]
+name = "rogalik_common"
+version = "0.3.0"
+dependencies = [
+ "rogalik_math",
+ "winit",
+]
 
 [[package]]
 name = "rogalik_math"
-version = "0.1.0"
+version = "0.3.0"
 dependencies = [
  "num-traits",
  "serde",
@@ -1989,7 +1972,7 @@ dependencies = [
 
 [[package]]
 name = "rogalik_persist"
-version = "0.1.0"
+version = "0.3.0"
 dependencies = [
  "anyhow",
  "base64",
@@ -2000,17 +1983,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "rogalik_storage"
-version = "0.1.0"
-dependencies = [
- "bincode",
- "rogalik_events",
- "serde",
-]
-
-[[package]]
 name = "rogalik_wgpu"
-version = "0.1.0"
+version = "0.3.0"
 dependencies = [
  "bytemuck",
  "image",

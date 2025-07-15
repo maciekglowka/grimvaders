@@ -25,24 +25,31 @@ impl Scene for GameScene {
         &mut self,
         game: &mut Self::Game,
         _context: &mut Context,
-    ) -> Option<SceneChange<Self::Game>> {
+        scenes: &mut SceneController<Self::Game>,
+    ) {
         match game.env.world.resources.game_mode {
-            GameMode::GameOver => {
-                return Some(SceneChange::Switch(Box::new(super::game_over::GameOver)))
-            }
-            GameMode::Win => return Some(SceneChange::Switch(Box::new(super::win::GameWin))),
-            _ => (),
+            GameMode::GameOver => scenes.switch(Box::new(super::game_over::GameOver)),
+            GameMode::Win => scenes.switch(Box::new(super::win::GameWin)),
+            _ => (), // _ => scenes.push(Box::new(super::battle::Battle::default())),
         }
-        Some(SceneChange::Push(
-            Box::new(super::battle::Battle::default()),
-        ))
     }
-    fn enter(&mut self, game: &mut Self::Game, context: &mut rogalik::engine::Context) {
+    fn enter(
+        &mut self,
+        game: &mut Self::Game,
+        context: &mut Context,
+        scenes: &mut SceneController<Self::Game>,
+    ) {
         game.env.world.resources.game_mode = GameMode::Init;
         let _ = context.graphics.set_postprocess_strength("noise", 0.);
         self.init_game(game, context);
+        scenes.push(Box::new(super::battle::Battle::default()));
     }
-    fn exit(&mut self, _game: &mut Self::Game, context: &mut rogalik::engine::Context) {
+    fn exit(
+        &mut self,
+        _game: &mut Self::Game,
+        context: &mut Context,
+        _scenes: &mut SceneController<Self::Game>,
+    ) {
         let _ = context.graphics.set_postprocess_strength("noise", 1.);
     }
 }

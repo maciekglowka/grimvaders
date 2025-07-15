@@ -35,7 +35,7 @@ impl Game for GameState {
             .graphics
             .set_clear_color(game_graphics::globals::BACKGROUND_COLOR);
     }
-    fn resize(&mut self, context: &mut rogalik::engine::Context) {
+    fn resize(&mut self, context: &mut Context) {
         let (w, h) = get_target_resolution(context);
         context.graphics.set_rendering_resolution(w, h);
         context
@@ -44,7 +44,7 @@ impl Game for GameState {
             .unwrap()
             .set_target(get_camera_center(w, h));
     }
-    fn reload_assets(&mut self, context: &mut rogalik::engine::Context) {
+    fn reload_assets(&mut self, context: &mut Context) {
         if !assets::load_data(
             &self.data_assets,
             &mut self.env.world.resources.data,
@@ -62,8 +62,7 @@ impl Game for GameState {
 #[cfg(target_arch = "wasm32")]
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
 pub fn wasm_main() {
-    console_log::init_with_level(rogalik::engine::log::Level::Info)
-        .expect("Can't init the logger!");
+    console_log::init_with_level(rogalik::log::Level::Info).expect("Can't init the logger!");
     let engine = EngineBuilder::new()
         .with_audio(AudioDeviceParams {
             buffer_secs: 0.05,

@@ -66,20 +66,6 @@ fn load_graphics(context: &mut Context) {
 
     // Other sprites
 
-    let sprites_texture = Some(context.graphics.load_texture("sprites/sprites.png"));
-    context.graphics.load_material(
-        "sprites",
-        MaterialParams {
-            atlas: Some(AtlasParams {
-                cols: 49,
-                rows: 22,
-                padding: Some((1., 1.)),
-            }),
-            diffuse_texture: sprites_texture,
-            ..Default::default()
-        },
-    );
-
     let bg_texture = Some(context.graphics.load_texture("sprites/background.png"));
     context.graphics.load_material(
         "background",

@@ -14,8 +14,8 @@
       }
       #rogalik-canvas {
         display: block;
-        width: 960px;
-        height: 540px;
+        width: 100%;
+        height: 100%;
         transform: scale(var(--scale-factor));
         transform-origin: center;
         image-rendering: crisp-edges;
@@ -23,20 +23,42 @@
     </style>
     <script type="module">
       import init from './game.js'
-      init()
 
       function updateScaleFactor() {
-        // let scaleFactor = Math.min(1.0, Math.floor(window.innerWidth / 960.0));
-        let scaleFactor = window.innerWidth / 960.0;
-        console.log(window.innerWidth, scaleFactor);
+        let targetW = window.innerWidth;
+        let targetH = window.innerHeight;
+        let ratio = targetW / targetH;
+        let dpi = window.devicePixelRatio;
+
+        let maxW = 1920.0 / dpi;
+
+        let canvasW = targetW;
+        let canvasH = targetH; 
+
+        if (canvasW > maxW) {
+          canvasW = maxW;
+          canvasH = canvasW / ratio;
+        }
+
+        const container = document.getElementById("container");
+        container.style.width = `${canvasW}px`;
+        container.style.height = `${canvasH}px`;
+
+        let scaleFactor = targetW / canvasW;
+        console.log("Target width:", window.innerWidth, "Scale factor:", scaleFactor, "dpi:", dpi);
+        console.log("Max width:", maxW, "Canvas width:", canvasW);
         document.documentElement.style.setProperty("--scale-factor", scaleFactor);
       }
 
       window.addEventListener("resize", updateScaleFactor);
       updateScaleFactor();
+
+      init()
     </script>
   </head>
   <body>
-    <canvas id="rogalik-canvas" width="100" height="100"></canvas>
+    <div id="container">
+      <canvas id="rogalik-canvas" width="100" height="100"></canvas>
+    </div>
   </body>
 </html>
